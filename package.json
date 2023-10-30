@@ -2,7 +2,6 @@
   "name": "tournamentmanagment",
   "version": "1.0.0",
   "description": "Torunament Managment",
-  "main": "dist/index.js",
   "scripts": {
     "prebuild": "rimraf dist",
     "test": "test",
