@@ -1,4 +1,6 @@
 import { Module } from "@nestjs/common";
 
-@Module({})
+const providers = [];
+
+@Module({providers, exports:[...providers]})
 export class DatabaseModule{}
