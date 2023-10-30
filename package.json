@@ -31,5 +31,26 @@
     "nest": "^0.1.6",
     "passport-headerapikey": "^1.2.2",
     "prisma": "^5.5.2"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "rootDir": "src/test",
+    "testRegex": ".*\\.spec\\.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "collectCoverageFrom": [
+      "**/*.(t|j)s"
+    ],
+    "coverageDirectory": "../coverage",
+    "testEnvironment": "node"
+  },
+  "prisma": {
+    "schema": "src/infrastructure/database/schema.prisma",
+    "seed": "ts-node src/infrastructure/database/seed.ts"
   }
 }
