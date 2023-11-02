@@ -1,4 +1,6 @@
 import { Module } from "@nestjs/common";
 
-@Module({})
-export class MatchModule{}
+const providers = [];
+
+@Module({ providers, exports: [...providers] })
+export class MatchModule {}
