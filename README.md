@@ -17,13 +17,20 @@
 ### 🏠 [Homepage](https://github.com/JacopoCrocetta/TournamentManagment#readme)
 
 ## Install
+First of all, run the command
 
 ```sh
 npm install
 ```
 
 ## Usage
+Once all the dependencies are installed, you will need to launch the project build with the command
 
+```sh
+npm run build
+```
+
+then run the command
 ```sh
 npm run start
 ```
