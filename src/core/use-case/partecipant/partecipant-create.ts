@@ -1,13 +1,17 @@
 import { Inject, Injectable } from "@nestjs/common";
+import { Participants } from "src/core/entity/abstract-participants";
 import { IParticipantsRepository } from "src/core/repository/participants.repository";
 
-interface CreateParticipantsInput {}
 
 @Injectable()
 export class PartecipantCreate {
-  constructor(@Inject() participantsRepository: IParticipantsRepository) {}
+  constructor(@Inject() private participantsRepository: IParticipantsRepository) {}
 
-  create = async (input: CreateParticipantsInput) => {
-    return null;
+  update = async (input:Participants):Promise<Participants> =>{
+    return await this.participantsRepository.update(input);
+  }
+
+  create = async (input: Participants):Promise<Participants> => {
+    return await this.participantsRepository.create(input);
   };
 }
