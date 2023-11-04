@@ -9,7 +9,7 @@ export class MatchPage {
     return this.matchRepository.getById(id);
   };
 
-  getAll = async (): Promise<Match[]> => {
-    return this.matchRepository.getAll();
+  getAll = async (id: number): Promise<Match[]> => {
+    return this.matchRepository.getAllByTournamentId(id);
   };
 }
