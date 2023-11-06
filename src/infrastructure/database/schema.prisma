@@ -6,3 +6,40 @@ datasource db {
 generator client {
   provider = "prisma-client-js"
 }
+
+model Users {
+  id           String        @id @unique @db.Uuid
+  username     String        @unique
+  password     String
+  email        String
+  name         String
+  surname      String
+  Participants Participants?
+  Teams        Teams?
+}
+
+model Tournaments {
+  id             String        @id @unique @db.Uuid
+  tournamentName String
+  description    String
+  beginDate      DateTime      @default(now()) @db.Timestamptz(6)
+  endDate        DateTime      @default(now()) @db.Timestamptz(6)
+  tournamentType String
+  Participants   Participants?
+}
+
+model Teams {
+  id        String @id @unique @db.Uuid
+  name      String @unique
+  tag       String
+  captainId String @unique @db.Uuid
+  Users     Users  @relation(fields: [captainId], references: [id], onDelete: NoAction)
+}
+
+model Participants {
+  id            String      @id @unique @db.Uuid
+  userId        String      @unique @db.Uuid
+  tournamentsId String      @unique @db.Uuid
+  Users         Users       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Tournaments   Tournaments @relation(fields: [tournamentsId], references: [id], onDelete: Cascade)
+}
