@@ -43,3 +43,11 @@ model Participants {
   Users         Users       @relation(fields: [userId], references: [id], onDelete: Cascade)
   Tournaments   Tournaments @relation(fields: [tournamentsId], references: [id], onDelete: Cascade)
 }
+
+model Standings {
+  id                String @id @unique @db.Uuid
+  tournamentId      String @unique @db.Uuid
+  teamsId           String @unique @db.Uuid
+  points            Int
+  positionInTheRank Int
+}
