@@ -51,7 +51,7 @@
     "testEnvironment": "node"
   },
   "prisma": {
-    "schema": "src/infrastructure/database/schema.prisma",
+    "schema": "prisma/schema.prisma",
     "seed": "ts-node src/infrastructure/database/seed.ts"
   },
   "compilerOptions": {
