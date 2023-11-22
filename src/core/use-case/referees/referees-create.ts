@@ -9,8 +9,4 @@ export class RefereesCreate {
   create = async (input: Referees): Promise<Referees> => {
     return this.refereesRepository.create(input);
   };
-
-  update = async (input: Referees): Promise<Referees> => {
-    return this.refereesRepository.update(input);
-  };
 }
