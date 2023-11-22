@@ -13,6 +13,6 @@ export class DeleteTournament{
         Logger.log("CHECK IF THE ITEM WAS DELETED CORRECTLY...");
         const res = this.repository.getById(id) === null;
 
-        return res ? true : false;
+        return !!res;
     }
 }
