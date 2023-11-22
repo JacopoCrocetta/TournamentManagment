@@ -1,16 +1,16 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
-import { Tournament } from "src/core/entity/abstract-tournament";
-import { ITournamentsRepository } from "src/core/repository/tournaments.repository";
+import { Referees } from "src/core/entity/abstract-referees";
+import { IRefereesRepository } from "src/core/repository/referees.repository";
 
 @Injectable()
-export class TournamentUpdate {
-  constructor(@Inject() private repository: ITournamentsRepository) {}
+export class RefereesUpdate {
+  constructor(@Inject() private repository: IRefereesRepository) {}
 
-  async updateTournament(inputToUpdate: Tournament): Promise<Tournament> {
-    Logger.log("UPDATING TOURNAMENT WITH NAME " + inputToUpdate.tournamentName + "...");
+  async updateTournament(inputToUpdate: Referees): Promise<Referees> {
+    Logger.log("UPDATING REFEREES " + inputToUpdate.nome + "...");
     const tournamentUpdated = this.repository.update(inputToUpdate);
 
-    Logger.log(inputToUpdate.tournamentName + " UPDATED");
+    Logger.log(inputToUpdate.nome + " UPDATED");
     return tournamentUpdated;
   }
 }

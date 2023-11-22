@@ -3,7 +3,7 @@ import { Tournament } from "src/core/entity/abstract-tournament";
 import { ITournamentsRepository } from "src/core/repository/tournaments.repository";
 
 @Injectable()
-export class TournamentUpdate {
+export class ParticipantUpdate {
   constructor(@Inject() private repository: ITournamentsRepository) {}
 
   async updateTournament(inputToUpdate: Tournament): Promise<Tournament> {

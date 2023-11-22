@@ -3,9 +3,7 @@ import { IParticipantsRepository } from "src/core/repository/participants.reposi
 
 @Injectable()
 export class PartecipantDelete {
-  constructor(
-    @Inject() private participantsRepository: IParticipantsRepository
-  ) {}
+  constructor(@Inject() private participantsRepository: IParticipantsRepository) {}
 
   delete = async (id: number): Promise<boolean> => {
     this.participantsRepository.delete(id);
