@@ -1,7 +1,8 @@
 import { Module } from "@nestjs/common";
 import { TournamentController } from "./tournament.controller";
+import { AppController } from "./healtz.controller";
 
-const controllers = [TournamentController];
+const controllers = [TournamentController, AppController];
 
 @Module({
   controllers,
