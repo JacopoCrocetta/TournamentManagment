@@ -8,8 +8,6 @@ export class TournamentPagePresenter{
 
 
     async getTournamentById(id: number): Promise<Tournament>{
-        const res = this.tournamentPage.getById(id);
-        
         return this.tournamentPage.getById(id);
     }
 

@@ -1,7 +1,7 @@
 import { Tournament } from "src/core/entity/abstract-tournament";
 
 export namespace TournamentPageMapper {
-  export const tournamentPageItemMapper = (input: Tournament) => ({
+  export const tournamentMapper = (input: Tournament) => ({
     id: input.id,
     tournamentName: input.tournamentName,
     descprition: input.descprition,
