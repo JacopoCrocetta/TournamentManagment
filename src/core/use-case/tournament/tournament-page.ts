@@ -8,11 +8,11 @@ export class TournamentPage {
 
   async getById(id: number): Promise<Tournament> {
     Logger.log("RETRIEVING TOURNAMENT WITH ID " + id + "...");
-    return await this.repository.getById(id);
+    return this.repository.getById(id);
   }
 
   async getAll(): Promise<Tournament[]> {
     Logger.log("RETRIEVING ALL TOURNAMENT...");
-    return await this.repository.getAll();
+    return this.repository.getAll();
   }
 }
