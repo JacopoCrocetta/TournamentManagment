@@ -4,7 +4,7 @@ import { Tournament } from "src/core/entity/abstract-tournament";
 
 @Injectable()
 export class TournamentPresenter {
-  private constructor(
+  constructor(
     @Inject() private tournamentPagePresenter: TournamentPagePresenter
   ) {}
 

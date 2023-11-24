@@ -11,8 +11,8 @@ export namespace TournamentPageMapper {
   });
 
   export interface TournamentPageItemMapper {
-    tournamentName: String;
-    descprition: String;
+    tournamentName: string;
+    descprition: string;
     beginDate: Date;
     endDate: Date;
     tournamentType: string;
