@@ -1,6 +1,11 @@
 import { Module } from "@nestjs/common";
-import { TournamentPresenter } from "./tournament/tournament.presenter";
+import { TournamentPagePresenter } from "./tournament/page/tournament-page.presenter";
+import { UseCasesModule } from "src/core/use-case/use-cases.module";
 
-const providers = [TournamentPresenter];
-@Module({providers, exports:[...providers]})
-export class PresenterModule{}
+const providers = [TournamentPagePresenter];
+@Module({
+  imports: [UseCasesModule],
+  providers,
+  exports: [...providers],
+})
+export class PresenterModule {}

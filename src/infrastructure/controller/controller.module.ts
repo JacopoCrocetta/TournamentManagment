@@ -6,6 +6,7 @@ const controllers = [TournamentController];
 
 @Module({
   controllers,
-  imports:[PresenterModule]
+  imports:[PresenterModule],
+  exports: controllers
 })
 export class ControllerModule {}
