@@ -4,7 +4,7 @@
   "description": "Torunament Managment",
   "scripts": {
     "prebuild": "rimraf dist",
-    "test": "test",
+    "test": "jest",
     "test:cov": "jest --coverage",
     "build": "nest build",
     "start": "nest start"
@@ -33,23 +33,6 @@
     "passport-headerapikey": "^1.2.2",
     "prisma": "^5.5.2"
   },
-  "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "json",
-      "ts"
-    ],
-    "rootDir": "src/test",
-    "testRegex": ".*\\.spec\\.ts$",
-    "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
-    },
-    "collectCoverageFrom": [
-      "**/*.(t|j)s"
-    ],
-    "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
-  },
   "prisma": {
     "schema": "prisma/schema.prisma",
     "seed": "ts-node src/infrastructure/database/seed.ts"
@@ -60,5 +43,11 @@
   },
   "include": [
     "src/"
-  ]
+  ],
+  "jest": {
+    "testPathIgnorePatterns": ["dist"]
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.11"
+  }
 }

@@ -1,17 +1,15 @@
-import { Injectable } from "@nestjs/common";
-import { TournamentPage } from "src/core/use-case/tournament/tournament-page";
 import { Tournament } from "src/core/entity/abstract-tournament";
+import { ITournamentsRepository } from "src/core/repository/tournaments.repository";
 
-@Injectable()
 export class TournamentPagePresenter{
-    constructor(private tournamentPage:TournamentPage){}
+    constructor(private repository: ITournamentsRepository){}
 
 
     async getTournamentById(id: number): Promise<Tournament>{
-        return this.tournamentPage.getById(id);
+        return this.repository.getById(id);
     }
 
     async getAllTournament():Promise<Tournament[]>{
-        return this.tournamentPage.getAll();
+        return this.repository.getAll();
     }
 }
