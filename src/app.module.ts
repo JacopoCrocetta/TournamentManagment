@@ -12,6 +12,6 @@ const controllers = [AppController, TournamentController];
 @Module({
     imports: [PresenterModule, UseCasesModule],
     controllers:[...controllers],
-    providers: []
+    providers: [...providers]
 })
 export class AppModule{}
