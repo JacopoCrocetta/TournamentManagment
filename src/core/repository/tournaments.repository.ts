@@ -7,5 +7,5 @@ export interface ITournamentsRepository {
   create(matchToCreate: Tournament): Promise<Tournament>;
   update(matchToUpdate: Tournament): Promise<Tournament>;
 
-  delete(id: number): void;
+  delete(id: number): boolean;
 }

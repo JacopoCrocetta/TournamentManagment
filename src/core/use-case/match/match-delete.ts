@@ -1,12 +1,17 @@
-import { Inject } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { IMatchRepository } from "src/core/repository/match.repository";
 
+@Injectable()
 export class MatchDelete {
-  constructor(@Inject() private matchRepository: IMatchRepository) {}
+  constructor(@Inject() private repository: IMatchRepository) {}
 
   delete = async (id: number): Promise<boolean> => {
-    this.matchRepository.delete(id);
+    Logger.log("DELETING ITEM WITH ID " + id + " ...");
+    this.repository.delete(id);
 
-    return this.matchRepository.getById(id) == null;
+    Logger.log("CHECK IF THE ITEM WAS DELETED CORRECTLY...");
+    const res = this.repository.getById(id) === null;
+
+    return !!res;
   };
 }
