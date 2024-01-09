@@ -7,5 +7,5 @@ export interface IRefereesRepository {
   create(matchToCreate: Referees): Promise<Referees>;
   update(matchToUpdate: Referees): Promise<Referees>;
 
-  delete(id: number): void;
+  delete(id: number): boolean;
 }

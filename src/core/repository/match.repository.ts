@@ -7,5 +7,5 @@ export interface IMatchRepository {
   create(matchToCreate: Match): Promise<Match>;
   update(matchToUpdate: Match): Promise<Match>;
 
-  delete(id: number): void;
+  delete(id: number): boolean;
 }

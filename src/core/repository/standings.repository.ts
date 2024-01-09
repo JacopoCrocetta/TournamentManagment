@@ -7,5 +7,5 @@ export interface IStandingRepository {
   create(matchToCreate: Standings): Promise<Standings>;
   update(matchToUpdate: Standings): Promise<Standings>;
 
-  delete(id: number):void;
+  delete(id: number):boolean;
 }

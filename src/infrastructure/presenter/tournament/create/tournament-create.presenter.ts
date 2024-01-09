@@ -5,7 +5,7 @@ import { ITournamentsRepository } from "src/core/repository/tournaments.reposito
 export class TournamentCreatePresenter {
     constructor(private repository: ITournamentsRepository){}
 
-    async deleteTournamentById(newTournament: Tournament){
+    async createTournamentById(newTournament: Tournament){
         return await this.repository.create(newTournament);
     }
 }
