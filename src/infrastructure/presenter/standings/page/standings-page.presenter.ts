@@ -1,18 +1,18 @@
 import { Logger } from "@nestjs/common";
-import { Referees } from "src/core/entity/abstract-referees";
-import { IRefereesRepository } from "src/core/repository/referees.repository";
+import { Standings } from "src/core/entity/abstract-standings";
+import { IStandingRepository } from "src/core/repository/standings.repository";
 
 export class StandingsPagePresenter{
-    constructor(private repository: IRefereesRepository){}
+    constructor(private repository: IStandingRepository){}
 
 
-    async getRefereesById(id: number): Promise<Referees>{
+    async getStandingsById(id: number): Promise<Standings>{
         Logger.log("RETREIVING REFEREES WITH ID " + id);
         return this.repository.getById(id);
     }
 
-    async getAllMatch():Promise<Referees[]>{
-        Logger.log("RETREIVING ALL MTCH FOR REFEREES WITH ID ");
-        return this.repository.getAll();
+    async getAllStandingsByTournamentId(tournamentId: number):Promise<Standings[]>{
+        Logger.log("RETREIVING ALL STANDING FOR TOURNAMENT WITH ID " + tournamentId);
+        return this.repository.getAllByIdTournament(tournamentId);
     }
 }

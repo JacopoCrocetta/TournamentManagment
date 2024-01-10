@@ -1,5 +1,5 @@
-export namespace RefereesPageMapper {
-  export interface MatchPageItemMapper {
+export namespace UserPageMapper {
+  export interface UserPageItemMapper {
     tournamentName: string;
     descprition: string;
     beginDate: Date;

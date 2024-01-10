@@ -1,12 +1,12 @@
 import { Logger } from "@nestjs/common";
-import { Referees } from "src/core/entity/abstract-referees";
-import { IRefereesRepository } from "src/core/repository/referees.repository";
+import { Standings } from "src/core/entity/abstract-standings";
+import { IStandingRepository } from "src/core/repository/standings.repository";
 
 export class StandingsCreatePresenter {
-    constructor(private repository: IRefereesRepository){}
+    constructor(private repository: IStandingRepository){}
 
-    async createMatchById(newRef: Referees): Promise<Referees>{
-        Logger.log("TRYING TO CREATE A NEW REFEREES ");
-        return this.repository.create(newRef);
+    async createStanding(newStanding: Standings): Promise<Standings>{
+        Logger.log("TRYING TO CREATE A NEW STANDING");
+        return this.repository.create(newStanding);
     }
 }

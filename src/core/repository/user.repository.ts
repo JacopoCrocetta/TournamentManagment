@@ -2,8 +2,8 @@ import { User } from "../entity/abstract-user";
 
 export interface IUserRepository {
   getUserByUsernameAndPassword(userName: String, password: String): User;
-  deleteUserByUserNameAndPassword(userName: String, password: String): boolean;
+  deleteUserByUserNameAndEmail(userName: String, email: String): boolean;
 
-  create(matchToCreate: User): Promise<User>;
-  update(matchToUpdate: User): Promise<User>;
+  create(userToCreate: User): Promise<User>;
+  update(userToUpdate: User): Promise<User>;
 }

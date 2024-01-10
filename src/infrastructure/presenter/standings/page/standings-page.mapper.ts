@@ -1,5 +1,5 @@
 export namespace StandingsPageMapper {
-  export interface MatchPageItemMapper {
+  export interface StandingsPageItemMapper {
     tournamentName: string;
     descprition: string;
     beginDate: Date;

@@ -1,16 +1,18 @@
 import { Logger } from "@nestjs/common";
 import { Referees } from "src/core/entity/abstract-referees";
+import { Standings } from "src/core/entity/abstract-standings";
 import { IRefereesRepository } from "src/core/repository/referees.repository";
+import { IStandingRepository } from "src/core/repository/standings.repository";
 
 export class StandingsUpdatePresenter {
-    constructor(private repository: IRefereesRepository){}
+    constructor(private repository: IStandingRepository){}
 
-    async updateMatchById(refereesToUpdate: Referees):Promise<Referees>{
-        Logger.log("TRYING TO UPDATE THE REFEREES WITH ID " + refereesToUpdate.id);
+    async updateStanding(standingToUpdate: Standings):Promise<Standings>{
+        Logger.log("TRYING TO UPDATE THE STANDING WITH ID " + standingToUpdate.id);
 
-        const refereesUpdated = await this.repository.update(refereesToUpdate);
+        const standingUpdated = await this.repository.update(standingToUpdate);
 
-        Logger.log("REFEREES WITH ID " + refereesUpdated.id+ " IS UPDATED");
-        return refereesUpdated;
+        Logger.log("STANDING WITH ID " + standingUpdated.id+ " IS UPDATED");
+        return standingUpdated;
     }
 }

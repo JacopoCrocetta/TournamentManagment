@@ -1,7 +1,7 @@
 import { Standings } from "../entity/abstract-standings";
 
 export interface IStandingRepository {
-  getAllByIdTournament(idTournament: number): Standings;
+  getAllByIdTournament(idTournament: number): Standings[];
   getById(id: number):Standings;
 
   create(matchToCreate: Standings): Promise<Standings>;

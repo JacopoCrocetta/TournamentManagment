@@ -1,16 +1,16 @@
 import { Logger } from "@nestjs/common";
-import { Referees } from "src/core/entity/abstract-referees";
-import { IRefereesRepository } from "src/core/repository/referees.repository";
+import { User } from "src/core/entity/abstract-user";
+import { IUserRepository } from "src/core/repository/user.repository";
 
-export class RefereesUpdatePresenter {
-    constructor(private repository: IRefereesRepository){}
+export class UserUpdatePresenter {
+    constructor(private repository: IUserRepository){}
 
-    async updateMatchById(refereesToUpdate: Referees):Promise<Referees>{
+    async updateMatchById(refereesToUpdate: User):Promise<User>{
         Logger.log("TRYING TO UPDATE THE REFEREES WITH ID " + refereesToUpdate.id);
 
-        const refereesUpdated = await this.repository.update(refereesToUpdate);
+        const userUpdated = await this.repository.update(refereesToUpdate);
 
-        Logger.log("REFEREES WITH ID " + refereesUpdated.id+ " IS UPDATED");
-        return refereesUpdated;
+        Logger.log("REFEREES WITH ID " + userUpdated.id+ " IS UPDATED");
+        return userUpdated;
     }
 }

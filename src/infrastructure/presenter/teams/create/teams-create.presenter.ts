@@ -1,12 +1,22 @@
 import { Logger } from "@nestjs/common";
-import { Referees } from "src/core/entity/abstract-referees";
-import { IRefereesRepository } from "src/core/repository/referees.repository";
+import { ExceptionsHandler } from "@nestjs/core/exceptions/exceptions-handler";
+import { Teams } from "src/core/entity/abstract-teams";
+import { ITeamsRepository } from "src/core/repository/teams.repository";
 
-export class RefereesCreatePresenter {
-    constructor(private repository: IRefereesRepository){}
+export class TeamsCreatePresenter {
+    constructor(private repository: ITeamsRepository){}
 
-    async createMatchById(newRef: Referees): Promise<Referees>{
-        Logger.log("TRYING TO CREATE A NEW REFEREES ");
-        return this.repository.create(newRef);
+    async createMatchById(newTeams: Teams): Promise<Teams>{
+        Logger.log("TRYING TO CREATE A NEW TEAMS...");
+
+        const createdTeams = await this.repository.create(newTeams);
+
+        if(!!createdTeams){
+            Logger.log("TEAMS WITH ID "+  createdTeams.id+ " CREATED SUCCESSFULLY");
+            return createdTeams;
+        }
+        
+        Logger.log("TEAMS NOT CREATED SUCCESSFULLY");
+        throw new ExceptionsHandler();
     }
 }

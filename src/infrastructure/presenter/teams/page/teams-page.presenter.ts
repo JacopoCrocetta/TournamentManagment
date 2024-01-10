@@ -1,18 +1,18 @@
 import { Logger } from "@nestjs/common";
-import { Referees } from "src/core/entity/abstract-referees";
-import { IRefereesRepository } from "src/core/repository/referees.repository";
+import { Teams } from "src/core/entity/abstract-teams";
+import { ITeamsRepository } from "src/core/repository/teams.repository";
 
 export class TeamsPagePresenter{
-    constructor(private repository: IRefereesRepository){}
+    constructor(private repository: ITeamsRepository){}
 
 
-    async getRefereesById(id: number): Promise<Referees>{
-        Logger.log("RETREIVING REFEREES WITH ID " + id);
+    async getTeamsById(id: number): Promise<Teams>{
+        Logger.log("RETREIVING TEAMS WITH ID " + id);
         return this.repository.getById(id);
     }
 
-    async getAllMatch():Promise<Referees[]>{
-        Logger.log("RETREIVING ALL MTCH FOR REFEREES WITH ID ");
+    async getAllTeams():Promise<Teams[]>{
+        Logger.log("RETREIVING ALL TEAMS FOR REFEREES WITH ID ");
         return this.repository.getAll();
     }
 }

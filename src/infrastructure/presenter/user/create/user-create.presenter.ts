@@ -1,12 +1,17 @@
 import { Logger } from "@nestjs/common";
-import { Referees } from "src/core/entity/abstract-referees";
-import { IRefereesRepository } from "src/core/repository/referees.repository";
+import { User } from "src/core/entity/abstract-user";
+import { IUserRepository } from "src/core/repository/user.repository";
+import { Md5 } from "ts-md5";
 
-export class RefereesCreatePresenter {
-    constructor(private repository: IRefereesRepository){}
+export class UserCreatePresenter {
+  constructor(private repository: IUserRepository) {}
 
-    async createMatchById(newRef: Referees): Promise<Referees>{
-        Logger.log("TRYING TO CREATE A NEW REFEREES ");
-        return this.repository.create(newRef);
-    }
+  async createMatchById(newUser: User): Promise<User> {
+    Logger.log("[LOG] TRYING TO CREATE A NEW USER...");
+    Logger.log("[LOG] ENCRYPTING STUFF...");
+    Md5.hashAsciiStr(newUser.password.toString(), true);
+
+    Logger.log("[LOG] CREATING AND SAVING THE USER...");
+    return this.repository.create(newUser);
+  }
 }

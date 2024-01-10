@@ -1,11 +1,11 @@
 import { Logger } from "@nestjs/common";
-import { IRefereesRepository } from "src/core/repository/referees.repository";
+import { ITeamsRepository } from "src/core/repository/teams.repository";
 
 export class TeamsDeletePresenter {
-    constructor(private repository: IRefereesRepository){}
+    constructor(private repository: ITeamsRepository){}
 
-    async deleteTournamentById(id: number): Promise<boolean>{
-        Logger.log("TRYING TO DELETE THE REFEREES WITH ID " + id);
+    async deleteTeamsById(id: number): Promise<boolean>{
+        Logger.log("TRYING TO DELETE THE MATCH WITH ID " + id);
         return await this.repository.delete(id);
     }
 }
