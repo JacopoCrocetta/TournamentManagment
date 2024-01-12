@@ -1,6 +1,4 @@
-import { Injectable } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
-import { ITournamentsRepository } from "src/core/repository/tournaments.repository";
 import { PrismaService } from "src/infrastructure/database/prisma.service";
 
 type tournamentCreateInput = Prisma.TournamentsCreateInput;
