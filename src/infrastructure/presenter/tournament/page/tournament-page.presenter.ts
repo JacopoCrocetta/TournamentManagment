@@ -5,11 +5,12 @@ export class TournamentPagePresenter{
     constructor(private repository: TournamentsInfrastructureRepository){}
 
     async getTournamentById(id: string){
-        Logger.log("RETREIVING TOURNAMENT WITH ID " + id);
+        Logger.log("[Application] RETREIVING TOURNAMENT WITH ID " + id);
        await this.repository.getById({id}) 
     }
 
     async getAllTournament() {
+        Logger.log("[Application] RETREIVING ALL TOURNAMENT");
         return this.repository.getAll();
     }
 }

@@ -5,9 +5,10 @@ import { TournamentController } from "./infrastructure/controller/tournament.con
 import { PresenterModule } from "./infrastructure/presenter/presenter.module";
 import { UseCasesModule } from "./core/use-case/use-cases.module";
 import { RepositoryCoreModule } from "./core/repository/repository-core.repository";
+import { RepositoryInfrastructureModule } from "./infrastructure/repository/repository-infrastructure.module";
 
 
-const providers = [PrismaService, PresenterModule, UseCasesModule, RepositoryCoreModule];
+const providers = [PrismaService, PresenterModule, UseCasesModule, RepositoryCoreModule, RepositoryInfrastructureModule];
 const controllers = [AppController, TournamentController];
 
 @Module({
