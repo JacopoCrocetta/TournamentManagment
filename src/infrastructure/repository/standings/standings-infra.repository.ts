@@ -1,21 +1,21 @@
 import { Prisma } from "@prisma/client";
 import { PrismaService } from "src/infrastructure/database/prisma.service";
 
-type matchCreateInput = Prisma.ParticipantsCreateInput;
-type WhereUniqueInput = Prisma.ParticipantsWhereUniqueInput;
+type standingsCreateInput = Prisma.StandingsCreateInput;
+type WhereUniqueInput = Prisma.StandingsWhereUniqueInput;
 
 export interface UpdateParams {
-  where: Prisma.ParticipantsWhereUniqueInput;
-  data: Prisma.ParticipantsUpdateInput;
+  where: Prisma.StandingsWhereUniqueInput;
+  data: Prisma.StandingsUpdateInput;
 }
 
 export interface GetManyParams {
   skip: number;
   take: number;
-  cursor: Prisma.ParticipantsWhereUniqueInput;
-  where: Prisma.ParticipantsWhereInput;
-  orderBy: Array<Prisma.ParticipantsOrderByWithRelationInput>;
-  include: Prisma.ParticipantsInclude;
+  cursor: Prisma.StandingsWhereUniqueInput;
+  where: Prisma.StandingsWhereInput;
+  orderBy: Array<Prisma.StandingsOrderByWithRelationInput>;
+  include: Prisma.StandingsInclude;
 }
 
 export abstract class StandingsInfrastructureRepository  {

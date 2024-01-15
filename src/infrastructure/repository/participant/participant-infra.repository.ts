@@ -1,7 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { PrismaService } from "src/infrastructure/database/prisma.service";
 
-type matchCreateInput = Prisma.ParticipantsCreateInput;
+type participantsCreateInput = Prisma.ParticipantsCreateInput;
 type WhereUniqueInput = Prisma.ParticipantsWhereUniqueInput;
 
 export interface UpdateParams {

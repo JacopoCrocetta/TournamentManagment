@@ -1,21 +1,21 @@
 import { Prisma } from "@prisma/client";
 import { PrismaService } from "src/infrastructure/database/prisma.service";
 
-type matchCreateInput = Prisma.ParticipantsCreateInput;
-type WhereUniqueInput = Prisma.ParticipantsWhereUniqueInput;
+type refereesCreateInput = Prisma.RefereesCreateInput;
+type WhereUniqueInput = Prisma.RefereesWhereUniqueInput;
 
 export interface UpdateParams {
-  where: Prisma.ParticipantsWhereUniqueInput;
-  data: Prisma.ParticipantsUpdateInput;
+  where: Prisma.RefereesWhereUniqueInput;
+  data: Prisma.RefereesUpdateInput;
 }
 
 export interface GetManyParams {
   skip: number;
   take: number;
-  cursor: Prisma.ParticipantsWhereUniqueInput;
-  where: Prisma.ParticipantsWhereInput;
-  orderBy: Array<Prisma.ParticipantsOrderByWithRelationInput>;
-  include: Prisma.ParticipantsInclude;
+  cursor: Prisma.RefereesWhereUniqueInput;
+  where: Prisma.RefereesWhereInput;
+  orderBy: Array<Prisma.RefereesOrderByWithRelationInput>;
+  include: Prisma.RefereesInclude;
 }
 
 export abstract class RefereesnfrastructureRepository  {
