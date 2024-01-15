@@ -6,7 +6,7 @@ export class TournamentController {
   constructor(private tournamentPresenter: TournamentPagePresenter) {}
 
   @Get("/tournamentById")
-  async getTournamentById(@Query('id') id: number) {
+  async getTournamentById(@Query('id') id: string) {
     return this.tournamentPresenter.getTournamentById(id);
   }
 
@@ -16,7 +16,7 @@ export class TournamentController {
   }
 
   @Delete("/tournamentById")
-  async deleteTournament(@Query('id') id: number) {
+  async deleteTournament(@Query('id') id: string) {
     return this.deleteTournament(id);
   }
 }

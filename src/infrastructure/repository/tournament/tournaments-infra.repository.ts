@@ -20,8 +20,7 @@ export interface GetManyParams {
 
 export abstract class TournamentsInfrastructureRepository  {
   constructor(protected prismaService:PrismaService){}
-
-
+  
   protected create = async (data:tournamentCreateInput) => {
     return this.prismaService.tournaments.create({data});
   }
@@ -31,8 +30,12 @@ export abstract class TournamentsInfrastructureRepository  {
     return this.prismaService.tournaments.update({data, where})
   }
 
-  protected getById = async (where: WhereUniqueInput) => {
+  getById = async (where: WhereUniqueInput) => {
     return this.prismaService.tournaments.findUnique({where})
+  }
+
+  getAll = async () => {
+    return this.prismaService.tournaments.findMany();
   }
 
   protected _delete = async (where: WhereUniqueInput) => this.prismaService.tournaments.delete({ where });
