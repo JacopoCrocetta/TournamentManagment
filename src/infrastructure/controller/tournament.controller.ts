@@ -12,7 +12,11 @@ export class TournamentController {
 
   @Get("/allTournament")
   async getAllTournament() {
-    return this.tournamentPresenter.getAllTournament()
+    return {
+      "status": "ok",
+      "message": "Il servizio è attivo e funzionante correttamente.",
+      "timestamp": event.toString()
+    };
   }
 
   @Delete("/tournamentById")

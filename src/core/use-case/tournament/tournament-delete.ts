@@ -6,7 +6,7 @@ export class DeleteTournament{
     constructor(@Inject() private repository: ITournamentsRepository) {}
 
 
-    async deleteById(id: number):Promise<boolean>{
+    async deleteById(id: string):Promise<boolean>{
         Logger.log("DELETING ITEM WITH ID "+ id+" ...");
         this.repository.delete(id);
 

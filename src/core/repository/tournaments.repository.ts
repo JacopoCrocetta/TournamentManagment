@@ -1,11 +1,11 @@
 import { Tournament } from "../entity/abstract-tournament";
 
 export interface ITournamentsRepository {
-  getById(id: number): Tournament;
-  getAll(): Tournament[];
+  getById(id: string);
+  getAll();
 
-  create(matchToCreate: Tournament): Promise<Tournament>;
-  update(matchToUpdate: Tournament): Promise<Tournament>;
+  create(matchToCreate: Tournament);
+  update(matchToUpdate: Tournament);
 
-  delete(id: number): boolean;
+  delete(id: string);
 }

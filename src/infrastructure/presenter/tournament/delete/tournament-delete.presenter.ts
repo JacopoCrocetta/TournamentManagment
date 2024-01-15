@@ -4,7 +4,7 @@ import { ITournamentsRepository } from "src/core/repository/tournaments.reposito
 export class TournamentDeletePresenter {
     constructor(private repository: ITournamentsRepository){}
 
-    async deleteTournamentById(id: number): Promise<boolean>{
+    async deleteTournamentById(id: string): Promise<boolean>{
         Logger.log("[Application] TRYING TO DELETE THE TOURNAMENT WITH ID " + id);
         return await this.repository.delete(id);
     }

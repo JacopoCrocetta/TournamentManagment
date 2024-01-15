@@ -6,11 +6,11 @@ export class TournamentPagePresenter{
 
     async getTournamentById(id: string){
         Logger.log("[Application] RETREIVING TOURNAMENT WITH ID " + id);
-       await this.repository.getById({id}) 
+       await this.repository.getById(id) 
     }
 
-    async getAllTournament() {
-        Logger.log("[Application] RETREIVING ALL TOURNAMENT");
-        return this.repository.getAll();
-    }
+    // async getAllTournament() {
+    //     Logger.log("[Application] RETREIVING ALL TOURNAMENT");
+    //     return this.repository.getAll();
+    // }
 }

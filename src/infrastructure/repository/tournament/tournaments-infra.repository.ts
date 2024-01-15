@@ -1,5 +1,8 @@
 import { Prisma } from "@prisma/client";
 import { PrismaService } from "src/infrastructure/database/prisma.service";
+import { TournamentsBaseRepository } from "./tournaments-base.repository";
+import { ITournamentsRepository } from "src/core/repository/tournaments.repository";
+import { Tournament } from "src/core/entity/abstract-tournament";
 
 type tournamentCreateInput = Prisma.TournamentsCreateInput;
 type WhereUniqueInput = Prisma.TournamentsWhereUniqueInput;
@@ -18,30 +21,27 @@ export interface GetManyParams {
   include: Prisma.TournamentsInclude
 }
 
-export abstract class TournamentsInfrastructureRepository  {
-  constructor(protected prismaService:PrismaService){}
-  
-  protected create = async (data:tournamentCreateInput) => {
-    return this.prismaService.tournaments.create({data});
+export abstract class TournamentsInfrastructureRepository extends TournamentsBaseRepository implements ITournamentsRepository {
+  constructor(protected prismaService:PrismaService){
+    super(prismaService)
   }
 
-  protected update = async (params:UpdateParams) => {
-    const {where, data} = params;
-    return this.prismaService.tournaments.update({data, where})
+  getById(id: string) {
+    return this._getById({id});
+  }
+  getAll(){
+    return;
   }
 
-  getById = async (where: WhereUniqueInput) => {
-    return this.prismaService.tournaments.findUnique({where})
+  create(matchToCreate: Tournament){
+    return;
   }
 
-  getAll = async () => {
-    return this.prismaService.tournaments.findMany();
+  update(matchToUpdate: Tournament){
+    return;
   }
 
-  protected _delete = async (where: WhereUniqueInput) => this.prismaService.tournaments.delete({ where });
-
-  protected getMany = async (params:GetManyParams) => {
-    const { skip, take, cursor, where, orderBy, include } = params;
-    return this.prismaService.tournaments.findMany({skip, take, cursor, where, orderBy, include})
+  delete(id: string) {
+    return;
   }
 }
