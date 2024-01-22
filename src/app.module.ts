@@ -8,7 +8,7 @@ import { RepositoryCoreModule } from "./core/repository/repository-core.reposito
 import { RepositoryInfrastructureModule } from "./infrastructure/repository/repository-infrastructure.module";
 
 
-const providers = [PrismaService, PresenterModule, UseCasesModule, RepositoryCoreModule, RepositoryInfrastructureModule];
+const providers = [ PresenterModule, UseCasesModule, RepositoryCoreModule, RepositoryInfrastructureModule];
 const controllers = [AppController, TournamentController];
 
 @Module({

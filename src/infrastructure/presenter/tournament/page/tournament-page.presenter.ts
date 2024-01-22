@@ -9,8 +9,8 @@ export class TournamentPagePresenter{
        await this.repository.getById(id) 
     }
 
-    // async getAllTournament() {
-    //     Logger.log("[Application] RETREIVING ALL TOURNAMENT");
-    //     return this.repository.getAll();
-    // }
+    async getAllTournament() {
+        Logger.log("[Application] RETREIVING ALL TOURNAMENT");
+        return this.repository.getAll();
+    }
 }

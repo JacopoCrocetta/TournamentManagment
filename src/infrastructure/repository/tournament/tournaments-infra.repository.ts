@@ -21,7 +21,7 @@ export interface GetManyParams {
   include: Prisma.TournamentsInclude
 }
 
-export abstract class TournamentsInfrastructureRepository extends TournamentsBaseRepository implements ITournamentsRepository {
+export class TournamentsInfrastructureRepository extends TournamentsBaseRepository implements ITournamentsRepository {
   constructor(protected prismaService:PrismaService){
     super(prismaService)
   }
@@ -30,7 +30,7 @@ export abstract class TournamentsInfrastructureRepository extends TournamentsBas
     return this._getById({id});
   }
   getAll(){
-    return;
+    return this._getAll();
   }
 
   create(matchToCreate: Tournament){
