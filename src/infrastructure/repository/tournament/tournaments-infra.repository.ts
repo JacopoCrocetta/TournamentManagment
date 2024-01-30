@@ -22,25 +22,60 @@ export interface GetManyParams {
 }
 
 export class TournamentsInfrastructureRepository extends TournamentsBaseRepository implements ITournamentsRepository {
+  /**
+   * Constructor for creating a new instance of the class.
+   *
+   * @param {PrismaService} prismaService - the Prisma service to be used
+   * @return {void} 
+   */
   constructor(protected prismaService:PrismaService){
     super(prismaService)
   }
 
+  /**
+   * Retrieves an item by its ID.
+   *
+   * @param {string} id - the ID of the item to retrieve
+   * @return {ReturnType} the retrieved item
+   */
   getById(id: string) {
     return this._getById({id});
   }
+  /**
+   * Retrieves all items.
+   *
+   * @return {type} description of return value
+   */
   getAll(){
     return this._getAll();
   }
 
+  /**
+   * Create a match to be added to the tournament.
+   *
+   * @param {Tournament} matchToCreate - the match to be created
+   * @return {void} 
+   */
   create(matchToCreate: Tournament){
     return;
   }
 
+  /**
+   * Update the match to be the provided tournament.
+   *
+   * @param {Tournament} matchToUpdate - the tournament to be set as the match
+   * @return {void} 
+   */
   update(matchToUpdate: Tournament){
     return;
   }
 
+  /**
+   * Deletes an item by its ID.
+   *
+   * @param {string} id - the ID of the item to delete
+   * @return {void} 
+   */
   delete(id: string) {
     return;
   }
