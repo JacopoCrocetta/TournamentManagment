@@ -8,5 +8,5 @@ export interface IParticipantsRepository {
   create(matchToCreate: Participants): Promise<Participants>;
   update(matchToUpdate: Participants): Promise<Participants>;
 
-  delete(id: number): void;
+  delete(id: number): boolean;
 }

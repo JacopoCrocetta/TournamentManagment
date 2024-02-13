@@ -7,5 +7,5 @@ export interface ITeamsRepository {
   create(matchToCreate: Teams): Promise<Teams>;
   update(matchToUpdate: Teams): Promise<Teams>;
 
-  delete(id: number): void;
+  delete(id: number): boolean;
 }

@@ -1,10 +1,12 @@
 import { Module } from "@nestjs/common";
-import { AppController } from "./healtz.controller";
 import { TournamentController } from "./tournament.controller";
+import { PresenterModule } from "../presenter/presenter.module";
 
-const controllers = [AppController, TournamentController];
+const controllers = [TournamentController];
 
 @Module({
   controllers,
+  imports:[PresenterModule],
+  exports: controllers
 })
 export class ControllerModule {}
