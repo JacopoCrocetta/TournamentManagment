@@ -1,5 +1,7 @@
 import { Match } from "../entity/abstract-match";
 
+export const MATCH_REPOSITORY = "MatchInfrastructureRepository";
+
 export interface IMatchRepository {
   getById(id: number): Match;
   getAllByTournamentId(tournamentId: number): Match[];
