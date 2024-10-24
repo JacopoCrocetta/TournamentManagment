@@ -1,0 +1,15 @@
+/Users/jacopo/Desktop/Progetti/TournamentManagment/src/main/java/com/tournamentmanagmentsystem/TournamentManagmentSystemApplication.java
+/Users/jacopo/Desktop/Progetti/TournamentManagment/src/main/java/com/tournamentmanagmentsystem/entity/MatchEntity.java
+/Users/jacopo/Desktop/Progetti/TournamentManagment/src/main/java/com/tournamentmanagmentsystem/entity/ParticipantEntity.java
+/Users/jacopo/Desktop/Progetti/TournamentManagment/src/main/java/com/tournamentmanagmentsystem/entity/RefereesEntity.java
+/Users/jacopo/Desktop/Progetti/TournamentManagment/src/main/java/com/tournamentmanagmentsystem/entity/StandingsEntity.java
+/Users/jacopo/Desktop/Progetti/TournamentManagment/src/main/java/com/tournamentmanagmentsystem/entity/TeamsEntity.java
+/Users/jacopo/Desktop/Progetti/TournamentManagment/src/main/java/com/tournamentmanagmentsystem/entity/TournamentEntity.java
+/Users/jacopo/Desktop/Progetti/TournamentManagment/src/main/java/com/tournamentmanagmentsystem/entity/UserEntity.java
+/Users/jacopo/Desktop/Progetti/TournamentManagment/src/main/java/com/tournamentmanagmentsystem/repository/MatchRepository.java
+/Users/jacopo/Desktop/Progetti/TournamentManagment/src/main/java/com/tournamentmanagmentsystem/repository/ParticipantRepository.java
+/Users/jacopo/Desktop/Progetti/TournamentManagment/src/main/java/com/tournamentmanagmentsystem/repository/RefereesReporitory.java
+/Users/jacopo/Desktop/Progetti/TournamentManagment/src/main/java/com/tournamentmanagmentsystem/repository/StandingsRepository.java
+/Users/jacopo/Desktop/Progetti/TournamentManagment/src/main/java/com/tournamentmanagmentsystem/repository/TeamsRepository.java
+/Users/jacopo/Desktop/Progetti/TournamentManagment/src/main/java/com/tournamentmanagmentsystem/repository/TournamentRepository.java
+/Users/jacopo/Desktop/Progetti/TournamentManagment/src/main/java/com/tournamentmanagmentsystem/repository/UserRepository.java

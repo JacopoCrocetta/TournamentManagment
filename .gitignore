@@ -8,7 +8,9 @@
 *.log
 *.log.*
 *.sig
+.env
 
 node_modules/
 .vscode/
 dist/
+target/
