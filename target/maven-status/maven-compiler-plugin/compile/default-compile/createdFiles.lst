@@ -1,0 +1,6 @@
+com/tournamentmanagmentsystem/TournamentManagmentSystemApplication.class
+com/tournamentmanagmentsystem/entity/TeamsEntity.class
+com/tournamentmanagmentsystem/repository/UserRepository.class
+com/tournamentmanagmentsystem/entity/ParticipantEntity.class
+com/tournamentmanagmentsystem/entity/UserEntity.class
+com/tournamentmanagmentsystem/entity/TournamentEntity.class

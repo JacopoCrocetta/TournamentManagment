@@ -26,6 +26,8 @@ public class TournamentEntity {
     private String description;
     private LocalDateTime beginDate;
     private LocalDateTime endDate;
-    // tournamentType ;
-    // Participants ;
+
+    private ParticipantEntity participant;
+
+    private String tournamentType;
 }

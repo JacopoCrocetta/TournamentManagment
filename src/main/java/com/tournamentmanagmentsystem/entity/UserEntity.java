@@ -26,6 +26,6 @@ public class UserEntity {
     private String name;
     private String surname;
 
-    //TODO
-    // add Participant and Teams correlation
+    private TeamsEntity teams;
+    private ParticipantEntity participants;
 }
