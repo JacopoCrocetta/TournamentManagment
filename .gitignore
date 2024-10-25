@@ -13,4 +13,8 @@
 node_modules/
 .vscode/
 dist/
+
+.classpath
+.project
+.settings/
 target/
