@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MatchService {
 
-    private final MatchRepository matchRepository;
+    private MatchRepository matchRepository;
 
     /**
      * Save a given MatchEntity. Use the returned instance for further operations as

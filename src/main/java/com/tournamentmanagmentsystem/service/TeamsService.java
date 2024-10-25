@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TeamsService {
 
-    private final TeamsRepository teamsRepository;
+    private TeamsRepository teamsRepository;
 
     /**
      * Save a given TeamsEntity. Use the returned instance for further operations

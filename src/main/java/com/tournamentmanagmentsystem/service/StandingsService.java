@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class StandingsService {
 
-    private final StandingsRepository standingsRepository;
+    private StandingsRepository standingsRepository;
 
     /**
      * Save a given StandingsEntity. Use the returned instance for further operations

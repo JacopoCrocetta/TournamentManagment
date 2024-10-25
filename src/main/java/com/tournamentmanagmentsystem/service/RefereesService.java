@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RefereesService {
 
-    private final RefereesRepository refereesRepository;
+    private RefereesRepository refereesRepository;
 
     /**
      * Save a given RefereesEntity. Use the returned instance for further operations

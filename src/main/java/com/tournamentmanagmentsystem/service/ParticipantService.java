@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ParticipantService {
 
-    private final ParticipantRepository participantRepository;
+    private ParticipantRepository participantRepository;
 
     /**
      * Save a given ParticipantEntity. Use the returned instance for further operations

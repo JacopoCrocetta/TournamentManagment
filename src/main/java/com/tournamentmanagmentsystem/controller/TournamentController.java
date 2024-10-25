@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TournamentController {
 
-    private final TournamentService tournamentService;
+    private TournamentService tournamentService;
 
 
     /**

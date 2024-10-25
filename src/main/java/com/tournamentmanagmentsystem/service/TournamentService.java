@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TournamentService {
 
-    private final TournamentRepository tournamentRepository;
+    private TournamentRepository tournamentRepository;
 
     /**
      * Save a given TournamentEntity. Use the returned instance for further operations
