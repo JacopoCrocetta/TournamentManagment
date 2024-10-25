@@ -1,6 +1,7 @@
 package com.tournamentmanagmentsystem.service;
 
 
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -25,6 +26,19 @@ public class TournamentService {
      * @return the saved entity will never be {@literal null}.
      */
     public TournamentEntity save(TournamentEntity entity) {
+        return this.tournamentRepository.save(entity);
+    }
+
+    /**
+     * Updates a given TournamentEntity. If the given entity does not have an ID, a empty TournamentEntity is returned.
+     * 
+     * @param entity must not be {@literal null}.
+     * @return the updated entity will never be {@literal null}.
+     */
+    public TournamentEntity update(TournamentEntity entity) {
+        if(Objects.isNull(entity.getId())){
+            return new TournamentEntity();
+        }
         return this.tournamentRepository.save(entity);
     }
 

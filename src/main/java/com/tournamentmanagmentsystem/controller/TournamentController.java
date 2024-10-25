@@ -3,7 +3,10 @@ package com.tournamentmanagmentsystem.controller;
 import java.util.Optional;
 
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,8 +29,30 @@ public class TournamentController {
      * @param id the ID of the tournament
      * @return the tournament with the given ID if it exists, otherwise an empty Optional
      */
-    @RequestMapping(value = "/find-tournament-by-id", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/find-tournament-by-id", produces = MediaType.APPLICATION_JSON_VALUE)
     public Optional<TournamentEntity> findById(@PathVariable int id) {
         return tournamentService.findById(id);
+    }
+
+    /**
+     * Updates a given TournamentEntity. If the given entity does not have an ID, a empty TournamentEntity is returned.
+     * 
+     * @param entity must not be {@literal null}.
+     * @return the updated entity will never be {@literal null}.
+     */
+    @PutMapping(value = "/update-tournament", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Optional<TournamentEntity> updateTournament(@RequestBody TournamentEntity entity) {
+        return Optional.of(tournamentService.update(entity));
+    }
+
+    /**
+     * Creates a new TournamentEntity.
+     * 
+     * @param entity must not be {@literal null}.
+     * @return the saved entity wrapped in an Optional, will never be {@literal null}.
+     */
+    @PutMapping(value = "/create-tournament", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Optional<TournamentEntity> createTournament(@RequestBody TournamentEntity entity) {
+        return Optional.of(tournamentService.save(entity));
     }
 }
