@@ -63,16 +63,28 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-    <groupId>io.springfox</groupId>
-		<artifactId>springfox-boot-starter</artifactId>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-boot-starter</artifactId>
 		<version>3.0.0</version>
 	</dependency>
 	
 	<!-- Data accessing -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
+	<dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-data-jpa</artifactId>
+	</dependency>
+
+	<!-- LOGGING -->
+	<dependency>
+		<groupId>org.apache.logging.log4j</groupId>
+		<artifactId>log4j-api</artifactId>
+		<version>2.13.0</version>
+	</dependency>
+	<dependency>
+		<groupId>org.apache.logging.log4j</groupId>
+		<artifactId>log4j-core</artifactId>
+		<version>2.13.0</version>
+	</dependency>
 
 	<!-- Entity to DTO mapper -->
 	<dependency>

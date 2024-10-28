@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.tournamentmanagmentsystem.entity.TeamsEntity;
 import com.tournamentmanagmentsystem.service.TeamsService;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.ApiResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -31,16 +34,25 @@ public class TeamsController {
      * @param id the ID of the Teams
      * @return the Teams with the given ID if it exists, otherwise an empty Optional
      */
+    @ApiOperation(value = "Retrieve a Teams by its ID", notes = "Retrieves the TeamsEntity with the given ID if it exists, otherwise an empty Optional")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully retrieved"),
+            @ApiResponse(code = 404, message = "Teams not found")
+    })
     @GetMapping(value = "/find-Teams-by-id", produces = MediaType.APPLICATION_JSON_VALUE)
     public Optional<TeamsEntity> findById(@PathVariable int id) {
         return teamsService.findById(id);
     }
 
     /**
-     * This method retrieves a list of all Teams.
+     * Retrieves a list of all Teams.
      * 
      * @return a list of all TeamsEntity objects.
      */
+    @ApiOperation(value = "Retrieve a list of all teams", notes = "Retrieves a list of all TeamsEntity objects")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Successfully retrieved")
+    })
     @GetMapping(value = "/find-all-Teams", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<TeamsEntity> findAll(){
         return teamsService.findAll();
@@ -63,6 +75,11 @@ public class TeamsController {
      * @param entity must not be {@literal null}.
      * @return the saved entity wrapped in an Optional, will never be {@literal null}.
      */
+    @ApiOperation(value = "Create a Teams", notes = "Creates a new TeamsEntity")
+    @ApiResponses(value = {
+        @ApiResponse(code = 201, message = "Successfully created"),
+        @ApiResponse(code = 400, message = "Validation error")
+    })
     @PutMapping(value = "/create-Teams", produces = MediaType.APPLICATION_JSON_VALUE)
     public Optional<TeamsEntity> createTeams(@RequestBody TeamsEntity entity) {
         return Optional.of(teamsService.save(entity));
