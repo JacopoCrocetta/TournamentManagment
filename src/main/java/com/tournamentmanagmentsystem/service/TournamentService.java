@@ -1,8 +1,10 @@
 package com.tournamentmanagmentsystem.service;
 
 
-import java.util.Objects;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.springframework.stereotype.Service;
 
@@ -29,6 +31,7 @@ public class TournamentService {
         return this.tournamentRepository.save(entity);
     }
 
+    
     /**
      * Updates a given TournamentEntity. If the given entity does not have an ID, a empty TournamentEntity is returned.
      * 
@@ -36,9 +39,6 @@ public class TournamentService {
      * @return the updated entity will never be {@literal null}.
      */
     public TournamentEntity update(TournamentEntity entity) {
-        if(Objects.isNull(entity.getId())){
-            return new TournamentEntity();
-        }
         return this.tournamentRepository.save(entity);
     }
 
@@ -50,6 +50,15 @@ public class TournamentService {
      */
     public Optional<TournamentEntity> findById(int id) {
         return this.tournamentRepository.findById(id);
+    }
+
+    /**
+     * Returns a List of all {@link TournamentEntity} in the repository.
+     *
+     * @return a List of all {@link TournamentEntity} in the repository.
+     */
+    public List<TournamentEntity> findAll () {
+        return StreamSupport.stream(this.tournamentRepository.findAll().spliterator(), false).collect(Collectors.toList());
     }
 
     /**

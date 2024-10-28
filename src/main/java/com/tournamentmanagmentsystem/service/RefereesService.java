@@ -1,6 +1,9 @@
 package com.tournamentmanagmentsystem.service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.springframework.stereotype.Service;
 
@@ -27,6 +30,17 @@ public class RefereesService {
     }
 
     /**
+     * Updates a given RefereesEntity. If the given entity does not have an ID, a empty
+     * RefereesEntity is returned.
+     * 
+     * @param entity must not be {@literal null}.
+     * @return the updated entity will never be {@literal null}.
+     */
+    public RefereesEntity update(RefereesEntity entity) {
+        return this.refereesRepository.save(entity);
+    }
+
+    /**
      * Retrieves a {@link RefereesEntity} by its id.
      *
      * @param id must not be {@literal null}.
@@ -34,6 +48,15 @@ public class RefereesService {
      */
     public Optional<RefereesEntity> findById(int id) {
         return this.refereesRepository.findById(id);
+    }
+
+     /**
+     * Returns a List of all {@link RefereesEntity} in the repository.
+     *
+     * @return a List of all {@link RefereesEntity} in the repository.
+     */
+    public List<RefereesEntity> findAll () {
+        return StreamSupport.stream(this.refereesRepository.findAll().spliterator(), false).collect(Collectors.toList());
     }
 
     /**

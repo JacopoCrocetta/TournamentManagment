@@ -1,6 +1,9 @@
 package com.tournamentmanagmentsystem.service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.springframework.stereotype.Service;
 
@@ -27,6 +30,17 @@ public class MatchService {
     }
 
     /**
+     * Updates a given MatchEntity. If the given entity does not have an ID, a empty
+     * MatchEntity is returned.
+     * 
+     * @param entity must not be {@literal null}.
+     * @return the updated entity will never be {@literal null}.
+     */
+    public MatchEntity update(MatchEntity entity) {
+        return this.matchRepository.save(entity);
+    }
+
+    /**
      * Retrieves a {@link MatchEntity} by its id.
      * 
      * @param id must not be {@literal null}.
@@ -34,6 +48,15 @@ public class MatchService {
      */
     public Optional<MatchEntity> findById(int id) {
         return this.matchRepository.findById(id);
+    }
+
+     /**
+     * Returns a List of all {@link MatchEntity} in the repository.
+     *
+     * @return a List of all {@link MatchEntity} in the repository.
+     */
+    public List<MatchEntity> findAll () {
+        return StreamSupport.stream(this.matchRepository.findAll().spliterator(), false).collect(Collectors.toList());
     }
 
     /**

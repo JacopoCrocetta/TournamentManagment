@@ -1,0 +1,81 @@
+package com.tournamentmanagmentsystem.controller;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.tournamentmanagmentsystem.entity.MatchEntity;
+import com.tournamentmanagmentsystem.service.MatchService;
+
+import lombok.RequiredArgsConstructor;
+
+@RestController
+@RequestMapping("/match")
+@RequiredArgsConstructor
+public class MatchController {
+
+    private MatchService matchService;
+
+
+    /**
+     * This method is used to find a match by its ID
+     * 
+     * @param id the ID of the match
+     * @return the match with the given ID if it exists, otherwise an empty Optional
+     */
+    @GetMapping(value = "/find-match-by-id", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Optional<MatchEntity> findById(@PathVariable int id) {
+        return matchService.findById(id);
+    }
+
+    /**
+     * This method retrieves a list of all matches.
+     * 
+     * @return a list of all MatchesEntity objects.
+     */
+    @GetMapping(value = "/find-all-match", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<MatchEntity> findAll(){
+        return matchService.findAll();
+    }
+
+    /**
+     * Updates a given MatchEntity. If the given entity does not have an ID, a empty MatchEntity is returned.
+     * 
+     * @param entity must not be {@literal null}.
+     * @return the updated entity will never be {@literal null}.
+     */
+    @PutMapping(value = "/update-match", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Optional<MatchEntity> updateMatch(@RequestBody MatchEntity entity) {
+        return Optional.of(matchService.update(entity));
+    }
+
+    /**
+     * Creates a new MatchEntity.
+     * 
+     * @param entity must not be {@literal null}.
+     * @return the saved entity wrapped in an Optional, will never be {@literal null}.
+     */
+    @PutMapping(value = "/create-match", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Optional<MatchEntity> createMatch(@RequestBody MatchEntity entity) {
+        return Optional.of(matchService.save(entity));
+    }
+
+    /**
+     * Deletes the {@link MatchEntity} with the given id.
+     * 
+     * @param id must not be {@literal null}.
+     * @return {@literal true} if the entity was deleted, {@literal false} otherwise.
+     */
+    @DeleteMapping(value = "/delete-match", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Optional<Boolean> deleteMatch(@PathVariable int id) {
+        return Optional.of(matchService.deleteById(id));
+    }
+}

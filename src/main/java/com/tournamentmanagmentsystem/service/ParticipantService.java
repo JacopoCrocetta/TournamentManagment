@@ -1,6 +1,9 @@
 package com.tournamentmanagmentsystem.service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.springframework.stereotype.Service;
 
@@ -27,6 +30,17 @@ public class ParticipantService {
     }
 
     /**
+     * Updates a given ParticipantEntity. If the given entity does not have an ID, a empty
+     * ParticipantEntity is returned.
+     * 
+     * @param entity must not be {@literal null}.
+     * @return the updated entity will never be {@literal null}.
+     */
+    public ParticipantEntity update(ParticipantEntity entity) {
+        return this.participantRepository.save(entity);
+    }
+
+    /**
      * Retrieves a {@link ParticipantEntity} by its id.
      *
      * @param id must not be {@literal null}.
@@ -35,6 +49,16 @@ public class ParticipantService {
     public Optional<ParticipantEntity> findById(int id) {
         return this.participantRepository.findById(id);
     }
+
+     /**
+     * Returns a List of all {@link ParticipantEntity} in the repository.
+     *
+     * @return a List of all {@link ParticipantEntity} in the repository.
+     */
+    public List<ParticipantEntity> findAll () {
+        return StreamSupport.stream(this.participantRepository.findAll().spliterator(), false).collect(Collectors.toList());
+    }
+
 
     /**
      * Deletes the {@link ParticipantEntity} with the given id.

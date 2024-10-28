@@ -1,6 +1,9 @@
 package com.tournamentmanagmentsystem.service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.springframework.stereotype.Service;
 
@@ -26,6 +29,17 @@ public class StandingsService {
         return this.standingsRepository.save(entity);
     }
 
+     /**
+     * Updates a given StandingsEntity. If the given entity does not have an ID, a empty
+     * StandingsEntity is returned.
+     * 
+     * @param entity must not be {@literal null}.
+     * @return the updated entity will never be {@literal null}.
+     */
+    public StandingsEntity update(StandingsEntity entity) {
+        return this.standingsRepository.save(entity);
+    }
+
     /**
      * Retrieves a {@link StandingsEntity} by its id.
      *
@@ -34,6 +48,15 @@ public class StandingsService {
      */
     public Optional<StandingsEntity> findById(int id) {
         return this.standingsRepository.findById(id);
+    }
+
+    /**
+     * Returns a List of all {@link StandingsEntity} in the repository.
+     *
+     * @return a List of all {@link StandingsEntity} in the repository.
+     */
+    public List<StandingsEntity> findAll () {
+        return StreamSupport.stream(this.standingsRepository.findAll().spliterator(), false).collect(Collectors.toList());
     }
 
     /**
