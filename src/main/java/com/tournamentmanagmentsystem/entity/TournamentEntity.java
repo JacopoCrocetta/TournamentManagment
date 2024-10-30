@@ -1,13 +1,18 @@
 package com.tournamentmanagmentsystem.entity;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,23 +23,37 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-@ApiModel(description = "A tournament")
 public class TournamentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @ApiModelProperty(notes = "The unique ID of the tournament")
     private int id;
-    @ApiModelProperty(notes = "The name of the tournament")
     private String tournamentName;
-    @ApiModelProperty(notes = "The description of the tournament")
     private String description;
-    @ApiModelProperty(notes = "The begin date of the tournament")
     private LocalDateTime beginDate;
-    @ApiModelProperty(notes = "The end date of the tournament")
     private LocalDateTime endDate;
 
-    private ParticipantEntity participant;
+    @OneToOne
+    @JoinColumn(name = "id")
+    private UserEntity organizer;
 
-    @ApiModelProperty(notes = "The type of the tournament")
+    @ManyToMany
+    @JoinTable(
+        name = "tournament_teams",
+        joinColumns = @JoinColumn(name = "tournamentId"),
+        inverseJoinColumns = @JoinColumn(name = "tournamentTeamId")
+    )
+    private Set<TeamsEntity> teams;
+
+    @OneToMany(mappedBy = "Matches")
+    private List<MatchEntity> matches;
+
+    @OneToOne
+    @JoinColumn(name = "id")
+    private StandingsEntity standing;
+
+    @OneToOne
+    @JoinColumn(name = "tournamentId")
+    private BracketEntity bracket;
+
     private String tournamentType;
 }
