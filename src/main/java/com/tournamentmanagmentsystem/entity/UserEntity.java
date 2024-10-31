@@ -4,6 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.Getter;
@@ -26,6 +28,7 @@ public class UserEntity {
     private String name;
     private String surname;
 
-    private TeamsEntity teams;
-    private ParticipantEntity participants;
+    @OneToOne
+    @JoinColumn(name = "userId")
+    private TeamMember teams;
 }
