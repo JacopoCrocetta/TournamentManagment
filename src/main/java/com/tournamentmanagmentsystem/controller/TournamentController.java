@@ -38,7 +38,7 @@ public class TournamentController {
      * @param id the ID of the tournament
      * @return the tournament with the given ID if it exists, otherwise an empty Optional
      */
-    @GetMapping(value = "/find-tournament-by-id", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/find-tournament-by-id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Retrieve a tournament by its ID", notes = "Retrieves the TournamentEntity with the given ID if it exists, otherwise an empty Optional")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully retrieved"),
@@ -107,7 +107,7 @@ public class TournamentController {
         @ApiResponse(code = 200, message = "Successfully deleted"),
         @ApiResponse(code = 404, message = "Tournament not found")
     })
-    @DeleteMapping(value = "/delete-tournament", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/delete-tournament/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Optional<Boolean> deleteTournament(@PathVariable int id) {
         return Optional.of(tournamentService.deleteById(id));
     }

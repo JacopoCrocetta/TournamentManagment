@@ -2,7 +2,6 @@ package com.tournamentmanagmentsystem.service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.springframework.stereotype.Service;
@@ -56,7 +55,7 @@ public class StandingsService {
      * @return a List of all {@link StandingsEntity} in the repository.
      */
     public List<StandingsEntity> findAll () {
-        return StreamSupport.stream(this.standingsRepository.findAll().spliterator(), false).collect(Collectors.toList());
+        return StreamSupport.stream(this.standingsRepository.findAll().spliterator(), false).toList();
     }
 
     /**

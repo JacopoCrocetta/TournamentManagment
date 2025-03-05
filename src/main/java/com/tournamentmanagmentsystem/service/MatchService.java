@@ -2,7 +2,6 @@ package com.tournamentmanagmentsystem.service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.springframework.stereotype.Service;
@@ -10,13 +9,15 @@ import org.springframework.stereotype.Service;
 import com.tournamentmanagmentsystem.entity.MatchEntity;
 import com.tournamentmanagmentsystem.repository.MatchRepository;
 
-import lombok.RequiredArgsConstructor;
 
 @Service
-@RequiredArgsConstructor
 public class MatchService {
 
-    private MatchRepository matchRepository;
+    private final MatchRepository matchRepository;
+
+    public MatchService(MatchRepository matchRepository) {
+        this.matchRepository = matchRepository;
+    }
 
     /**
      * Save a given MatchEntity. Use the returned instance for further operations as
@@ -56,7 +57,7 @@ public class MatchService {
      * @return a List of all {@link MatchEntity} in the repository.
      */
     public List<MatchEntity> findAll () {
-        return StreamSupport.stream(this.matchRepository.findAll().spliterator(), false).collect(Collectors.toList());
+        return StreamSupport.stream(this.matchRepository.findAll().spliterator(), false).toList();
     }
 
     /**

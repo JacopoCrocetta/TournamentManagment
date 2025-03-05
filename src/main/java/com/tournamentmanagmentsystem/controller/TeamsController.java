@@ -39,7 +39,7 @@ public class TeamsController {
             @ApiResponse(code = 200, message = "Successfully retrieved"),
             @ApiResponse(code = 404, message = "Teams not found")
     })
-    @GetMapping(value = "/find-Teams-by-id", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/find-Teams-by-id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Optional<TeamsEntity> findById(@PathVariable int id) {
         return teamsService.findById(id);
     }
@@ -91,7 +91,7 @@ public class TeamsController {
      * @param id must not be {@literal null}.
      * @return {@literal true} if the entity was deleted, {@literal false} otherwise.
      */
-    @DeleteMapping(value = "/delete-Teams", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/delete-Teams/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Optional<Boolean> deleteTeams(@PathVariable int id) {
         return Optional.of(teamsService.deleteById(id));
     }

@@ -34,7 +34,7 @@ public class StandingsController {
      * @param id the ID of the Standings
      * @return the Standings with the given ID if it exists, otherwise an empty Optional
      */
-    @GetMapping(value = "/find-Standings-by-id", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/find-Standings-by-id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Retrieve a Standings by its ID", notes = "Retrieves the StandingsEntity with the given ID if it exists, otherwise an empty Optional")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully retrieved"),
@@ -102,7 +102,7 @@ public class StandingsController {
         @ApiResponse(code = 200, message = "Successfully deleted"),
         @ApiResponse(code = 404, message = "Standings not found")
     })
-    @DeleteMapping(value = "/delete-Standings", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/delete-Standings/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Optional<Boolean> deleteStandings(@PathVariable int id) {
         return Optional.of(standingsService.deleteById(id));
     }

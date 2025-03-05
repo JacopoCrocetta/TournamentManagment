@@ -39,7 +39,7 @@ public class MatchController {
         @ApiResponse(code = 200, message = "Successfully retrieved"),
         @ApiResponse(code = 404, message = "Match not found")
     })
-    @GetMapping(value = "/find-match-by-id", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/find-match-by-id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Optional<MatchEntity> findById(@PathVariable int id) {
         return matchService.findById(id);
     }
@@ -102,7 +102,7 @@ public class MatchController {
         @ApiResponse(code = 200, message = "Successfully deleted"),
         @ApiResponse(code = 404, message = "Match not found")
     })
-    @DeleteMapping(value = "/delete-match", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/delete-match/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Optional<Boolean> deleteMatch(@PathVariable int id) {
         return Optional.of(matchService.deleteById(id));
     }

@@ -1,0 +1,118 @@
+<changeSet author="JACOPO" id="001">
+    <createTable tableName="referees">
+        <column name="id" type="int" autoIncrement="true">
+            <constraints primaryKey="true" nullable="false"/>
+        </column>
+        <column name="name" type="varchar(255)">
+            <constraints nullable="false"/>
+        </column>
+        <column name="age" type="int">
+            <constraints nullable="false"/>
+        </column>
+        <column name="email" type="varchar(255)">
+            <constraints nullable="false"/>
+        </column>
+    </createTable>
+
+    <createTable tableName="teams">
+        <column name="id" type="int" autoIncrement="true">
+            <constraints primaryKey="true" nullable="false"/>
+        </column>
+        <column name="name" type="varchar(255)">
+            <constraints nullable="false"/>
+        </column>
+    </createTable>
+
+    <createTable tableName="matches">
+        <column name="id" type="int" autoIncrement="true">
+            <constraints primaryKey="true" nullable="false"/>
+        </column>
+        <column name="team1_id" type="int">
+            <constraints foreignKeyName="fk_match_team1" references="teams(id)"/>
+        </column>
+        <column name="team2_id" type="int">
+            <constraints foreignKeyName="fk_match_team2" references="teams(id)"/>
+        </column>
+        <column name="bracket_id" type="int">
+            <constraints foreignKeyName="fk_match_bracket" references="bracket(id)"/>
+        </column>
+        <column name="scheduled_time" type="datetime">
+            <constraints nullable="false"/>
+        </column>
+        <column name="actual_time" type="datetime">
+            <constraints nullable="true"/>
+        </column>
+    </createTable>
+
+    <createTable tableName="bracket">
+        <column name="id" type="int" autoIncrement="true">
+            <constraints primaryKey="true" nullable="false"/>
+        </column>
+        <column name="name" type="varchar(255)">
+            <constraints nullable="false"/>
+        </column>
+    </createTable>
+
+    <createTable tableName="users">
+        <column name="id" type="int" autoIncrement="true">
+            <constraints primaryKey="true" nullable="false"/>
+        </column>
+        <column name="name" type="varchar(255)">
+            <constraints nullable="false"/>
+        </column>
+        <column name="email" type="varchar(255)">
+            <constraints nullable="false"/>
+        </column>
+        <column name="password" type="varchar(255)">
+            <constraints nullable="false"/>
+        </column>
+    </createTable>
+
+    <createTable tableName="team_members">
+        <column name="team_id" type="int">
+            <constraints foreignKeyName="fk_team_member_team" references="teams(id)"/>
+        </column>
+        <column name="user_id" type="int">
+            <constraints foreignKeyName="fk_team_member_user" references="users(id)"/>
+        </column>
+        <column name="join_date" type="datetime">
+            <constraints nullable="false"/>
+        </column>
+    </createTable>
+
+    <createTable tableName="notifications">
+        <column name="id" type="int" autoIncrement="true">
+            <constraints primaryKey="true" nullable="false"/>
+        </column>
+        <column name="type" type="varchar(255)">
+            <constraints nullable="false"/>
+        </column>
+        <column name="message" type="varchar(255)">
+            <constraints nullable="false"/>
+        </column>
+        <column name="user_id" type="int">
+            <constraints foreignKeyName="fk_notification_user" references="users(id)"/>
+        </column>
+        <column name="sent_time" type="datetime">
+            <constraints nullable="false"/>
+        </column>
+    </createTable>
+
+    <createTable tableName="standings">
+        <column name="id" type="int" autoIncrement="true">
+            <constraints primaryKey="true" nullable="false"/>
+        </column>
+        <column name="team_id" type="int">
+            <constraints foreignKeyName="fk_standings_team" references="teams(id)"/>
+        </column>
+        <column name="wins" type="int">
+            <constraints nullable="false"/>
+        </column>
+        <column name="losses" type="int">
+            <constraints nullable="false"/>
+        </column>
+        <column name="ties" type="int">
+            <constraints nullable="false"/>
+        </column>
+    </createTable>
+</changeSet>

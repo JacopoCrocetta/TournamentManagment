@@ -39,7 +39,7 @@ public class RefereesController {
         @ApiResponse(code = 200, message = "Successfully retrieved"),
         @ApiResponse(code = 404, message = "Referees not found")
     })
-    @GetMapping(value = "/find-Referees-by-id", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/find-Referees-by-id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Optional<RefereesEntity> findById(@PathVariable int id) {
         return refereesService.findById(id);
     }
@@ -102,7 +102,7 @@ public class RefereesController {
         @ApiResponse(code = 200, message = "Successfully deleted"),
         @ApiResponse(code = 404, message = "Referee not found")
     })
-    @DeleteMapping(value = "/delete-Referees", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/delete-Referees/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Optional<Boolean> deleteReferees(@PathVariable int id) {
         return Optional.of(refereesService.deleteById(id));
     }

@@ -39,7 +39,7 @@ public class ParticipantController {
         @ApiResponse(code = 200, message = "Successfully retrieved"),
         @ApiResponse(code = 404, message = "Participant not found")
     })
-    @GetMapping(value = "/find-Participant-by-id", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/find-Participant-by-id/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Optional<ParticipantEntity> findById(@PathVariable int id) {
         return participantService.findById(id);
     }
@@ -102,7 +102,7 @@ public class ParticipantController {
         @ApiResponse(code = 200, message = "Successfully deleted"),
         @ApiResponse(code = 404, message = "Participant not found")
     })
-    @DeleteMapping(value = "/delete-Participant", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/delete-Participant/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Optional<Boolean> deleteParticipant(@PathVariable int id) {
         return Optional.of(participantService.deleteById(id));
     }
