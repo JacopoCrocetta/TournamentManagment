@@ -18,11 +18,9 @@ import com.tournamentmanagmentsystem.service.RefereesService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ApiResponse;
-import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/Referees")
-@RequiredArgsConstructor
 public class RefereesController {
 
     private RefereesService refereesService;

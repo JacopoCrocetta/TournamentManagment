@@ -2,6 +2,7 @@ package com.tournamentmanagmentsystem.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.springframework.stereotype.Service;
@@ -9,10 +10,8 @@ import org.springframework.stereotype.Service;
 import com.tournamentmanagmentsystem.entity.ParticipantEntity;
 import com.tournamentmanagmentsystem.repository.ParticipantRepository;
 
-import lombok.RequiredArgsConstructor;
 
 @Service
-@RequiredArgsConstructor
 public class ParticipantService {
 
     private ParticipantRepository participantRepository;
@@ -55,7 +54,8 @@ public class ParticipantService {
      * @return a List of all {@link ParticipantEntity} in the repository.
      */
     public List<ParticipantEntity> findAll () {
-        return StreamSupport.stream(this.participantRepository.findAll().spliterator(), false).toList();
+        return StreamSupport.stream(this.participantRepository.findAll().spliterator(), false)
+                            .collect(Collectors.toList());
     }
 
 

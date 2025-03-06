@@ -21,11 +21,9 @@ import com.tournamentmanagmentsystem.service.TournamentService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ApiResponse;
-import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/tournament")
-@RequiredArgsConstructor
 public class TournamentController {
 
     private TournamentService tournamentService;

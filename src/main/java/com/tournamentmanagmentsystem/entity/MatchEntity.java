@@ -9,19 +9,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 @Entity
-@Data
-@NoArgsConstructor
-@Getter
-@Setter
 @Table(name = "Match")
 @ApiModel(description = "Details about the match")
 public class MatchEntity {
@@ -46,4 +39,58 @@ public class MatchEntity {
 
     @ApiModelProperty(notes = "The time of the match")
     private LocalDateTime matchTime;
+
+    // Getter and Setter for id
+    public int getId() {
+        return this.id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    // Getter and Setter for tournamentEntity
+    public TournamentEntity getTournamentEntity() {
+        return this.tournamentEntity;
+    }
+
+    public void setTournamentEntity(TournamentEntity tournamentEntity) {
+        this.tournamentEntity = tournamentEntity;
+    }
+
+    // Getter and Setter for teamIds
+    public int[] getTeamIds() {
+        return this.teamIds;
+    }
+
+    public void setTeamIds(int[] teamIds) {
+        this.teamIds = teamIds;
+    }
+
+    // Getter and Setter for winningTeamsId
+    public int getWinningTeamsId() {
+        return this.winningTeamsId;
+    }
+
+    public void setWinningTeamsId(int winningTeamsId) {
+        this.winningTeamsId = winningTeamsId;
+    }
+
+    // Getter and Setter for refereeId
+    public int getRefereeId() {
+        return this.refereeId;
+    }
+
+    public void setRefereeId(int refereeId) {
+        this.refereeId = refereeId;
+    }
+
+    // Getter and Setter for matchTime
+    public LocalDateTime getMatchTime() {
+        return this.matchTime;
+    }
+
+    public void setMatchTime(LocalDateTime matchTime) {
+        this.matchTime = matchTime;
+    }
 }

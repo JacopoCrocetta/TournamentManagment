@@ -14,15 +14,9 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name = "Tournament")
-@NoArgsConstructor
-@Getter
-@Setter
 public class TournamentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -56,4 +50,103 @@ public class TournamentEntity {
     private BracketEntity bracket;
 
     private String tournamentType;
+
+    // Getter and Setter for id
+    public int getId() {
+        return this.id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    // Getter and Setter for tournamentName
+    public String getTournamentName() {
+        return this.tournamentName;
+    }
+
+    public void setTournamentName(String tournamentName) {
+        this.tournamentName = tournamentName;
+    }
+
+    // Getter and Setter for description
+    public String getDescription() {
+        return this.description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    // Getter and Setter for beginDate
+    public LocalDateTime getBeginDate() {
+        return this.beginDate;
+    }
+
+    public void setBeginDate(LocalDateTime beginDate) {
+        this.beginDate = beginDate;
+    }
+
+    // Getter and Setter for endDate
+    public LocalDateTime getEndDate() {
+        return this.endDate;
+    }
+
+    public void setEndDate(LocalDateTime endDate) {
+        this.endDate = endDate;
+    }
+
+    // Getter and Setter for organizer
+    public UserEntity getOrganizer() {
+        return this.organizer;
+    }
+
+    public void setOrganizer(UserEntity organizer) {
+        this.organizer = organizer;
+    }
+
+    // Getter and Setter for teams
+    public Set<TeamsEntity> getTeams() {
+        return this.teams;
+    }
+
+    public void setTeams(Set<TeamsEntity> teams) {
+        this.teams = teams;
+    }
+
+    // Getter and Setter for matches
+    public List<MatchEntity> getMatches() {
+        return this.matches;
+    }
+
+    public void setMatches(List<MatchEntity> matches) {
+        this.matches = matches;
+    }
+
+    // Getter and Setter for standing
+    public StandingsEntity getStanding() {
+        return this.standing;
+    }
+
+    public void setStanding(StandingsEntity standing) {
+        this.standing = standing;
+    }
+
+    // Getter and Setter for bracket
+    public BracketEntity getBracket() {
+        return this.bracket;
+    }
+
+    public void setBracket(BracketEntity bracket) {
+        this.bracket = bracket;
+    }
+
+    // Getter and Setter for tournamentType
+    public String getTournamentType() {
+        return this.tournamentType;
+    }
+
+    public void setTournamentType(String tournamentType) {
+        this.tournamentType = tournamentType;
+    }
 }

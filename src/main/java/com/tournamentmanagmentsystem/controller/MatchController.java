@@ -18,11 +18,9 @@ import com.tournamentmanagmentsystem.service.MatchService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ApiResponse;
-import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/match")
-@RequiredArgsConstructor
 public class MatchController {
 
     private MatchService matchService;

@@ -7,14 +7,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
-@NoArgsConstructor
-@Getter
-@Setter
 @Table(name = "Standings")
 @ApiModel(description = "Details about the standings")
 public class StandingsEntity {
@@ -34,4 +28,49 @@ public class StandingsEntity {
 
     @ApiModelProperty(notes = "The tournament associated with the standings")
     private TournamentEntity tournament;
+
+    // Getter and Setter for id
+    public int getId() {
+        return this.id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    // Getter and Setter for points
+    public int getPoints() {
+        return this.points;
+    }
+
+    public void setPoints(int points) {
+        this.points = points;
+    }
+
+    // Getter and Setter for ranking
+    public int getRanking() {
+        return this.ranking;
+    }
+
+    public void setRanking(int ranking) {
+        this.ranking = ranking;
+    }
+
+    // Getter and Setter for teams
+    public TeamsEntity[] getTeams() {
+        return this.teams;
+    }
+
+    public void setTeams(TeamsEntity[] teams) {
+        this.teams = teams;
+    }
+
+    // Getter and Setter for tournament
+    public TournamentEntity getTournament() {
+        return this.tournament;
+    }
+
+    public void setTournament(TournamentEntity tournament) {
+        this.tournament = tournament;
+    }
 }

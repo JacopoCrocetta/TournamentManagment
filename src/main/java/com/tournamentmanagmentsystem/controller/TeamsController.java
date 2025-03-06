@@ -18,11 +18,9 @@ import com.tournamentmanagmentsystem.service.TeamsService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ApiResponse;
-import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/Teams")
-@RequiredArgsConstructor
 public class TeamsController {
 
     private TeamsService teamsService;

@@ -18,11 +18,9 @@ import com.tournamentmanagmentsystem.service.StandingsService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.ApiResponse;
-import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/standings")
-@RequiredArgsConstructor
 public class StandingsController {
 
     private StandingsService standingsService;

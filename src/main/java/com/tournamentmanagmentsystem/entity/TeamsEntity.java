@@ -7,14 +7,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
-@Getter
-@Setter
-@NoArgsConstructor
 @Table(name = "Teams")
 public class TeamsEntity {
     @Id
@@ -26,4 +20,31 @@ public class TeamsEntity {
     private TeamMember teamName;
 
     private String description;
+
+    // Getter and Setter for id
+    public int getId() {
+        return this.id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    // Getter and Setter for teamName
+    public TeamMember getTeamName() {
+        return this.teamName;
+    }
+
+    public void setTeamName(TeamMember teamName) {
+        this.teamName = teamName;
+    }
+
+    // Getter and Setter for description
+    public String getDescription() {
+        return this.description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }

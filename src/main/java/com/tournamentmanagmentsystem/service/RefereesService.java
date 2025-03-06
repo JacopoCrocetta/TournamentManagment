@@ -2,6 +2,7 @@ package com.tournamentmanagmentsystem.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.springframework.stereotype.Service;
@@ -9,10 +10,8 @@ import org.springframework.stereotype.Service;
 import com.tournamentmanagmentsystem.entity.RefereesEntity;
 import com.tournamentmanagmentsystem.repository.RefereesRepository;
 
-import lombok.RequiredArgsConstructor;
 
 @Service
-@RequiredArgsConstructor
 public class RefereesService {
 
     private RefereesRepository refereesRepository;
@@ -55,7 +54,8 @@ public class RefereesService {
      * @return a List of all {@link RefereesEntity} in the repository.
      */
     public List<RefereesEntity> findAll () {
-        return StreamSupport.stream(this.refereesRepository.findAll().spliterator(), false).toList();
+        return StreamSupport.stream(this.refereesRepository.findAll().spliterator(), false)
+                            .collect(Collectors.toList());
     }
 
     /**

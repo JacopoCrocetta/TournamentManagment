@@ -8,14 +8,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
 @Entity
-@NoArgsConstructor
 @Table(name = "TeamMember")
 public class TeamMember {
     @Id
@@ -30,4 +24,49 @@ public class TeamMember {
     private UserEntity user;
     private String role;
     private LocalDate joinedAt;
+
+    // Getter and Setter for id
+    public int getId() {
+        return this.id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    // Getter and Setter for team
+    public TeamsEntity getTeam() {
+        return this.team;
+    }
+
+    public void setTeam(TeamsEntity team) {
+        this.team = team;
+    }
+
+    // Getter and Setter for user
+    public UserEntity getUser() {
+        return this.user;
+    }
+
+    public void setUser(UserEntity user) {
+        this.user = user;
+    }
+
+    // Getter and Setter for role
+    public String getRole() {
+        return this.role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    // Getter and Setter for joinedAt
+    public LocalDate getJoinedAt() {
+        return this.joinedAt;
+    }
+
+    public void setJoinedAt(LocalDate joinedAt) {
+        this.joinedAt = joinedAt;
+    }
 }

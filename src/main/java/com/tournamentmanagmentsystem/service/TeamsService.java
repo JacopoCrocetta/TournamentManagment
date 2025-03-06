@@ -2,6 +2,7 @@ package com.tournamentmanagmentsystem.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.springframework.stereotype.Service;
@@ -9,10 +10,8 @@ import org.springframework.stereotype.Service;
 import com.tournamentmanagmentsystem.entity.TeamsEntity;
 import com.tournamentmanagmentsystem.repository.TeamsRepository;
 
-import lombok.RequiredArgsConstructor;
 
 @Service
-@RequiredArgsConstructor
 public class TeamsService {
 
     private TeamsRepository teamsRepository;
@@ -56,7 +55,8 @@ public class TeamsService {
      * @return a List of all {@link TeamsEntity} in the repository.
      */
     public List<TeamsEntity> findAll () {
-        return StreamSupport.stream(this.teamsRepository.findAll().spliterator(), false).toList();
+        return StreamSupport.stream(this.teamsRepository.findAll().spliterator(), false)
+                            .collect(Collectors.toList());
     }
 
 
