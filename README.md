@@ -14,8 +14,8 @@ This system provides a comprehensive API to handle organizations, multi-format t
   - **Single Elimination**: Automated pairing and winner advancement (basic).
   - **Round Robin**: Full league permutation generation.
 - **Security**: Granular RBAC (ORG_ADMIN, TOURNAMENT_ADMIN, REFEREE, VIEWER).
-- **Documentation**: Fully integrated Swagger/OpenAPI 3.1.
-- **Audit**: Asynchronous logging of all critical system actions.
+- **Audit**: Asynchronous logging of all critical system actions into the database.
+- **Application Logging**: Structured logging with SLF4J and Logback, including daily log rotation and colorized console output.
 
 ## 🛠 Tech Stack
 - **Core**: Java 21, Spring Boot 3.4
@@ -73,6 +73,7 @@ This project follows **Clean Code** principles and **SOLID** design patterns.
 - **Services**: Contain business logic and are annotated with JavaDocs for clarity.
 - **Domain**: Rich entities using JPA and Lombok.
 - **Security**: Logic is centralized in `SecurityService` for maintainability.
+- **Logging**: Uses `@Slf4j` for technical logs (errors, info) and a custom `AuditService` for business-level auditing. Logs are stored in `./logs` with a 30-day retention policy.
 
 ---
 *Developed as part of the Tournament Management System modernization initiative.*

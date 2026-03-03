@@ -1,5 +1,7 @@
 package com.tournamentmanagmentsystem.service;
 
+import org.springframework.lang.NonNull;
+
 import com.tournamentmanagmentsystem.domain.entity.Organization;
 import com.tournamentmanagmentsystem.domain.entity.Tournament;
 import com.tournamentmanagmentsystem.domain.enums.TournamentStatus;
@@ -8,6 +10,7 @@ import com.tournamentmanagmentsystem.dto.response.TournamentResponse;
 import com.tournamentmanagmentsystem.repository.OrganizationRepository;
 import com.tournamentmanagmentsystem.repository.TournamentRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +27,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TournamentService {
 
     private final TournamentRepository tournamentRepository;
@@ -40,7 +44,8 @@ public class TournamentService {
      * @throws RuntimeException if the organization is not found
      */
     @Transactional
-    public TournamentResponse createTournament(TournamentRequest request) {
+    @NonNull
+    public TournamentResponse createTournament(@NonNull TournamentRequest request) {
         Organization organization = organizationRepository.findById(request.getOrganizationId())
                 .orElseThrow(() -> new RuntimeException("Organization not found: " + request.getOrganizationId()));
 
@@ -53,8 +58,11 @@ public class TournamentService {
         tournament.setStatus(TournamentStatus.DRAFT);
 
         Tournament savedTournament = tournamentRepository.save(tournament);
-        auditService.log("CREATE", "TOURNAMENT", savedTournament.getId(), Map.of("name", savedTournament.getName()));
-
+        log.info("Tournament '{}' created in organization {}", savedTournament.getName(), organization.getName());
+        if (savedTournament.getId() != null) {
+            auditService.log("CREATE", "TOURNAMENT", savedTournament.getId(),
+                    Map.of("name", savedTournament.getName()));
+        }
         return modelMapper.map(savedTournament, TournamentResponse.class);
     }
 
@@ -66,7 +74,8 @@ public class TournamentService {
      * @throws RuntimeException if tournament is not found
      */
     @Transactional(readOnly = true)
-    public TournamentResponse getTournament(UUID id) {
+    @NonNull
+    public TournamentResponse getTournament(@NonNull UUID id) {
         Tournament tournament = tournamentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Tournament not found: " + id));
         return modelMapper.map(tournament, TournamentResponse.class);
@@ -79,7 +88,8 @@ public class TournamentService {
      * @return list of tournament details
      */
     @Transactional(readOnly = true)
-    public List<TournamentResponse> getTournamentsByOrganization(UUID organizationId) {
+    @NonNull
+    public List<TournamentResponse> getTournamentsByOrganization(@NonNull UUID organizationId) {
         return tournamentRepository.findByOrganizationId(organizationId).stream()
                 .map(tournament -> modelMapper.map(tournament, TournamentResponse.class))
                 .collect(Collectors.toList());
@@ -94,7 +104,8 @@ public class TournamentService {
      * @return updated tournament details
      */
     @Transactional
-    public TournamentResponse updateStatus(UUID id, TournamentStatus newStatus) {
+    @NonNull
+    public TournamentResponse updateStatus(@NonNull UUID id, @NonNull TournamentStatus newStatus) {
         Tournament tournament = tournamentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Tournament not found: " + id));
 
@@ -103,8 +114,11 @@ public class TournamentService {
         tournament.setStatus(newStatus);
         Tournament savedTournament = tournamentRepository.save(tournament);
 
-        auditService.log("UPDATE_STATUS", "TOURNAMENT", savedTournament.getId(), Map.of("newStatus", newStatus));
+        log.info("Tournament {} status updated to {}", savedTournament.getId(), newStatus);
 
+        if (savedTournament.getId() != null) {
+            auditService.log("UPDATE_STATUS", "TOURNAMENT", savedTournament.getId(), Map.of("newStatus", newStatus));
+        }
         return modelMapper.map(savedTournament, TournamentResponse.class);
     }
 

@@ -1,5 +1,7 @@
 package com.tournamentmanagmentsystem.service;
 
+import org.springframework.lang.NonNull;
+
 import com.tournamentmanagmentsystem.domain.entity.Participant;
 import com.tournamentmanagmentsystem.domain.entity.Tournament;
 import com.tournamentmanagmentsystem.domain.entity.User;
@@ -41,7 +43,8 @@ public class ParticipantService {
      * @throws RuntimeException if registration is closed or tournament not found
      */
     @Transactional
-    public ParticipantResponse register(ParticipantRequest request) {
+    @NonNull
+    public ParticipantResponse register(@NonNull ParticipantRequest request) {
         Tournament tournament = fetchTournament(request.getTournamentId());
         ensureRegistrationIsOpen(tournament);
 
@@ -67,7 +70,8 @@ public class ParticipantService {
      * @return list of participant details
      */
     @Transactional(readOnly = true)
-    public List<ParticipantResponse> getParticipants(UUID tournamentId) {
+    @NonNull
+    public List<ParticipantResponse> getParticipants(@NonNull UUID tournamentId) {
         return participantRepository.findByTournamentId(tournamentId).stream()
                 .map(participant -> modelMapper.map(participant, ParticipantResponse.class))
                 .collect(Collectors.toList());

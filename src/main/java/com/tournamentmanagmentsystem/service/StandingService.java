@@ -1,5 +1,8 @@
 package com.tournamentmanagmentsystem.service;
 
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
+
 import com.tournamentmanagmentsystem.domain.entity.Event;
 import com.tournamentmanagmentsystem.domain.entity.Participant;
 import com.tournamentmanagmentsystem.domain.entity.Standing;
@@ -32,8 +35,8 @@ public class StandingService {
      * @param tieBreakerInfo map of additional stats (e.g., number of wins, rounds)
      */
     @Transactional
-    public void updateStanding(Event event, Participant participant, int pointsChange,
-            Map<String, Object> tieBreakerInfo) {
+    public void updateStanding(@NonNull Event event, @NonNull Participant participant, int pointsChange,
+            @Nullable Map<String, Object> tieBreakerInfo) {
         Standing standing = standingRepository.findByEventIdAndParticipantId(event.getId(), participant.getId())
                 .orElseGet(() -> createInitialStanding(event, participant));
 
@@ -53,7 +56,8 @@ public class StandingService {
      * @return ordered list of standings
      */
     @Transactional(readOnly = true)
-    public List<Standing> getStandings(UUID eventId) {
+    @NonNull
+    public List<Standing> getStandings(@NonNull UUID eventId) {
         return standingRepository.findByEventIdOrderByPointsDesc(eventId);
     }
 

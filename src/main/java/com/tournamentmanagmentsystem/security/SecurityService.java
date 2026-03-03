@@ -1,5 +1,7 @@
 package com.tournamentmanagmentsystem.security;
 
+import org.springframework.lang.NonNull;
+
 import com.tournamentmanagmentsystem.domain.enums.Role;
 import com.tournamentmanagmentsystem.repository.MembershipRepository;
 import com.tournamentmanagmentsystem.repository.TournamentRepository;
@@ -21,7 +23,7 @@ public class SecurityService {
     private final EventRepository eventRepository;
     private final MatchRepository matchRepository;
 
-    public boolean hasRoleInOrganization(UUID organizationId, String roleName) {
+    public boolean hasRoleInOrganization(@NonNull UUID organizationId, @NonNull String roleName) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !(auth.getPrincipal() instanceof UserDetailsImpl userDetails)) {
             return false;
@@ -35,19 +37,19 @@ public class SecurityService {
                 .orElse(false);
     }
 
-    public boolean hasRoleInTournament(UUID tournamentId, String roleName) {
+    public boolean hasRoleInTournament(@NonNull UUID tournamentId, @NonNull String roleName) {
         return tournamentRepository.findById(tournamentId)
                 .map(t -> hasRoleInOrganization(t.getOrganization().getId(), roleName))
                 .orElse(false);
     }
 
-    public boolean isTournamentAdminOfEvent(UUID eventId) {
+    public boolean isTournamentAdminOfEvent(@NonNull UUID eventId) {
         return eventRepository.findById(eventId)
                 .map(e -> hasRoleInTournament(e.getTournament().getId(), "TOURNAMENT_ADMIN"))
                 .orElse(false);
     }
 
-    public boolean isRefereeOfMatch(UUID matchId) {
+    public boolean isRefereeOfMatch(@NonNull UUID matchId) {
         return matchRepository.findById(matchId)
                 .map(m -> hasRoleInTournament(m.getEvent().getTournament().getId(), "REFEREE")
                         || hasRoleInTournament(m.getEvent().getTournament().getId(), "TOURNAMENT_ADMIN"))

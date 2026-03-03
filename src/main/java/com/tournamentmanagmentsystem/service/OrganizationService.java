@@ -1,5 +1,7 @@
 package com.tournamentmanagmentsystem.service;
 
+import org.springframework.lang.NonNull;
+
 import com.tournamentmanagmentsystem.domain.entity.Membership;
 import com.tournamentmanagmentsystem.domain.entity.Organization;
 import com.tournamentmanagmentsystem.domain.entity.User;
@@ -11,6 +13,7 @@ import com.tournamentmanagmentsystem.repository.OrganizationRepository;
 import com.tournamentmanagmentsystem.repository.UserRepository;
 import com.tournamentmanagmentsystem.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -28,6 +31,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class OrganizationService {
 
     private final OrganizationRepository organizationRepository;
@@ -44,7 +48,8 @@ public class OrganizationService {
      * @throws RuntimeException if the slug is already taken
      */
     @Transactional
-    public OrganizationResponse createOrganization(OrganizationRequest request) {
+    @NonNull
+    public OrganizationResponse createOrganization(@NonNull OrganizationRequest request) {
         validateSlugUniqueness(request.getSlug());
 
         Organization organization = modelMapper.map(request, Organization.class);
@@ -53,7 +58,12 @@ public class OrganizationService {
         User currentUser = getCurrentUser();
         createMembership(currentUser, organization, Role.ORG_ADMIN);
 
-        auditService.log("CREATE", "ORGANIZATION", organization.getId(), Map.of("name", organization.getName()));
+        log.info("Organization created: '{}' with slug '{}' by user {}", organization.getName(), organization.getSlug(),
+                currentUser.getEmail());
+
+        if (organization.getId() != null) {
+            auditService.log("CREATE", "ORGANIZATION", organization.getId(), Map.of("name", organization.getName()));
+        }
 
         return modelMapper.map(organization, OrganizationResponse.class);
     }
@@ -66,7 +76,8 @@ public class OrganizationService {
      * @throws RuntimeException if organization is not found
      */
     @Transactional(readOnly = true)
-    public OrganizationResponse getOrganization(UUID id) {
+    @NonNull
+    public OrganizationResponse getOrganization(@NonNull UUID id) {
         Organization organization = organizationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Organization not found: " + id));
         return modelMapper.map(organization, OrganizationResponse.class);
@@ -78,6 +89,7 @@ public class OrganizationService {
      * @return List of OrganizationResponse
      */
     @Transactional(readOnly = true)
+    @NonNull
     public List<OrganizationResponse> getAllMyOrganizations() {
         User currentUser = getCurrentUser();
         return membershipRepository.findByUser(currentUser).stream()
@@ -93,7 +105,8 @@ public class OrganizationService {
      * @return OrganizationResponse with updated details
      */
     @Transactional
-    public OrganizationResponse updateOrganization(UUID id, OrganizationRequest request) {
+    @NonNull
+    public OrganizationResponse updateOrganization(@NonNull UUID id, @NonNull OrganizationRequest request) {
         Organization organization = organizationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Organization not found: " + id));
 
@@ -102,7 +115,10 @@ public class OrganizationService {
         organization.setSettings(request.getSettings());
 
         organization = organizationRepository.save(organization);
-        auditService.log("UPDATE", "ORGANIZATION", organization.getId(), Map.of("name", organization.getName()));
+        log.info("Organization updated: ID={}", organization.getId());
+        if (organization.getId() != null) {
+            auditService.log("UPDATE", "ORGANIZATION", organization.getId(), Map.of("name", organization.getName()));
+        }
 
         return modelMapper.map(organization, OrganizationResponse.class);
     }

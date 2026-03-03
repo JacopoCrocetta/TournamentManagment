@@ -1,5 +1,8 @@
 package com.tournamentmanagmentsystem.service.bracket;
 
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
+
 import com.tournamentmanagmentsystem.domain.entity.Event;
 import com.tournamentmanagmentsystem.domain.entity.Match;
 import com.tournamentmanagmentsystem.domain.entity.Participant;
@@ -32,7 +35,8 @@ public class RoundRobinEngine implements BracketEngine {
      * @return all scheduled league matches
      */
     @Override
-    public List<Match> generateInitialMatches(UUID eventId, List<Participant> participants) {
+    @NonNull
+    public List<Match> generateInitialMatches(@NonNull UUID eventId, @NonNull List<Participant> participants) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found: " + eventId));
 
@@ -45,7 +49,8 @@ public class RoundRobinEngine implements BracketEngine {
      * Round Robin does not typically have an "advance" logic as it's point-based.
      */
     @Override
-    public Match advanceWinner(Match finishedMatch) {
+    @Nullable
+    public Match advanceWinner(@NonNull Match finishedMatch) {
         return null;
     }
 

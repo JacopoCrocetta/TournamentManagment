@@ -1,5 +1,7 @@
 package com.tournamentmanagmentsystem.service.auth;
 
+import org.springframework.lang.NonNull;
+
 import com.tournamentmanagmentsystem.domain.entity.User;
 import com.tournamentmanagmentsystem.domain.enums.UserStatus;
 import com.tournamentmanagmentsystem.dto.request.AuthRequest;
@@ -9,6 +11,7 @@ import com.tournamentmanagmentsystem.repository.UserRepository;
 import com.tournamentmanagmentsystem.security.JwtService;
 import com.tournamentmanagmentsystem.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthService {
 
         private final UserRepository userRepository;
@@ -37,8 +41,10 @@ public class AuthService {
          * @throws RuntimeException if the email already exists
          */
         @Transactional
-        public AuthResponse register(RegisterRequest request) {
+        @NonNull
+        public AuthResponse register(@NonNull RegisterRequest request) {
                 if (userRepository.existsByEmail(request.getEmail())) {
+                        log.warn("Registration attempt failed: email {} already exists", request.getEmail());
                         throw new RuntimeException("Account with this email already exists");
                 }
 
@@ -50,6 +56,7 @@ public class AuthService {
                                 .build();
 
                 User savedUser = userRepository.save(user);
+                log.info("New user registered successfully: {}", savedUser.getEmail());
                 return createAuthResponse(savedUser);
         }
 
@@ -59,7 +66,8 @@ public class AuthService {
          * @param request the login credentials (email and password)
          * @return AuthResponse containing access and refresh tokens
          */
-        public AuthResponse login(AuthRequest request) {
+        @NonNull
+        public AuthResponse login(@NonNull AuthRequest request) {
                 authenticationManager.authenticate(
                                 new UsernamePasswordAuthenticationToken(
                                                 request.getEmail(),
@@ -69,6 +77,7 @@ public class AuthService {
                                 .orElseThrow(() -> new RuntimeException(
                                                 "User not found after successful authentication"));
 
+                log.info("User {} logged in successfully", user.getEmail());
                 return createAuthResponse(user);
         }
 
@@ -78,7 +87,7 @@ public class AuthService {
          * @param user the user entity
          * @return AuthResponse with JWT tokens
          */
-        private AuthResponse createAuthResponse(User user) {
+        private AuthResponse createAuthResponse(@org.springframework.lang.NonNull User user) {
                 UserDetailsImpl userDetails = UserDetailsImpl.build(user);
                 String accessToken = jwtService.generateToken(userDetails);
                 String refreshToken = jwtService.generateRefreshToken(userDetails);

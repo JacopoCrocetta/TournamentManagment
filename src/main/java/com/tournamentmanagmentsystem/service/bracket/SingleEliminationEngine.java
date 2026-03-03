@@ -1,5 +1,8 @@
 package com.tournamentmanagmentsystem.service.bracket;
 
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
+
 import com.tournamentmanagmentsystem.domain.entity.Event;
 import com.tournamentmanagmentsystem.domain.entity.Match;
 import com.tournamentmanagmentsystem.domain.entity.Participant;
@@ -34,7 +37,8 @@ public class SingleEliminationEngine implements BracketEngine {
      * @return persisted list of initial matches
      */
     @Override
-    public List<Match> generateInitialMatches(UUID eventId, List<Participant> participants) {
+    @NonNull
+    public List<Match> generateInitialMatches(@NonNull UUID eventId, @NonNull List<Participant> participants) {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found: " + eventId));
 
@@ -52,7 +56,8 @@ public class SingleEliminationEngine implements BracketEngine {
      * @return the next match the winner is assigned to, or null if none
      */
     @Override
-    public Match advanceWinner(Match finishedMatch) {
+    @Nullable
+    public Match advanceWinner(@NonNull Match finishedMatch) {
         // TODO: Implement advanced tree traversal to find the next placeholder match
         return null;
     }

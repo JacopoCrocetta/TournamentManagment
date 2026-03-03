@@ -1,5 +1,8 @@
 package com.tournamentmanagmentsystem.service;
 
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
+
 import com.tournamentmanagmentsystem.domain.entity.AuditLog;
 import com.tournamentmanagmentsystem.repository.AuditLogRepository;
 import com.tournamentmanagmentsystem.security.UserDetailsImpl;
@@ -34,7 +37,8 @@ public class AuditService {
      * @param payload    additional metadata about the action (e.g., changed fields)
      */
     @Async
-    public void log(String action, String entityType, UUID entityId, Map<String, Object> payload) {
+    public void log(@NonNull String action, @NonNull String entityType, @NonNull UUID entityId,
+            @NonNull Map<String, Object> payload) {
         UUID userId = getCurrentUserId();
 
         AuditLog auditLog = AuditLog.builder()
@@ -49,6 +53,7 @@ public class AuditService {
         log.info("Audit log saved: {} on {} ID: {}. Triggered by user: {}", action, entityType, entityId, userId);
     }
 
+    @Nullable
     private UUID getCurrentUserId() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.getPrincipal() instanceof UserDetailsImpl userDetails) {

@@ -1,5 +1,7 @@
 package com.tournamentmanagmentsystem.service;
 
+import org.springframework.lang.NonNull;
+
 import com.tournamentmanagmentsystem.domain.entity.Event;
 import com.tournamentmanagmentsystem.domain.entity.Tournament;
 import com.tournamentmanagmentsystem.dto.request.EventRequest;
@@ -35,7 +37,8 @@ public class EventService {
      * @throws RuntimeException if tournament is not found
      */
     @Transactional
-    public EventResponse createEvent(EventRequest request) {
+    @NonNull
+    public EventResponse createEvent(@NonNull EventRequest request) {
         Tournament tournament = tournamentRepository.findById(request.getTournamentId())
                 .orElseThrow(() -> new RuntimeException("Tournament not found: " + request.getTournamentId()));
 
@@ -58,7 +61,8 @@ public class EventService {
      * @return list of event details
      */
     @Transactional(readOnly = true)
-    public List<EventResponse> getEventsByTournament(UUID tournamentId) {
+    @NonNull
+    public List<EventResponse> getEventsByTournament(@NonNull UUID tournamentId) {
         return eventRepository.findByTournamentId(tournamentId).stream()
                 .map(event -> modelMapper.map(event, EventResponse.class))
                 .collect(Collectors.toList());
@@ -72,7 +76,8 @@ public class EventService {
      * @throws RuntimeException if event not found
      */
     @Transactional(readOnly = true)
-    public EventResponse getEvent(UUID id) {
+    @NonNull
+    public EventResponse getEvent(@NonNull UUID id) {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Event not found: " + id));
         return modelMapper.map(event, EventResponse.class);
