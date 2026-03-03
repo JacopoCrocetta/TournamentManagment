@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://db:5432/tournament_db
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  liquibase:
+    enabled: true
+    url: jdbc:postgresql://db:5432/tournament_db
+    user: postgres
+    password: postgres
+
+logging:
+  level:
+    com.tournamentmanagmentsystem: DEBUG

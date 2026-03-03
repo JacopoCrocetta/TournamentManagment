@@ -1,65 +1,79 @@
-<h1 align="center">Welcome to Tournament Managment 👋</h1>
-<p>
-  <img alt="Version" src="https://img.shields.io/badge/version-1.0.0-blue.svg?cacheSeconds=2592000" />
-  <a href="https://github.com/JacopoCrocetta/TournamentManagment#readme" target="_blank">
-    <img alt="Documentation" src="https://img.shields.io/badge/documentation-yes-brightgreen.svg" />
-  </a>
-  <a href="https://github.com/JacopoCrocetta/TournamentManagment/graphs/commit-activity" target="_blank">
-    <img alt="Maintenance" src="https://img.shields.io/badge/Maintained%3F-yes-green.svg" />
-  </a>
-  <a href="https://github.com/JacopoCrocetta/TournamentManagment/blob/master/LICENSE" target="_blank">
-    <img alt="License: ISC" src="https://img.shields.io/github/license/JacopoCrocetta/Tournament Managment" />
-  </a>
-</p>
+# Tournament Management System
 
-> Tournament Managment
+A robust, enterprise-grade backend for managing sports and gaming tournaments. Built with Spring Boot 3.4, Java 21, and PostgreSQL.
 
-### 🏠 [Homepage](https://github.com/JacopoCrocetta/TournamentManagment#readme)
+## 🚀 Overview
 
-## Install
-First of all, run the command
+This system provides a comprehensive API to handle organizations, multi-format tournaments (Single Elimination, Round Robin), participant registration, and live match results. It features Role-Based Access Control (RBAC), automated bracket generation, and asynchronous auditing.
 
-```sh
-npm install
+### Key Features
+- **Authentication**: JWT-based security with access and refresh tokens.
+- **Organization Management**: Multi-tenancy support with organizations and memberships.
+- **Tournament Lifecycle**: DRAFT -> REGISTRATION -> IN_PROGRESS -> COMPLETED.
+- **Bracket Support**:
+  - **Single Elimination**: Automated pairing and winner advancement (basic).
+  - **Round Robin**: Full league permutation generation.
+- **Security**: Granular RBAC (ORG_ADMIN, TOURNAMENT_ADMIN, REFEREE, VIEWER).
+- **Audit**: Asynchronous logging of all critical system actions into the database.
+- **Application Logging**: Structured logging with SLF4J and Logback, including daily log rotation and colorized console output.
+
+## 🛠 Tech Stack
+- **Core**: Java 21, Spring Boot 3.4
+- **Database**: PostgreSQL (JSONB for dynamic fields)
+- **Migrations**: Liquibase
+- **Mapping**: ModelMapper
+- **Security**: Spring Security + JJWT
+- **API Documentation**: Springdoc OpenAPI
+- **Testing**: JUnit 5, Mockito, Testcontainers
+
+## 🏁 Getting Started
+
+### Prerequisites
+- JDK 21
+- Docker (for PostgreSQL and Testcontainers)
+- Maven 3.9+
+
+### Installation (Manual)
+1. Clone the repository.
+2. Configure your `application.yml` with your database credentials and JWT secret.
+3. Run migrations and start the app:
+   ```bash
+   mvn spring-boot:run
+   ```
+
+### 🐳 Docker Deployment (Recommended)
+You can start the entire stack (App + PostgreSQL) with a single command:
+```bash
+docker-compose up --build
+```
+This will:
+- Build the optimized multi-stage image.
+- Start a PostgreSQL 16 container with healthchecks.
+- Start the application using the `docker` Spring profile.
+
+Once started, the app will be reachable at `http://localhost:8080`.
+
+### Documentation
+Once the app is running, access the interactive API docs at:
+`http://localhost:8080/swagger-ui.html`
+
+## 🧪 Testing
+The project includes a comprehensive test suite:
+- **Unit Tests**: Coverage for all service logic and security rules.
+- **Integration Tests**: (In Progress) End-to-end flows using Testcontainers.
+
+Run tests with:
+```bash
+mvn clean verify
 ```
 
-## Usage
-Once all the dependencies are installed, you will need to launch the project build with the command
+## 📖 Developer Guide
+This project follows **Clean Code** principles and **SOLID** design patterns.
+- **Controllers**: Thin layers for request/response handling and Swagger definitions.
+- **Services**: Contain business logic and are annotated with JavaDocs for clarity.
+- **Domain**: Rich entities using JPA and Lombok.
+- **Security**: Logic is centralized in `SecurityService` for maintainability.
+- **Logging**: Uses `@Slf4j` for technical logs (errors, info) and a custom `AuditService` for business-level auditing. Logs are stored in `./logs` with a 30-day retention policy.
 
-```sh
-npm run build
-```
-
-then run the command
-```sh
-npm run start
-```
-
-## Run tests
-
-```sh
-npm run test
-```
-
-## Author
-
-👤 **Jacopo Crocetta**
-
-* Website: https://www.linkedin.com/in/jacopo-crocetta-27119218a/
-* Github: [@JacopoCrocetta](https://github.com/JacopoCrocetta)
-
-## 🤝 Contributing
-
-Contributions, issues and feature requests are welcome!<br />Feel free to check [issues page](https://github.com/JacopoCrocetta/TournamentManagment/issues). You can also take a look at the [contributing guide](https://github.com/JacopoCrocetta/TournamentManagment/blob/master/CONTRIBUTING.md).
-
-## Show your support
-
-Give a ⭐️ if this project helped you!
-
-## 📝 License
-
-Copyright © 2023 [Jacopo Crocetta](https://github.com/JacopoCrocetta).<br />
-This project is [ISC](https://github.com/JacopoCrocetta/TournamentManagment/blob/master/LICENSE) licensed.
-
-***
-_This README was generated with ❤️ by [readme-md-generator](https://github.com/kefranabg/readme-md-generator)_
+---
+*Developed as part of the Tournament Management System modernization initiative.*
