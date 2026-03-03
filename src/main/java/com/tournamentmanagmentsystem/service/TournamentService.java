@@ -7,6 +7,8 @@ import com.tournamentmanagmentsystem.domain.entity.Tournament;
 import com.tournamentmanagmentsystem.domain.enums.TournamentStatus;
 import com.tournamentmanagmentsystem.dto.request.TournamentRequest;
 import com.tournamentmanagmentsystem.dto.response.TournamentResponse;
+import com.tournamentmanagmentsystem.exception.BusinessException;
+import com.tournamentmanagmentsystem.exception.ResourceNotFoundException;
 import com.tournamentmanagmentsystem.repository.OrganizationRepository;
 import com.tournamentmanagmentsystem.repository.TournamentRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -47,11 +50,12 @@ public class TournamentService {
     @NonNull
     public TournamentResponse createTournament(@NonNull TournamentRequest request) {
         Organization organization = organizationRepository.findById(request.getOrganizationId())
-                .orElseThrow(() -> new RuntimeException("Organization not found: " + request.getOrganizationId()));
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Organization not found: " + request.getOrganizationId()));
 
         Tournament tournament = modelMapper.map(request, Tournament.class);
         if (tournament == null) {
-            throw new RuntimeException("Failed to map request to Tournament entity");
+            throw new BusinessException("Failed to map request to Tournament entity");
         }
 
         tournament.setOrganization(organization);
@@ -63,7 +67,8 @@ public class TournamentService {
             auditService.log("CREATE", "TOURNAMENT", savedTournament.getId(),
                     Map.of("name", savedTournament.getName()));
         }
-        return modelMapper.map(savedTournament, TournamentResponse.class);
+        return Objects.requireNonNull(modelMapper.map(savedTournament, TournamentResponse.class),
+                "Mapped response must not be null");
     }
 
     /**
@@ -77,8 +82,9 @@ public class TournamentService {
     @NonNull
     public TournamentResponse getTournament(@NonNull UUID id) {
         Tournament tournament = tournamentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Tournament not found: " + id));
-        return modelMapper.map(tournament, TournamentResponse.class);
+                .orElseThrow(() -> new ResourceNotFoundException("Tournament not found: " + id));
+        return Objects.requireNonNull(modelMapper.map(tournament, TournamentResponse.class),
+                "Mapped response must not be null");
     }
 
     /**
@@ -107,7 +113,7 @@ public class TournamentService {
     @NonNull
     public TournamentResponse updateStatus(@NonNull UUID id, @NonNull TournamentStatus newStatus) {
         Tournament tournament = tournamentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Tournament not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Tournament not found: " + id));
 
         validateStatusTransition(tournament.getStatus(), newStatus);
 
@@ -119,7 +125,8 @@ public class TournamentService {
         if (savedTournament.getId() != null) {
             auditService.log("UPDATE_STATUS", "TOURNAMENT", savedTournament.getId(), Map.of("newStatus", newStatus));
         }
-        return modelMapper.map(savedTournament, TournamentResponse.class);
+        return Objects.requireNonNull(modelMapper.map(savedTournament, TournamentResponse.class),
+                "Mapped response must not be null");
     }
 
     /**
@@ -135,7 +142,7 @@ public class TournamentService {
         }
 
         if (current == TournamentStatus.COMPLETED || current == TournamentStatus.CANCELLED) {
-            throw new RuntimeException("Cannot change status of a finished or cancelled tournament (" + current + ")");
+            throw new BusinessException("Cannot change status of a finished or cancelled tournament (" + current + ")");
         }
 
         // Add more specific rules as needed:

@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,7 +43,8 @@ public class OrganizationController {
             @ApiResponse(responseCode = "200", description = "Organization created successfully"),
             @ApiResponse(responseCode = "400", description = "Slug already exists or validation failed", content = @Content)
     })
-    public ResponseEntity<OrganizationResponse> create(@Valid @RequestBody OrganizationRequest request) {
+    @NonNull
+    public ResponseEntity<OrganizationResponse> create(@Valid @RequestBody @NonNull OrganizationRequest request) {
         return ResponseEntity.ok(organizationService.createOrganization(request));
     }
 
@@ -53,6 +55,7 @@ public class OrganizationController {
      */
     @GetMapping
     @Operation(summary = "List current user's organizations", description = "Returns a list of all organizations where the authenticated user is registered as a member.")
+    @NonNull
     public ResponseEntity<List<OrganizationResponse>> getAll() {
         return ResponseEntity.ok(organizationService.getAllMyOrganizations());
     }
@@ -71,7 +74,8 @@ public class OrganizationController {
             @ApiResponse(responseCode = "404", description = "Organization not found", content = @Content)
     })
     @PreAuthorize("@securityService.hasRoleInOrganization(#id, 'VIEWER')")
-    public ResponseEntity<OrganizationResponse> getById(@PathVariable UUID id) {
+    @NonNull
+    public ResponseEntity<OrganizationResponse> getById(@PathVariable @NonNull UUID id) {
         return ResponseEntity.ok(organizationService.getOrganization(id));
     }
 
@@ -88,8 +92,9 @@ public class OrganizationController {
             @ApiResponse(responseCode = "403", description = "Forbidden - Admin access required", content = @Content)
     })
     @PreAuthorize("@securityService.hasRoleInOrganization(#id, 'ORG_ADMIN')")
-    public ResponseEntity<OrganizationResponse> update(@PathVariable UUID id,
-            @Valid @RequestBody OrganizationRequest request) {
+    @NonNull
+    public ResponseEntity<OrganizationResponse> update(@PathVariable @NonNull UUID id,
+            @Valid @RequestBody @NonNull OrganizationRequest request) {
         return ResponseEntity.ok(organizationService.updateOrganization(id, request));
     }
 }

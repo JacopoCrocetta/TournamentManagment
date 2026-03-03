@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,7 +51,9 @@ public class MatchController {
             @ApiResponse(responseCode = "403", description = "Access denied - Admin role required", content = @Content)
     })
     @PreAuthorize("@securityService.isTournamentAdminOfEvent(#eventId)")
-    public ResponseEntity<List<MatchResponse>> generate(@PathVariable UUID eventId, @RequestParam FormatType format) {
+    @NonNull
+    public ResponseEntity<List<MatchResponse>> generate(@PathVariable @NonNull UUID eventId,
+            @RequestParam @NonNull FormatType format) {
         return ResponseEntity.ok(bracketService.generateBracket(eventId, format).stream()
                 .map(match -> modelMapper.map(match, MatchResponse.class))
                 .collect(Collectors.toList()));
@@ -70,9 +73,10 @@ public class MatchController {
             @ApiResponse(responseCode = "403", description = "Access denied - Referee permissions required", content = @Content)
     })
     @PreAuthorize("@securityService.isRefereeOfMatch(#matchId)")
+    @NonNull
     public ResponseEntity<MatchResponse> updateResult(
-            @PathVariable UUID matchId,
-            @Parameter(description = "Score and winner ID") @RequestBody MatchResultRequest request) {
+            @PathVariable @NonNull UUID matchId,
+            @Parameter(description = "Score and winner ID") @RequestBody @NonNull MatchResultRequest request) {
         return ResponseEntity.ok(matchService.updateResult(matchId, request));
     }
 }

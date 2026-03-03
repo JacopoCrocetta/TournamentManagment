@@ -6,6 +6,8 @@ import com.tournamentmanagmentsystem.domain.entity.Event;
 import com.tournamentmanagmentsystem.domain.entity.Tournament;
 import com.tournamentmanagmentsystem.dto.request.EventRequest;
 import com.tournamentmanagmentsystem.dto.response.EventResponse;
+import com.tournamentmanagmentsystem.exception.BusinessException;
+import com.tournamentmanagmentsystem.exception.ResourceNotFoundException;
 import com.tournamentmanagmentsystem.repository.EventRepository;
 import com.tournamentmanagmentsystem.repository.TournamentRepository;
 import lombok.RequiredArgsConstructor;
@@ -40,11 +42,11 @@ public class EventService {
     @NonNull
     public EventResponse createEvent(@NonNull EventRequest request) {
         Tournament tournament = tournamentRepository.findById(request.getTournamentId())
-                .orElseThrow(() -> new RuntimeException("Tournament not found: " + request.getTournamentId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Tournament not found: " + request.getTournamentId()));
 
         Event event = modelMapper.map(request, Event.class);
         if (event == null) {
-            throw new RuntimeException("Mapping error during event creation");
+            throw new BusinessException("Mapping error during event creation");
         }
 
         event.setTournament(tournament);
@@ -79,7 +81,7 @@ public class EventService {
     @NonNull
     public EventResponse getEvent(@NonNull UUID id) {
         Event event = eventRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Event not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found: " + id));
         return modelMapper.map(event, EventResponse.class);
     }
 }

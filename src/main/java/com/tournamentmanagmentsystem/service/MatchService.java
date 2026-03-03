@@ -8,6 +8,7 @@ import com.tournamentmanagmentsystem.domain.entity.Participant;
 import com.tournamentmanagmentsystem.domain.enums.MatchStatus;
 import com.tournamentmanagmentsystem.dto.request.MatchResultRequest;
 import com.tournamentmanagmentsystem.dto.response.MatchResponse;
+import com.tournamentmanagmentsystem.exception.ResourceNotFoundException;
 import com.tournamentmanagmentsystem.repository.MatchRepository;
 import com.tournamentmanagmentsystem.service.bracket.SingleEliminationEngine;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +40,7 @@ public class MatchService {
     @NonNull
     public MatchResponse updateResult(@NonNull UUID matchId, @NonNull MatchResultRequest request) {
         Match match = matchRepository.findById(matchId)
-                .orElseThrow(() -> new RuntimeException("Match not found: " + matchId));
+                .orElseThrow(() -> new ResourceNotFoundException("Match not found: " + matchId));
 
         applyResultToMatch(match, request);
         Match savedMatch = matchRepository.save(match);
@@ -50,7 +51,7 @@ public class MatchService {
 
         log.info("Match result updated: ID={}, winnerID={}", savedMatch.getId(), request.getWinnerId());
 
-        return modelMapper.map(savedMatch, MatchResponse.class);
+        return Objects.requireNonNull(modelMapper.map(savedMatch, MatchResponse.class), "Mapped response must not be null");
     }
 
     private void applyResultToMatch(@NonNull Match match, @NonNull MatchResultRequest request) {
@@ -61,7 +62,7 @@ public class MatchService {
 
     private void logResultUpdate(@NonNull Match match, @NonNull MatchResultRequest request) {
         if (match.getId() != null) {
-            auditService.log("UPDATE_RESULT", "MATCH", match.getId(), Map.of(
+            auditService.log("UPDATE_RESULT", "MATCH", Objects.requireNonNull(match.getId()), Map.of(
                     "winnerId", request.getWinnerId() != null ? request.getWinnerId().toString() : "null",
                     "score", request.getScore() != null ? request.getScore() : Collections.emptyMap()));
         }

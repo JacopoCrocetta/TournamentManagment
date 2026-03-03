@@ -7,6 +7,7 @@ import com.tournamentmanagmentsystem.domain.entity.Event;
 import com.tournamentmanagmentsystem.domain.entity.Match;
 import com.tournamentmanagmentsystem.domain.entity.Participant;
 import com.tournamentmanagmentsystem.domain.enums.MatchStatus;
+import com.tournamentmanagmentsystem.exception.ResourceNotFoundException;
 import com.tournamentmanagmentsystem.repository.EventRepository;
 import com.tournamentmanagmentsystem.repository.MatchRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -38,11 +40,12 @@ public class RoundRobinEngine implements BracketEngine {
     @NonNull
     public List<Match> generateInitialMatches(@NonNull UUID eventId, @NonNull List<Participant> participants) {
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new RuntimeException("Event not found: " + eventId));
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found: " + eventId));
 
-        List<Match> leagueMatches = generateAllPermutations(event, participants);
+        List<Match> leagueMatches = generateAllPermutations(Objects.requireNonNull(event, "Event must not be null"),
+                participants);
 
-        return matchRepository.saveAll(leagueMatches);
+        return Objects.requireNonNull(matchRepository.saveAll(leagueMatches), "Saved matches must not be null");
     }
 
     /**
@@ -54,25 +57,30 @@ public class RoundRobinEngine implements BracketEngine {
         return null;
     }
 
-    private List<Match> generateAllPermutations(Event event, List<Participant> participants) {
+    @NonNull
+    private List<Match> generateAllPermutations(@NonNull Event event, @NonNull List<Participant> participants) {
         List<Match> matches = new ArrayList<>();
         int n = participants.size();
 
         for (int i = 0; i < n; i++) {
             for (int j = i + 1; j < n; j++) {
-                matches.add(createLeagueMatch(event, participants.get(i), participants.get(j)));
+                matches.add(createLeagueMatch(event,
+                        Objects.requireNonNull(participants.get(i), "Participant A must not be null"),
+                        Objects.requireNonNull(participants.get(j), "Participant B must not be null")));
             }
         }
         return matches;
     }
 
-    private Match createLeagueMatch(Event event, Participant p1, Participant p2) {
-        return Match.builder()
+    @NonNull
+    private Match createLeagueMatch(@NonNull Event event, @NonNull Participant p1, @NonNull Participant p2) {
+        Match match = Match.builder()
                 .event(event)
                 .stage("LEAGUE")
                 .participantA(p1)
                 .participantB(p2)
                 .status(MatchStatus.PENDING)
                 .build();
+        return Objects.requireNonNull(match, "Match must not be null");
     }
 }

@@ -21,6 +21,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -101,5 +102,24 @@ class OrganizationServiceTest {
     void createOrganization_DuplicateSlug_ThrowsException() {
         when(organizationRepository.findBySlug(request.getSlug())).thenReturn(Optional.of(organization));
         assertThrows(RuntimeException.class, () -> organizationService.createOrganization(request));
+    }
+
+    @Test
+    void getAllMyOrganizations_Success() {
+        UserDetailsImpl userDetails = mock(UserDetailsImpl.class);
+        when(userDetails.getId()).thenReturn(Objects.requireNonNull(userId));
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getPrincipal()).thenReturn(userDetails);
+        when(userRepository.findById(Objects.requireNonNull(userId))).thenReturn(Optional.of(user));
+
+        Membership membership = Membership.builder().user(user).organization(organization).build();
+        when(membershipRepository.findByUser(user)).thenReturn(java.util.List.of(membership));
+        when(modelMapper.map(any(), eq(OrganizationResponse.class))).thenReturn(new OrganizationResponse());
+
+        java.util.List<OrganizationResponse> responses = organizationService.getAllMyOrganizations();
+
+        assertNotNull(responses);
+        assertEquals(1, responses.size());
+        verify(membershipRepository).findByUser(user);
     }
 }

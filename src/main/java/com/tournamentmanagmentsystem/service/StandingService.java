@@ -61,7 +61,7 @@ public class StandingService {
         return standingRepository.findByEventIdOrderByPointsDesc(eventId);
     }
 
-    private Standing createInitialStanding(Event event, Participant participant) {
+    private Standing createInitialStanding(@NonNull Event event, @NonNull Participant participant) {
         return Standing.builder()
                 .event(event)
                 .participant(participant)

@@ -39,18 +39,28 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problemDetail);
         }
 
+        @ExceptionHandler(BaseException.class)
+        public ResponseEntity<ProblemDetail> handleBaseException(@NonNull BaseException ex) {
+                log.warn("Domain exception occurred: {} - {}", ex.getStatus(), ex.getMessage());
+                ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                                ex.getStatus(),
+                                ex.getMessage());
+                problemDetail.setTitle(ex.getClass().getSimpleName().replace("Exception", " Error"));
+                return ResponseEntity.status(ex.getStatus()).body(problemDetail);
+        }
+
         @ExceptionHandler(RuntimeException.class)
-        public ResponseEntity<ProblemDetail> handleRuntimeException(RuntimeException ex) {
+        public ResponseEntity<ProblemDetail> handleRuntimeException(@NonNull RuntimeException ex) {
                 log.error("Unhandled RuntimeException occurred: ", ex);
                 ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                                 HttpStatus.INTERNAL_SERVER_ERROR,
-                                ex.getMessage());
+                                "An internal server error occurred.");
                 problemDetail.setTitle("Internal Server Error");
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problemDetail);
         }
 
         @ExceptionHandler(Exception.class)
-        public ResponseEntity<ProblemDetail> handleGeneralException(Exception ex) {
+        public ResponseEntity<ProblemDetail> handleGeneralException(@NonNull Exception ex) {
                 log.error("Unexpected Exception occurred: ", ex);
                 ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                                 HttpStatus.INTERNAL_SERVER_ERROR,

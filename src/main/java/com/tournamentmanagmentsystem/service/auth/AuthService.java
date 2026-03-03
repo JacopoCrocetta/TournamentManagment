@@ -7,6 +7,8 @@ import com.tournamentmanagmentsystem.domain.enums.UserStatus;
 import com.tournamentmanagmentsystem.dto.request.AuthRequest;
 import com.tournamentmanagmentsystem.dto.request.RegisterRequest;
 import com.tournamentmanagmentsystem.dto.response.AuthResponse;
+import com.tournamentmanagmentsystem.exception.ConflictException;
+import com.tournamentmanagmentsystem.exception.ResourceNotFoundException;
 import com.tournamentmanagmentsystem.repository.UserRepository;
 import com.tournamentmanagmentsystem.security.JwtService;
 import com.tournamentmanagmentsystem.security.UserDetailsImpl;
@@ -17,6 +19,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Objects;
 
 /**
  * Service responsible for user authentication and registration operations.
@@ -38,14 +42,14 @@ public class AuthService {
          * @param request the registration details including email, password, and
          *                display name
          * @return AuthResponse containing access and refresh tokens
-         * @throws RuntimeException if the email already exists
+         * @throws ConflictException if the email already exists
          */
         @Transactional
         @NonNull
         public AuthResponse register(@NonNull RegisterRequest request) {
                 if (userRepository.existsByEmail(request.getEmail())) {
                         log.warn("Registration attempt failed: email {} already exists", request.getEmail());
-                        throw new RuntimeException("Account with this email already exists");
+                        throw new ConflictException("Account with this email already exists");
                 }
 
                 User user = User.builder()
@@ -56,6 +60,9 @@ public class AuthService {
                                 .build();
 
                 User savedUser = userRepository.save(user);
+                if (savedUser == null) {
+                        throw new ConflictException("Failed to register user");
+                }
                 log.info("New user registered successfully: {}", savedUser.getEmail());
                 return createAuthResponse(savedUser);
         }
@@ -65,6 +72,7 @@ public class AuthService {
          *
          * @param request the login credentials (email and password)
          * @return AuthResponse containing access and refresh tokens
+         * @throws ResourceNotFoundException if user is not found after authentication
          */
         @NonNull
         public AuthResponse login(@NonNull AuthRequest request) {
@@ -74,7 +82,7 @@ public class AuthService {
                                                 request.getPassword()));
 
                 User user = userRepository.findByEmail(request.getEmail())
-                                .orElseThrow(() -> new RuntimeException(
+                                .orElseThrow(() -> new ResourceNotFoundException(
                                                 "User not found after successful authentication"));
 
                 log.info("User {} logged in successfully", user.getEmail());
@@ -87,16 +95,19 @@ public class AuthService {
          * @param user the user entity
          * @return AuthResponse with JWT tokens
          */
-        private AuthResponse createAuthResponse(@org.springframework.lang.NonNull User user) {
+        @NonNull
+        private AuthResponse createAuthResponse(@NonNull User user) {
                 UserDetailsImpl userDetails = UserDetailsImpl.build(user);
                 String accessToken = jwtService.generateToken(userDetails);
                 String refreshToken = jwtService.generateRefreshToken(userDetails);
 
-                return AuthResponse.builder()
+                AuthResponse response = AuthResponse.builder()
                                 .accessToken(accessToken)
                                 .refreshToken(refreshToken)
                                 .email(user.getEmail())
                                 .displayName(user.getDisplayName())
                                 .build();
+
+                return Objects.requireNonNull(response, "AuthResponse must not be null");
         }
 }

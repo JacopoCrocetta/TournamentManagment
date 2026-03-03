@@ -3,6 +3,7 @@ package com.tournamentmanagmentsystem.service.bracket;
 import com.tournamentmanagmentsystem.domain.entity.Match;
 import com.tournamentmanagmentsystem.domain.entity.Participant;
 import com.tournamentmanagmentsystem.domain.enums.FormatType;
+import com.tournamentmanagmentsystem.exception.BusinessException;
 import com.tournamentmanagmentsystem.repository.ParticipantRepository;
 import com.tournamentmanagmentsystem.service.AuditService;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,7 +13,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import org.springframework.lang.NonNull;
+
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,12 +37,12 @@ class BracketServiceTest {
     @InjectMocks
     private BracketService bracketService;
 
-    private UUID eventId;
+    @NonNull
+    private UUID eventId = UUID.randomUUID();
     private List<Participant> participants;
 
     @BeforeEach
     void setUp() {
-        eventId = UUID.randomUUID();
         participants = List.of(Participant.builder().id(UUID.randomUUID()).build());
         when(participantRepository.findByTournamentId(eventId)).thenReturn(participants);
     }
@@ -46,31 +50,35 @@ class BracketServiceTest {
     @Test
     void generateBracket_SingleElimination_Success() {
         List<Match> expectedMatches = List.of(new Match());
-        when(singleEliminationEngine.generateInitialMatches(eventId, participants)).thenReturn(expectedMatches);
+        when(singleEliminationEngine.generateInitialMatches(Objects.requireNonNull(eventId),
+                Objects.requireNonNull(participants))).thenReturn(expectedMatches);
 
         List<Match> results = bracketService.generateBracket(eventId, FormatType.SINGLE_ELIMINATION);
 
         assertEquals(expectedMatches, results);
-        verify(singleEliminationEngine).generateInitialMatches(eventId, participants);
+        verify(singleEliminationEngine).generateInitialMatches(Objects.requireNonNull(eventId),
+                Objects.requireNonNull(participants));
         verify(roundRobinEngine, never()).generateInitialMatches(any(), any());
-        verify(auditService).log(eq("GENERATE_BRACKET"), eq("EVENT"), eq(eventId), anyMap());
+        verify(auditService).log(eq("GENERATE_BRACKET"), eq("EVENT"), eq(Objects.requireNonNull(eventId)), anyMap());
     }
 
     @Test
     void generateBracket_RoundRobin_Success() {
         List<Match> expectedMatches = List.of(new Match());
-        when(roundRobinEngine.generateInitialMatches(eventId, participants)).thenReturn(expectedMatches);
+        when(roundRobinEngine.generateInitialMatches(Objects.requireNonNull(eventId),
+                Objects.requireNonNull(participants))).thenReturn(expectedMatches);
 
         List<Match> results = bracketService.generateBracket(eventId, FormatType.ROUND_ROBIN);
 
         assertEquals(expectedMatches, results);
-        verify(roundRobinEngine).generateInitialMatches(eventId, participants);
+        verify(roundRobinEngine).generateInitialMatches(Objects.requireNonNull(eventId),
+                Objects.requireNonNull(participants));
         verify(singleEliminationEngine, never()).generateInitialMatches(any(), any());
     }
 
     @Test
     void generateBracket_UnsupportedFormat_ThrowsException() {
-        assertThrows(UnsupportedOperationException.class,
-                () -> bracketService.generateBracket(eventId, FormatType.DOUBLE_ELIMINATION));
+        assertThrows(BusinessException.class,
+                () -> bracketService.generateBracket(Objects.requireNonNull(eventId), FormatType.DOUBLE_ELIMINATION));
     }
 }

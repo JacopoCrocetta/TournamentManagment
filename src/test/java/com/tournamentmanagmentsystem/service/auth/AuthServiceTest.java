@@ -4,6 +4,7 @@ import com.tournamentmanagmentsystem.domain.entity.User;
 import com.tournamentmanagmentsystem.dto.request.AuthRequest;
 import com.tournamentmanagmentsystem.dto.request.RegisterRequest;
 import com.tournamentmanagmentsystem.dto.response.AuthResponse;
+import com.tournamentmanagmentsystem.exception.ConflictException;
 import com.tournamentmanagmentsystem.repository.UserRepository;
 import com.tournamentmanagmentsystem.security.JwtService;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +17,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -67,7 +69,7 @@ class AuthServiceTest {
         when(jwtService.generateToken(any())).thenReturn("accessToken");
         when(jwtService.generateRefreshToken(any())).thenReturn("refreshToken");
 
-        AuthResponse response = authService.register(registerRequest);
+        AuthResponse response = authService.register(Objects.requireNonNull(registerRequest));
 
         assertNotNull(response);
         assertEquals("test@example.com", response.getEmail());
@@ -79,17 +81,17 @@ class AuthServiceTest {
     void register_AlreadyExists_ThrowsException() {
         when(userRepository.existsByEmail(anyString())).thenReturn(true);
 
-        assertThrows(RuntimeException.class, () -> authService.register(registerRequest));
+        assertThrows(ConflictException.class, () -> authService.register(Objects.requireNonNull(registerRequest)));
         verify(userRepository, never()).save(any(User.class));
     }
 
     @Test
     void login_Success() {
-        when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(user));
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(Objects.requireNonNull(user)));
         when(jwtService.generateToken(any())).thenReturn("accessToken");
         when(jwtService.generateRefreshToken(any())).thenReturn("refreshToken");
 
-        AuthResponse response = authService.login(authRequest);
+        AuthResponse response = authService.login(Objects.requireNonNull(authRequest));
 
         assertNotNull(response);
         assertEquals("accessToken", response.getAccessToken());

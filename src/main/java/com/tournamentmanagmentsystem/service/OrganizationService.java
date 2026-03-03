@@ -8,6 +8,9 @@ import com.tournamentmanagmentsystem.domain.entity.User;
 import com.tournamentmanagmentsystem.domain.enums.Role;
 import com.tournamentmanagmentsystem.dto.request.OrganizationRequest;
 import com.tournamentmanagmentsystem.dto.response.OrganizationResponse;
+import com.tournamentmanagmentsystem.exception.BusinessException;
+import com.tournamentmanagmentsystem.exception.ConflictException;
+import com.tournamentmanagmentsystem.exception.ResourceNotFoundException;
 import com.tournamentmanagmentsystem.repository.MembershipRepository;
 import com.tournamentmanagmentsystem.repository.OrganizationRepository;
 import com.tournamentmanagmentsystem.repository.UserRepository;
@@ -21,8 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * Service for managing organizations and their members.
@@ -79,7 +82,7 @@ public class OrganizationService {
     @NonNull
     public OrganizationResponse getOrganization(@NonNull UUID id) {
         Organization organization = organizationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Organization not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Organization not found: " + id));
         return modelMapper.map(organization, OrganizationResponse.class);
     }
 
@@ -92,9 +95,9 @@ public class OrganizationService {
     @NonNull
     public List<OrganizationResponse> getAllMyOrganizations() {
         User currentUser = getCurrentUser();
-        return membershipRepository.findByUser(currentUser).stream()
+        return Objects.requireNonNull(membershipRepository.findByUser(currentUser).stream()
                 .map(membership -> modelMapper.map(membership.getOrganization(), OrganizationResponse.class))
-                .collect(Collectors.toList());
+                .toList());
     }
 
     /**
@@ -108,7 +111,7 @@ public class OrganizationService {
     @NonNull
     public OrganizationResponse updateOrganization(@NonNull UUID id, @NonNull OrganizationRequest request) {
         Organization organization = organizationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Organization not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Organization not found: " + id));
 
         organization.setName(request.getName());
         organization.setDescription(request.getDescription());
@@ -125,7 +128,7 @@ public class OrganizationService {
 
     private void validateSlugUniqueness(String slug) {
         if (organizationRepository.findBySlug(slug).isPresent()) {
-            throw new RuntimeException("Slug '" + slug + "' is already in use");
+            throw new ConflictException("Slug '" + slug + "' is already in use");
         }
     }
 
@@ -133,7 +136,7 @@ public class OrganizationService {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         return userRepository.findById(userDetails.getId())
-                .orElseThrow(() -> new RuntimeException("Current authenticated user session is invalid"));
+                .orElseThrow(() -> new BusinessException("Current authenticated user session is invalid"));
     }
 
     private void createMembership(User user, Organization organization, Role role) {

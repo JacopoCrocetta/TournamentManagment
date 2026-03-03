@@ -7,6 +7,7 @@ import com.tournamentmanagmentsystem.domain.entity.Event;
 import com.tournamentmanagmentsystem.domain.entity.Match;
 import com.tournamentmanagmentsystem.domain.entity.Participant;
 import com.tournamentmanagmentsystem.domain.enums.MatchStatus;
+import com.tournamentmanagmentsystem.exception.ResourceNotFoundException;
 import com.tournamentmanagmentsystem.repository.EventRepository;
 import com.tournamentmanagmentsystem.repository.MatchRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -40,12 +42,12 @@ public class SingleEliminationEngine implements BracketEngine {
     @NonNull
     public List<Match> generateInitialMatches(@NonNull UUID eventId, @NonNull List<Participant> participants) {
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new RuntimeException("Event not found: " + eventId));
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found: " + eventId));
 
         List<Participant> seeds = prepareSeeds(participants);
-        List<Match> initialMatches = createFirstRound(event, seeds);
+        List<Match> initialMatches = createFirstRound(Objects.requireNonNull(event, "Event must not be null"), seeds);
 
-        return matchRepository.saveAll(initialMatches);
+        return Objects.requireNonNull(matchRepository.saveAll(initialMatches), "Saved matches must not be null");
     }
 
     /**
@@ -62,31 +64,37 @@ public class SingleEliminationEngine implements BracketEngine {
         return null;
     }
 
-    private List<Participant> prepareSeeds(List<Participant> participants) {
+    @NonNull
+    private List<Participant> prepareSeeds(@NonNull List<Participant> participants) {
         List<Participant> seeds = new ArrayList<>(participants);
         Collections.shuffle(seeds); // Default to random seeding
         return seeds;
     }
 
-    private List<Match> createFirstRound(Event event, List<Participant> seeds) {
+    @NonNull
+    private List<Match> createFirstRound(@NonNull Event event, @NonNull List<Participant> seeds) {
         List<Match> matches = new ArrayList<>();
         int numParticipants = seeds.size();
 
         // Create pairs
         for (int i = 0; i < numParticipants - 1; i += 2) {
-            matches.add(buildMatch(event, seeds.get(i), seeds.get(i + 1)));
+            matches.add(buildMatch(event,
+                    Objects.requireNonNull(seeds.get(i), "Participant A must not be null"),
+                    Objects.requireNonNull(seeds.get(i + 1), "Participant B must not be null")));
         }
 
         // Handle bye if participants are odd
         if (numParticipants % 2 != 0) {
-            matches.add(buildByeMatch(event, seeds.get(numParticipants - 1)));
+            matches.add(buildByeMatch(event,
+                    Objects.requireNonNull(seeds.get(numParticipants - 1), "Bye participant must not be null")));
         }
 
         return matches;
     }
 
-    private Match buildMatch(Event event, Participant pA, Participant pB) {
-        return Match.builder()
+    @NonNull
+    private Match buildMatch(@NonNull Event event, @NonNull Participant pA, @NonNull Participant pB) {
+        Match match = Match.builder()
                 .event(event)
                 .stage("ROUND_1")
                 .roundNumber(1)
@@ -94,10 +102,12 @@ public class SingleEliminationEngine implements BracketEngine {
                 .participantB(pB)
                 .status(MatchStatus.PENDING)
                 .build();
+        return Objects.requireNonNull(match, "Match must not be null");
     }
 
-    private Match buildByeMatch(Event event, Participant pA) {
-        return Match.builder()
+    @NonNull
+    private Match buildByeMatch(@NonNull Event event, @NonNull Participant pA) {
+        Match match = Match.builder()
                 .event(event)
                 .stage("ROUND_1")
                 .roundNumber(1)
@@ -106,5 +116,6 @@ public class SingleEliminationEngine implements BracketEngine {
                 .winnerId(pA.getId())
                 .score(Collections.singletonMap("note", "BYE"))
                 .build();
+        return Objects.requireNonNull(match, "Bye match must not be null");
     }
 }

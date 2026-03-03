@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,7 +47,8 @@ public class TournamentController {
             @ApiResponse(responseCode = "403", description = "Forbidden - requires ORG_ADMIN role", content = @Content)
     })
     @PreAuthorize("@securityService.hasRoleInOrganization(#request.organizationId, 'ORG_ADMIN')")
-    public ResponseEntity<TournamentResponse> create(@Valid @RequestBody TournamentRequest request) {
+    @NonNull
+    public ResponseEntity<TournamentResponse> create(@Valid @RequestBody @NonNull TournamentRequest request) {
         return ResponseEntity.ok(tournamentService.createTournament(request));
     }
 
@@ -58,7 +60,8 @@ public class TournamentController {
      */
     @GetMapping("/{id}")
     @Operation(summary = "Get tournament details", description = "Returns the configuration and status of a specific tournament.")
-    public ResponseEntity<TournamentResponse> getById(@PathVariable UUID id) {
+    @NonNull
+    public ResponseEntity<TournamentResponse> getById(@PathVariable @NonNull UUID id) {
         return ResponseEntity.ok(tournamentService.getTournament(id));
     }
 
@@ -71,7 +74,8 @@ public class TournamentController {
     @GetMapping("/organization/{orgId}")
     @Operation(summary = "List tournaments by organization", description = "Fetches all tournaments hosted by the specified organization. Requires VIEWER role in the organization.")
     @PreAuthorize("@securityService.hasRoleInOrganization(#orgId, 'VIEWER')")
-    public ResponseEntity<List<TournamentResponse>> getByOrg(@PathVariable UUID orgId) {
+    @NonNull
+    public ResponseEntity<List<TournamentResponse>> getByOrg(@PathVariable @NonNull UUID orgId) {
         return ResponseEntity.ok(tournamentService.getTournamentsByOrganization(orgId));
     }
 
@@ -90,9 +94,10 @@ public class TournamentController {
             @ApiResponse(responseCode = "403", description = "Forbidden - requires TOURNAMENT_ADMIN role", content = @Content)
     })
     @PreAuthorize("@securityService.hasRoleInTournament(#id, 'TOURNAMENT_ADMIN')")
+    @NonNull
     public ResponseEntity<TournamentResponse> updateStatus(
-            @PathVariable UUID id,
-            @Parameter(description = "The new status to apply") @RequestParam TournamentStatus status) {
+            @PathVariable @NonNull UUID id,
+            @Parameter(description = "The new status to apply") @RequestParam @NonNull TournamentStatus status) {
         return ResponseEntity.ok(tournamentService.updateStatus(id, status));
     }
 }

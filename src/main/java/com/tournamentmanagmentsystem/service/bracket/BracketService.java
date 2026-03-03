@@ -1,8 +1,11 @@
 package com.tournamentmanagmentsystem.service.bracket;
 
+import org.springframework.lang.NonNull;
+
 import com.tournamentmanagmentsystem.domain.entity.Match;
 import com.tournamentmanagmentsystem.domain.entity.Participant;
 import com.tournamentmanagmentsystem.domain.enums.FormatType;
+import com.tournamentmanagmentsystem.exception.BusinessException;
 import com.tournamentmanagmentsystem.repository.ParticipantRepository;
 import com.tournamentmanagmentsystem.service.AuditService;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +41,8 @@ public class BracketService {
      * @throws UnsupportedOperationException if the format is not yet implemented
      */
     @Transactional
-    public List<Match> generateBracket(UUID eventId, FormatType formatType) {
+    @NonNull
+    public List<Match> generateBracket(@NonNull UUID eventId, @NonNull FormatType formatType) {
         List<Participant> participants = participantRepository.findByTournamentId(eventId);
 
         List<Match> generatedMatches = dispatchToEngine(eventId, participants, formatType);
@@ -48,16 +52,17 @@ public class BracketService {
         return generatedMatches;
     }
 
-    private List<Match> dispatchToEngine(UUID eventId, List<Participant> participants, FormatType formatType) {
+    private List<Match> dispatchToEngine(@NonNull UUID eventId, @NonNull List<Participant> participants,
+            @NonNull FormatType formatType) {
         return switch (formatType) {
             case SINGLE_ELIMINATION -> singleEliminationEngine.generateInitialMatches(eventId, participants);
             case ROUND_ROBIN -> roundRobinEngine.generateInitialMatches(eventId, participants);
             default ->
-                throw new UnsupportedOperationException("Generation logic not yet implemented for: " + formatType);
+                throw new BusinessException("Generation logic not yet implemented for: " + formatType);
         };
     }
 
-    private void logBracketGeneration(UUID eventId, FormatType formatType, int matchCount) {
+    private void logBracketGeneration(@NonNull UUID eventId, @NonNull FormatType formatType, int matchCount) {
         auditService.log("GENERATE_BRACKET", "EVENT", eventId, Map.of(
                 "format", formatType,
                 "matchCount", matchCount));

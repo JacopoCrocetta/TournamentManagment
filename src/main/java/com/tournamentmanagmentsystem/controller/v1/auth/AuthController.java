@@ -6,12 +6,12 @@ import com.tournamentmanagmentsystem.dto.response.AuthResponse;
 import com.tournamentmanagmentsystem.service.auth.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,7 +42,8 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "User successfully registered"),
             @ApiResponse(responseCode = "400", description = "Email already in use or invalid input data", content = @Content)
     })
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
+    @NonNull
+    public ResponseEntity<AuthResponse> register(@NonNull @Valid @RequestBody RegisterRequest request) {
         return ResponseEntity.ok(authService.register(request));
     }
 
@@ -57,7 +58,8 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "Successfully authenticated"),
             @ApiResponse(responseCode = "401", description = "Invalid credentials", content = @Content)
     })
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request) {
+    @NonNull
+    public ResponseEntity<AuthResponse> login(@NonNull @Valid @RequestBody AuthRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 }

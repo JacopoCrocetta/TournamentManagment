@@ -9,6 +9,8 @@ import com.tournamentmanagmentsystem.domain.enums.ParticipantStatus;
 import com.tournamentmanagmentsystem.domain.enums.TournamentStatus;
 import com.tournamentmanagmentsystem.dto.request.ParticipantRequest;
 import com.tournamentmanagmentsystem.dto.response.ParticipantResponse;
+import com.tournamentmanagmentsystem.exception.BusinessException;
+import com.tournamentmanagmentsystem.exception.ResourceNotFoundException;
 import com.tournamentmanagmentsystem.repository.ParticipantRepository;
 import com.tournamentmanagmentsystem.repository.TournamentRepository;
 import com.tournamentmanagmentsystem.repository.UserRepository;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -45,7 +48,8 @@ public class ParticipantService {
     @Transactional
     @NonNull
     public ParticipantResponse register(@NonNull ParticipantRequest request) {
-        Tournament tournament = fetchTournament(request.getTournamentId());
+        Tournament tournament = fetchTournament(
+                Objects.requireNonNull(request.getTournamentId(), "Tournament ID must not be null"));
         ensureRegistrationIsOpen(tournament);
 
         ParticipantStatus enrollmentStatus = determineEnrollmentStatus(tournament);
@@ -60,7 +64,14 @@ public class ParticipantService {
         associateUserIfExists(participant, request.getUserId());
 
         Participant savedParticipant = participantRepository.save(participant);
-        return modelMapper.map(savedParticipant, ParticipantResponse.class);
+        if (savedParticipant == null) {
+            throw new BusinessException("Failed to save participant");
+        }
+        ParticipantResponse response = modelMapper.map(savedParticipant, ParticipantResponse.class);
+        if (response == null) {
+            throw new BusinessException("Failed to map participant response");
+        }
+        return response;
     }
 
     /**
@@ -77,14 +88,14 @@ public class ParticipantService {
                 .collect(Collectors.toList());
     }
 
-    private Tournament fetchTournament(UUID tournamentId) {
+    private Tournament fetchTournament(@NonNull UUID tournamentId) {
         return tournamentRepository.findById(tournamentId)
-                .orElseThrow(() -> new RuntimeException("Tournament not found: " + tournamentId));
+                .orElseThrow(() -> new ResourceNotFoundException("Tournament not found: " + tournamentId));
     }
 
-    private void ensureRegistrationIsOpen(Tournament tournament) {
+    private void ensureRegistrationIsOpen(@NonNull Tournament tournament) {
         if (tournament.getStatus() != TournamentStatus.REGISTRATION_OPEN) {
-            throw new RuntimeException("Registration is currently " + tournament.getStatus() + " and not open");
+            throw new BusinessException("Registration is currently " + tournament.getStatus() + " and not open");
         }
     }
 
@@ -95,10 +106,11 @@ public class ParticipantService {
                 : ParticipantStatus.WAITLIST;
     }
 
-    private void associateUserIfExists(Participant participant, UUID userId) {
+    private void associateUserIfExists(@NonNull Participant participant, UUID userId) {
         if (userId != null) {
             User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new RuntimeException("Target user not found for association: " + userId));
+                    .orElseThrow(
+                            () -> new ResourceNotFoundException("Target user not found for association: " + userId));
             participant.setUser(user);
         }
     }
