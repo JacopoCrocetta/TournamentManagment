@@ -1,73 +1,130 @@
 package com.tournamentmanagmentsystem.service;
 
+import com.tournamentmanagmentsystem.domain.entity.Organization;
+import com.tournamentmanagmentsystem.domain.entity.Tournament;
+import com.tournamentmanagmentsystem.domain.enums.TournamentStatus;
+import com.tournamentmanagmentsystem.dto.request.TournamentRequest;
+import com.tournamentmanagmentsystem.dto.response.TournamentResponse;
+import com.tournamentmanagmentsystem.repository.OrganizationRepository;
+import com.tournamentmanagmentsystem.repository.TournamentRepository;
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
-import org.springframework.stereotype.Service;
-
-import com.tournamentmanagmentsystem.entity.TournamentEntity;
-import com.tournamentmanagmentsystem.repository.TournamentRepository;
-
-
+/**
+ * Service for managing tournament lifecycles.
+ * Handles creation, status transitions, and retrieval of tournaments within
+ * organizations.
+ */
 @Service
+@RequiredArgsConstructor
 public class TournamentService {
 
-    private TournamentRepository tournamentRepository;
+    private final TournamentRepository tournamentRepository;
+    private final OrganizationRepository organizationRepository;
+    private final AuditService auditService;
+    private final ModelMapper modelMapper;
 
     /**
-     * Save a given TournamentEntity. Use the returned instance for further operations
-     * as the save operation might have changed the entity instance completely.
+     * Creates a new tournament in a specific organization.
+     * Starts in DRAFT status.
      *
-     * @param entity must not be {@literal null}.
-     * @return the saved entity will never be {@literal null}.
+     * @param request data for the new tournament
+     * @return TournamentResponse with the created tournament details
+     * @throws RuntimeException if the organization is not found
      */
-    public TournamentEntity save(TournamentEntity entity) {
-        return this.tournamentRepository.save(entity);
+    @Transactional
+    public TournamentResponse createTournament(TournamentRequest request) {
+        Organization organization = organizationRepository.findById(request.getOrganizationId())
+                .orElseThrow(() -> new RuntimeException("Organization not found: " + request.getOrganizationId()));
+
+        Tournament tournament = modelMapper.map(request, Tournament.class);
+        if (tournament == null) {
+            throw new RuntimeException("Failed to map request to Tournament entity");
+        }
+
+        tournament.setOrganization(organization);
+        tournament.setStatus(TournamentStatus.DRAFT);
+
+        Tournament savedTournament = tournamentRepository.save(tournament);
+        auditService.log("CREATE", "TOURNAMENT", savedTournament.getId(), Map.of("name", savedTournament.getName()));
+
+        return modelMapper.map(savedTournament, TournamentResponse.class);
     }
 
-    
     /**
-     * Updates a given TournamentEntity. If the given entity does not have an ID, a empty TournamentEntity is returned.
+     * Retrieves specific tournament details by its ID.
+     *
+     * @param id tournament UUID
+     * @return TournamentResponse
+     * @throws RuntimeException if tournament is not found
+     */
+    @Transactional(readOnly = true)
+    public TournamentResponse getTournament(UUID id) {
+        Tournament tournament = tournamentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Tournament not found: " + id));
+        return modelMapper.map(tournament, TournamentResponse.class);
+    }
+
+    /**
+     * Lists all tournaments belonging to a specific organization.
+     *
+     * @param organizationId organization UUID
+     * @return list of tournament details
+     */
+    @Transactional(readOnly = true)
+    public List<TournamentResponse> getTournamentsByOrganization(UUID organizationId) {
+        return tournamentRepository.findByOrganizationId(organizationId).stream()
+                .map(tournament -> modelMapper.map(tournament, TournamentResponse.class))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Transitions a tournament to a new status.
+     * Validates if the transition is logically allowed.
+     *
+     * @param id        tournament UUID
+     * @param newStatus target status
+     * @return updated tournament details
+     */
+    @Transactional
+    public TournamentResponse updateStatus(UUID id, TournamentStatus newStatus) {
+        Tournament tournament = tournamentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Tournament not found: " + id));
+
+        validateStatusTransition(tournament.getStatus(), newStatus);
+
+        tournament.setStatus(newStatus);
+        Tournament savedTournament = tournamentRepository.save(tournament);
+
+        auditService.log("UPDATE_STATUS", "TOURNAMENT", savedTournament.getId(), Map.of("newStatus", newStatus));
+
+        return modelMapper.map(savedTournament, TournamentResponse.class);
+    }
+
+    /**
+     * Validates if a tournament can move from the current status to the next one.
      * 
-     * @param entity must not be {@literal null}.
-     * @return the updated entity will never be {@literal null}.
+     * @param current current tournament status
+     * @param next    target tournament status
+     * @throws RuntimeException if transition is invalid
      */
-    public TournamentEntity update(TournamentEntity entity) {
-        return this.tournamentRepository.save(entity);
-    }
+    private void validateStatusTransition(TournamentStatus current, TournamentStatus next) {
+        if (current == next) {
+            return;
+        }
 
-    /**
-     * Retrieves a {@link TournamentEntity} by its id.
-     *
-     * @param id must not be {@literal null}.
-     * @return the entity with the given id or {@literal Optional#empty()} if none found.
-     */
-    public Optional<TournamentEntity> findById(int id) {
-        return this.tournamentRepository.findById(id);
-    }
+        if (current == TournamentStatus.COMPLETED || current == TournamentStatus.CANCELLED) {
+            throw new RuntimeException("Cannot change status of a finished or cancelled tournament (" + current + ")");
+        }
 
-    /**
-     * Returns a List of all {@link TournamentEntity} in the repository.
-     *
-     * @return a List of all {@link TournamentEntity} in the repository.
-     */
-    public List<TournamentEntity> findAll () {
-        return StreamSupport.stream(this.tournamentRepository.findAll().spliterator(), false)
-                            .collect(Collectors.toList());
-    }
-
-    /**
-     * Deletes the {@link TournamentEntity} with the given id.
-     *
-     * @param id must not be {@literal null}.
-     * @return {@literal true} if the entity was deleted, {@literal false} otherwise.
-     */
-    public boolean deleteById(int id){
-        this.tournamentRepository.deleteById(id);
-
-        return this.tournamentRepository.findById(id).isPresent();
+        // Add more specific rules as needed:
+        // e.g. DRAFT -> REGISTRATION_OPEN -> IN_PROGRESS -> COMPLETED
     }
 }

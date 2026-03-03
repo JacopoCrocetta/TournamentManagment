@@ -1,9 +1,14 @@
 package com.tournamentmanagmentsystem.repository;
 
-import org.springframework.data.repository.CrudRepository;
+import com.tournamentmanagmentsystem.domain.entity.Participant;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.tournamentmanagmentsystem.entity.ParticipantEntity;
+import java.util.UUID;
 
 @Repository
-public interface ParticipantRepository extends CrudRepository<ParticipantEntity, Integer>{}
+public interface ParticipantRepository extends JpaRepository<Participant, UUID> {
+    long countByTournamentId(UUID tournamentId);
+
+    java.util.List<Participant> findByTournamentId(UUID tournamentId);
+}

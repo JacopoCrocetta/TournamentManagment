@@ -1,73 +1,101 @@
 package com.tournamentmanagmentsystem.service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import org.springframework.stereotype.Service;
-
-import com.tournamentmanagmentsystem.entity.ParticipantEntity;
+import com.tournamentmanagmentsystem.domain.entity.Participant;
+import com.tournamentmanagmentsystem.domain.entity.Tournament;
+import com.tournamentmanagmentsystem.domain.entity.User;
+import com.tournamentmanagmentsystem.domain.enums.ParticipantStatus;
+import com.tournamentmanagmentsystem.domain.enums.TournamentStatus;
+import com.tournamentmanagmentsystem.dto.request.ParticipantRequest;
+import com.tournamentmanagmentsystem.dto.response.ParticipantResponse;
 import com.tournamentmanagmentsystem.repository.ParticipantRepository;
+import com.tournamentmanagmentsystem.repository.TournamentRepository;
+import com.tournamentmanagmentsystem.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
+/**
+ * Service for handling participant registrations and player management.
+ * Manages confirmed lists and waitlists based on tournament capacity.
+ */
 @Service
+@RequiredArgsConstructor
 public class ParticipantService {
 
-    private ParticipantRepository participantRepository;
+    private final ParticipantRepository participantRepository;
+    private final TournamentRepository tournamentRepository;
+    private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
 
     /**
-     * Save a given ParticipantEntity. Use the returned instance for further operations
-     * as the save operation might have changed the entity instance completely.
+     * Registers a new participant for a tournament.
+     * Automatically assigns to WAITLIST if max capacity is reached.
      *
-     * @param entity must not be {@literal null}.
-     * @return the saved entity will never be {@literal null}.
+     * @param request registration details
+     * @return ParticipantResponse with status and name
+     * @throws RuntimeException if registration is closed or tournament not found
      */
-    public ParticipantEntity save(ParticipantEntity entity) {
-        return this.participantRepository.save(entity);
+    @Transactional
+    public ParticipantResponse register(ParticipantRequest request) {
+        Tournament tournament = fetchTournament(request.getTournamentId());
+        ensureRegistrationIsOpen(tournament);
+
+        ParticipantStatus enrollmentStatus = determineEnrollmentStatus(tournament);
+
+        Participant participant = Participant.builder()
+                .tournament(tournament)
+                .name(request.getName())
+                .status(enrollmentStatus)
+                .metadata(request.getMetadata())
+                .build();
+
+        associateUserIfExists(participant, request.getUserId());
+
+        Participant savedParticipant = participantRepository.save(participant);
+        return modelMapper.map(savedParticipant, ParticipantResponse.class);
     }
 
     /**
-     * Updates a given ParticipantEntity. If the given entity does not have an ID, a empty
-     * ParticipantEntity is returned.
-     * 
-     * @param entity must not be {@literal null}.
-     * @return the updated entity will never be {@literal null}.
+     * Retrieves all participants signed up for a specific tournament.
+     *
+     * @param tournamentId tournament UUID
+     * @return list of participant details
      */
-    public ParticipantEntity update(ParticipantEntity entity) {
-        return this.participantRepository.save(entity);
+    @Transactional(readOnly = true)
+    public List<ParticipantResponse> getParticipants(UUID tournamentId) {
+        return participantRepository.findByTournamentId(tournamentId).stream()
+                .map(participant -> modelMapper.map(participant, ParticipantResponse.class))
+                .collect(Collectors.toList());
     }
 
-    /**
-     * Retrieves a {@link ParticipantEntity} by its id.
-     *
-     * @param id must not be {@literal null}.
-     * @return the entity with the given id or {@literal Optional#empty()} if none found.
-     */
-    public Optional<ParticipantEntity> findById(int id) {
-        return this.participantRepository.findById(id);
+    private Tournament fetchTournament(UUID tournamentId) {
+        return tournamentRepository.findById(tournamentId)
+                .orElseThrow(() -> new RuntimeException("Tournament not found: " + tournamentId));
     }
 
-     /**
-     * Returns a List of all {@link ParticipantEntity} in the repository.
-     *
-     * @return a List of all {@link ParticipantEntity} in the repository.
-     */
-    public List<ParticipantEntity> findAll () {
-        return StreamSupport.stream(this.participantRepository.findAll().spliterator(), false)
-                            .collect(Collectors.toList());
+    private void ensureRegistrationIsOpen(Tournament tournament) {
+        if (tournament.getStatus() != TournamentStatus.REGISTRATION_OPEN) {
+            throw new RuntimeException("Registration is currently " + tournament.getStatus() + " and not open");
+        }
     }
 
+    private ParticipantStatus determineEnrollmentStatus(Tournament tournament) {
+        long currentParticipantCount = participantRepository.countByTournamentId(tournament.getId());
+        return (currentParticipantCount < tournament.getMaxParticipants())
+                ? ParticipantStatus.CONFIRMED
+                : ParticipantStatus.WAITLIST;
+    }
 
-    /**
-     * Deletes the {@link ParticipantEntity} with the given id.
-     *
-     * @param id must not be {@literal null}.
-     * @return {@literal true} if the entity was not deleted, {@literal false} if the entity was successfully deleted.
-     */
-    public boolean deleteById(int id){
-        this.participantRepository.deleteById(id);
-
-        return this.participantRepository.findById(id).isPresent();
+    private void associateUserIfExists(Participant participant, UUID userId) {
+        if (userId != null) {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("Target user not found for association: " + userId));
+            participant.setUser(user);
+        }
     }
 }

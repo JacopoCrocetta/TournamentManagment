@@ -1,76 +1,96 @@
 package com.tournamentmanagmentsystem.service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
-import org.springframework.stereotype.Service;
-
-import com.tournamentmanagmentsystem.entity.MatchEntity;
+import com.tournamentmanagmentsystem.domain.entity.Match;
+import com.tournamentmanagmentsystem.domain.entity.Participant;
+import com.tournamentmanagmentsystem.domain.enums.MatchStatus;
+import com.tournamentmanagmentsystem.dto.request.MatchResultRequest;
+import com.tournamentmanagmentsystem.dto.response.MatchResponse;
 import com.tournamentmanagmentsystem.repository.MatchRepository;
+import com.tournamentmanagmentsystem.service.bracket.SingleEliminationEngine;
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 
+/**
+ * Service for match result management and automation of tournament progress.
+ * Updates scores, finishes matches, and triggers winner advancement in brackets.
+ */
 @Service
+@RequiredArgsConstructor
 public class MatchService {
 
     private final MatchRepository matchRepository;
-
-    public MatchService(MatchRepository matchRepository) {
-        this.matchRepository = matchRepository;
-    }
-
-    /**
-     * Save a given MatchEntity. Use the returned instance for further operations as
-     * the save operation might have changed the entity instance completely.
-     * 
-     * @param entity must not be {@literal null}.
-     * @return the saved entity will never be {@literal null}.
-     */
-    public MatchEntity save(MatchEntity entity) {
-        return this.matchRepository.save(entity);
-    }
+    private final AuditService auditService;
+    private final StandingService standingService;
+    private final SingleEliminationEngine singleEliminationEngine;
+    private final ModelMapper modelMapper;
 
     /**
-     * Updates a given MatchEntity. If the given entity does not have an ID, a empty
-     * MatchEntity is returned.
-     * 
-     * @param entity must not be {@literal null}.
-     * @return the updated entity will never be {@literal null}.
-     */
-    public MatchEntity update(MatchEntity entity) {
-        return this.matchRepository.save(entity);
-    }
-
-    /**
-     * Retrieves a {@link MatchEntity} by its id.
-     * 
-     * @param id must not be {@literal null}.
-     * @return the entity with the given id or {@literal Optional#empty()} if none found.
-     */
-    public Optional<MatchEntity> findById(int id) {
-        return this.matchRepository.findById(id);
-    }
-
-     /**
-     * Returns a List of all {@link MatchEntity} in the repository.
+     * Updates the result of a match, calculating standings and advancing winners.
      *
-     * @return a List of all {@link MatchEntity} in the repository.
+     * @param matchId match UUID
+     * @param request result details (score, winner)
+     * @return updated match data
      */
-    public List<MatchEntity> findAll () {
-        return StreamSupport.stream(this.matchRepository.findAll().spliterator(), false)
-                            .collect(Collectors.toList());
+    @Transactional
+    public MatchResponse updateResult(UUID matchId, MatchResultRequest request) {
+        Match match = matchRepository.findById(matchId)
+                .orElseThrow(() -> new RuntimeException("Match not found: " + matchId));
+
+        applyResultToMatch(match, request);
+        Match savedMatch = matchRepository.save(match);
+
+        logResultUpdate(savedMatch, request);
+        processStandingsUpdate(savedMatch);
+        triggerAdvancementLogic(savedMatch);
+
+        return modelMapper.map(savedMatch, MatchResponse.class);
     }
 
-    /**
-     * Deletes the {@link MatchEntity} with the given id.
-     * 
-     * @param id must not be {@literal null}.
-     * @return {@literal true} if the entity was deleted, {@literal false} otherwise.
-     */
-    public boolean deleteById(int id){
-        this.matchRepository.deleteById(id);
+    private void applyResultToMatch(Match match, MatchResultRequest request) {
+        match.setScore(request.getScore());
+        match.setWinnerId(request.getWinnerId());
+        match.setStatus(MatchStatus.FINISHED);
+    }
 
-        return this.matchRepository.findById(id).isPresent();
+    private void logResultUpdate(Match match, MatchResultRequest request) {
+        auditService.log("UPDATE_RESULT", "MATCH", match.getId(), Map.of(
+                "winnerId", request.getWinnerId() != null ? request.getWinnerId().toString() : "null",
+                "score", request.getScore() != null ? request.getScore() : Collections.emptyMap()));
+    }
+
+    private void processStandingsUpdate(Match match) {
+        if (match.getWinnerId() == null) {
+            return;
+        }
+
+        UUID winnerId = match.getWinnerId();
+
+        Participant participantB = match.getParticipantB();
+
+        if (participantA == null || participantB == null) {
+            // Cannot update standings if one participant is missing (e.g. bye or TBD matches)
+            return;
+        }
+
+        boolean isAWinner = Objects.equals(winnerId, participantA.getId());
+        
+        Participant winner = isAWinner ? participantA : participantB;
+        Participant loser = isAWinner ? participantB : participantA;
+
+        // 3 points for win, 0 for loss (League standard)
+        standingService.updateStanding(match.getEvent(), winner, 3, Map.of("lastWin", match.getId()));
+        standingService.updateStanding(match.getEvent(), loser, 0, Map.of("lastLoss", match.getId()));
+    }
+
+    private void triggerAdvancementLogic(Match match) {
+        // Only applicable for Single Elimination brackets for now
+        singleEliminationEngine.advanceWinner(match);
     }
 }

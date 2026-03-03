@@ -1,0 +1,270 @@
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet author="JACOPO" id="002-drop-old">
+        <dropTable tableName="standings" cascadeConstraints="true"/>
+        <dropTable tableName="notifications" cascadeConstraints="true"/>
+        <dropTable tableName="team_members" cascadeConstraints="true"/>
+        <dropTable tableName="matches" cascadeConstraints="true"/>
+        <dropTable tableName="bracket" cascadeConstraints="true"/>
+        <dropTable tableName="users" cascadeConstraints="true"/>
+        <dropTable tableName="teams" cascadeConstraints="true"/>
+        <dropTable tableName="referees" cascadeConstraints="true"/>
+    </changeSet>
+
+    <changeSet author="JACOPO" id="002-create-new">
+        <!-- Users -->
+        <createTable tableName="users">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="email" type="varchar(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="password_hash" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="display_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_login_at" type="timestamp"/>
+            <column name="version" type="bigint" defaultValueNumeric="0"/>
+        </createTable>
+        <createIndex tableName="users" indexName="idx_user_email">
+            <column name="email"/>
+        </createIndex>
+
+        <!-- Organizations -->
+        <createTable tableName="organizations">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="slug" type="varchar(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="timezone" type="varchar(100)"/>
+            <column name="locale" type="varchar(10)"/>
+            <column name="default_settings" type="jsonb"/>
+            <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="organizations" indexName="idx_org_slug">
+            <column name="slug"/>
+        </createIndex>
+
+        <!-- Memberships -->
+        <createTable tableName="memberships">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_membership_user" references="users(id)"/>
+            </column>
+            <column name="organization_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_membership_org" references="organizations(id)"/>
+            </column>
+            <column name="role" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="scope" type="jsonb"/>
+        </createTable>
+        <addUniqueConstraint tableName="memberships" columnNames="user_id, organization_id" constraintName="uk_membership_user_org"/>
+
+        <!-- Tournaments -->
+        <createTable tableName="tournaments">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="organization_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_tournament_org" references="organizations(id)"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="text"/>
+            <column name="sport_type" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="location" type="varchar(255)"/>
+            <column name="timezone" type="varchar(100)"/>
+            <column name="visibility" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="registration_settings" type="jsonb"/>
+            <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp"/>
+            <column name="version" type="bigint" defaultValueNumeric="0"/>
+        </createTable>
+        <createIndex tableName="tournaments" indexName="idx_tournament_org">
+            <column name="organization_id"/>
+        </createIndex>
+
+        <!-- Events -->
+        <createTable tableName="events">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="tournament_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_event_tournament" references="tournaments(id)"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="format_type" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="config" type="jsonb"/>
+            <column name="seeding_policy" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="max_participants" type="int"/>
+            <column name="status" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="bigint" defaultValueNumeric="0"/>
+        </createTable>
+        <createIndex tableName="events" indexName="idx_event_tournament">
+            <column name="tournament_id"/>
+        </createIndex>
+
+        <!-- Participants -->
+        <createTable tableName="participants">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="event_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_participant_event" references="events(id)"/>
+            </column>
+            <column name="type" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rating" type="int"/>
+            <column name="metadata" type="jsonb"/>
+            <column name="status" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="participants" indexName="idx_participant_event">
+            <column name="event_id"/>
+        </createIndex>
+
+        <!-- Teams -->
+        <createTable tableName="teams">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="event_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_team_event" references="events(id)"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="captain_id" type="uuid"/>
+        </createTable>
+
+        <!-- Venues -->
+        <createTable tableName="venues">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="tournament_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_venue_tournament" references="tournaments(id)"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="availability" type="jsonb"/>
+        </createTable>
+
+        <!-- Matches -->
+        <createTable tableName="matches">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="event_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_match_event" references="events(id)"/>
+            </column>
+            <column name="stage" type="varchar(100)"/>
+            <column name="round_number" type="int"/>
+            <column name="participant_a_id" type="uuid">
+                <constraints foreignKeyName="fk_match_participant_a" references="participants(id)"/>
+            </column>
+            <column name="participant_b_id" type="uuid">
+                <constraints foreignKeyName="fk_match_participant_b" references="participants(id)"/>
+            </column>
+            <column name="scheduled_start" type="timestamp"/>
+            <column name="venue_id" type="uuid">
+                <constraints foreignKeyName="fk_match_venue" references="venues(id)"/>
+            </column>
+            <column name="status" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="score" type="jsonb"/>
+            <column name="winner_id" type="uuid"/>
+            <column name="referee_id" type="uuid"/>
+            <column name="version" type="bigint" defaultValueNumeric="0"/>
+        </createTable>
+        <createIndex tableName="matches" indexName="idx_match_event">
+            <column name="event_id"/>
+        </createIndex>
+        <createIndex tableName="matches" indexName="idx_match_scheduled">
+            <column name="scheduled_start"/>
+        </createIndex>
+
+        <!-- Standings -->
+        <createTable tableName="standings">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="event_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_standing_event" references="events(id)"/>
+            </column>
+            <column name="participant_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_standing_participant" references="participants(id)"/>
+            </column>
+            <column name="points" type="int" defaultValueNumeric="0"/>
+            <column name="tie_breaker_data" type="jsonb"/>
+        </createTable>
+
+        <!-- Audit Logs -->
+        <createTable tableName="audit_logs">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="uuid"/>
+            <column name="action" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="entity_type" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="entity_id" type="uuid"/>
+            <column name="timestamp" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="payload" type="jsonb"/>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
