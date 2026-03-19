@@ -49,7 +49,7 @@ public class ParticipantService {
      */
     @Transactional
     public ParticipantResponse register(ParticipantRequest request) {
-        Tournament tournament = fetchTournament(request.getTournamentId());
+        Tournament tournament = fetchTournament(Objects.requireNonNull(request.getTournamentId()));
         ensureRegistrationIsOpen(tournament);
 
         ParticipantStatus enrollmentStatus = determineEnrollmentStatus(tournament);
@@ -63,7 +63,7 @@ public class ParticipantService {
 
         associateUserIfExists(participant, request.getUserId());
 
-        Participant savedParticipant = participantRepository.save(participant);
+        Participant savedParticipant = participantRepository.save(Objects.requireNonNull(participant));
         return modelMapper.map(savedParticipant, ParticipantResponse.class);
     }
 
@@ -74,8 +74,8 @@ public class ParticipantService {
      * @return list of participant details
      */
     @Transactional(readOnly = true)
-    public List<ParticipantResponse> getParticipants(UUID tournamentId) {
-        return participantRepository.findByTournamentId(tournamentId).stream()
+    public List<ParticipantResponse> getParticipants(@NonNull UUID tournamentId) {
+        return participantRepository.findByTournamentId(Objects.requireNonNull(tournamentId)).stream()
                 .map(participant -> modelMapper.map(participant, ParticipantResponse.class))
                 .collect(Collectors.toList());
     }
@@ -98,12 +98,12 @@ public class ParticipantService {
         }
         
         participant.setCheckedIn(true);
-        Participant savedParticipant = participantRepository.save(participant);
+        Participant savedParticipant = participantRepository.save(Objects.requireNonNull(participant));
         return modelMapper.map(savedParticipant, ParticipantResponse.class);
     }
 
-    private Tournament fetchTournament(UUID tournamentId) {
-        return tournamentRepository.findById(tournamentId)
+    private Tournament fetchTournament(@NonNull UUID tournamentId) {
+        return tournamentRepository.findById(Objects.requireNonNull(tournamentId))
                 .orElseThrow(() -> new NotFoundException("Tournament not found: " + tournamentId));
     }
 
@@ -114,7 +114,7 @@ public class ParticipantService {
     }
 
     private ParticipantStatus determineEnrollmentStatus(Tournament tournament) {
-        long currentParticipantCount = participantRepository.countByTournamentId(tournament.getId());
+        long currentParticipantCount = participantRepository.countByTournamentId(Objects.requireNonNull(tournament.getId()));
         return (currentParticipantCount < tournament.getMaxParticipants())
                 ? ParticipantStatus.CONFIRMED
                 : ParticipantStatus.WAITLIST;
@@ -122,7 +122,7 @@ public class ParticipantService {
 
     private void associateUserIfExists(Participant participant, UUID userId) {
         if (userId != null) {
-            User user = userRepository.findById(userId)
+            User user = userRepository.findById(Objects.requireNonNull(userId))
                     .orElseThrow(() -> new NotFoundException("Target user not found for association: " + userId));
             participant.setUser(user);
         }

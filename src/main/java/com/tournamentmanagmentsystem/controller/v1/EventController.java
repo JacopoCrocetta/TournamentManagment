@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,7 +47,7 @@ public class EventController {
             @ApiResponse(responseCode = "403", description = "Forbidden - Admin access required", content = @Content)
     })
     @PreAuthorize("@securityService.hasRoleInTournament(#request.tournamentId, 'TOURNAMENT_ADMIN')")
-    public ResponseEntity<EventResponse> create(@Valid @RequestBody EventRequest request) {
+    public ResponseEntity<EventResponse> create(@Valid @RequestBody @NonNull EventRequest request) {
         return ResponseEntity.ok(eventService.createEvent(request));
     }
 
@@ -58,7 +59,7 @@ public class EventController {
      */
     @GetMapping("/tournament/{tournamentId}")
     @Operation(summary = "List events by tournament", description = "Fetches all events configured for the given tournament.")
-    public ResponseEntity<List<EventResponse>> getByTournament(@PathVariable UUID tournamentId) {
+    public ResponseEntity<List<EventResponse>> getByTournament(@PathVariable @NonNull UUID tournamentId) {
         return ResponseEntity.ok(eventService.getEventsByTournament(tournamentId));
     }
 
@@ -70,7 +71,7 @@ public class EventController {
      */
     @GetMapping("/{id}")
     @Operation(summary = "Get event by ID", description = "Returns full details including format and status of a specific event.")
-    public ResponseEntity<EventResponse> getById(@PathVariable UUID id) {
+    public ResponseEntity<EventResponse> getById(@PathVariable @NonNull UUID id) {
         return ResponseEntity.ok(eventService.getEvent(id));
     }
 
@@ -83,7 +84,7 @@ public class EventController {
      */
     @GetMapping("/{id}/standings")
     @Operation(summary = "Get event standings", description = "Returns the live leaderboard for an event, ordered by points. Each entry includes participant info and tie-breaker statistics.")
-    public ResponseEntity<List<Standing>> getStandings(@PathVariable UUID id) {
+    public ResponseEntity<List<Standing>> getStandings(@PathVariable @NonNull UUID id) {
         return ResponseEntity.ok(standingService.getStandings(id));
     }
 }

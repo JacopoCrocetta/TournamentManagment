@@ -15,6 +15,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -61,9 +63,9 @@ class TournamentServiceTest {
 
     @Test
     void createTournament_Success() {
-        when(organizationRepository.findById(orgId)).thenReturn(Optional.of(organization));
-        when(modelMapper.map(request, Tournament.class)).thenReturn(tournament);
-        when(tournamentRepository.save(any(Tournament.class))).thenReturn(tournament);
+        when(organizationRepository.findById(Objects.requireNonNull(orgId))).thenReturn(Optional.of(organization));
+        when(modelMapper.map(request, Tournament.class)).thenReturn(Objects.requireNonNull(tournament));
+        when(tournamentRepository.save(any(Tournament.class))).thenReturn(Objects.requireNonNull(tournament));
         when(modelMapper.map(tournament, TournamentResponse.class)).thenReturn(new TournamentResponse());
 
         TournamentResponse response = tournamentService.createTournament(request);
@@ -75,9 +77,23 @@ class TournamentServiceTest {
 
     @Test
     void createTournament_OrganizationNotFound_ThrowsException() {
-        when(organizationRepository.findById(orgId)).thenReturn(Optional.empty());
+        when(organizationRepository.findById(Objects.requireNonNull(orgId))).thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class, () -> tournamentService.createTournament(request));
         verify(tournamentRepository, never()).save(any());
+    }
+
+    @Test
+    void getTournamentsByOrganization_Success() {
+        when(tournamentRepository.findByOrganizationId(Objects.requireNonNull(orgId))).thenReturn(List.of(tournament));
+        when(modelMapper.map(Objects.requireNonNull(tournament), TournamentResponse.class))
+                .thenReturn(new TournamentResponse());
+
+        List<TournamentResponse> responses = tournamentService
+                .getTournamentsByOrganization(Objects.requireNonNull(orgId));
+
+        assertNotNull(responses);
+        assertEquals(1, responses.size());
+        verify(tournamentRepository, times(1)).findByOrganizationId(Objects.requireNonNull(orgId));
     }
 }

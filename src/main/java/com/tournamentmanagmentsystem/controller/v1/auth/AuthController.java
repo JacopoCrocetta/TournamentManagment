@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,7 +42,7 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "User successfully registered"),
             @ApiResponse(responseCode = "400", description = "Email already in use or invalid input data", content = @Content)
     })
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody @NonNull RegisterRequest request) {
         return ResponseEntity.ok(authService.register(request));
     }
 
@@ -56,7 +57,7 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "Successfully authenticated"),
             @ApiResponse(responseCode = "401", description = "Invalid credentials", content = @Content)
     })
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request) {
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody @NonNull AuthRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 }

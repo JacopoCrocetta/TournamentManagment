@@ -50,7 +50,7 @@ public class TournamentService {
     @Transactional
     @NonNull
     public TournamentResponse createTournament(@NonNull TournamentRequest request) {
-        Organization organization = organizationRepository.findById(request.getOrganizationId())
+        Organization organization = organizationRepository.findById(Objects.requireNonNull(request.getOrganizationId()))
                 .orElseThrow(() -> new NotFoundException("Organization not found: " + request.getOrganizationId()));
 
         Tournament tournament = modelMapper.map(request, Tournament.class);
@@ -65,9 +65,9 @@ public class TournamentService {
         log.info("Tournament '{}' created in organization {}", savedTournament.getName(), organization.getName());
         if (savedTournament.getId() != null) {
             auditService.log("CREATE", "TOURNAMENT", savedTournament.getId(),
-                    Map.of("name", savedTournament.getName()));
+                    Objects.requireNonNull(Map.of("name", savedTournament.getName())));
         }
-        return modelMapper.map(savedTournament, TournamentResponse.class);
+        return Objects.requireNonNull(modelMapper.map(savedTournament, TournamentResponse.class));
     }
 
     /**
@@ -82,7 +82,7 @@ public class TournamentService {
     public TournamentResponse getTournament(@NonNull UUID id) {
         Tournament tournament = tournamentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Tournament not found: " + id));
-        return modelMapper.map(tournament, TournamentResponse.class);
+        return Objects.requireNonNull(modelMapper.map(tournament, TournamentResponse.class));
     }
 
     /**
@@ -94,9 +94,9 @@ public class TournamentService {
     @Transactional(readOnly = true)
     @NonNull
     public List<TournamentResponse> getTournamentsByOrganization(@NonNull UUID organizationId) {
-        return tournamentRepository.findByOrganizationId(organizationId).stream()
-                .map(tournament -> modelMapper.map(tournament, TournamentResponse.class))
-                .collect(Collectors.toList());
+        return Objects.requireNonNull(tournamentRepository.findByOrganizationId(organizationId).stream()
+                .map(tournament -> Objects.requireNonNull(modelMapper.map(tournament, TournamentResponse.class)))
+                .collect(Collectors.toList()));
     }
 
     /**

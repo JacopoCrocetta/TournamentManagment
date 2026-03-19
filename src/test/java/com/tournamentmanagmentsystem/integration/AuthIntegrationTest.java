@@ -10,6 +10,8 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.Objects;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -37,9 +39,9 @@ public class AuthIntegrationTest extends BaseIntegrationTest {
                 AuthResponse.class);
 
         assertThat(registerResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(registerResponse.getBody()).isNotNull();
-        assertThat(registerResponse.getBody().getEmail()).isEqualTo("it-test@example.com");
-        assertThat(registerResponse.getBody().getAccessToken()).isNotBlank();
+        AuthResponse registerBody = Objects.requireNonNull(registerResponse.getBody());
+        assertThat(registerBody.getEmail()).isEqualTo("it-test@example.com");
+        assertThat(registerBody.getAccessToken()).isNotBlank();
 
         // 2. LOGIN
         AuthRequest loginRequest = new AuthRequest("it-test@example.com", "StrongPass123!");
@@ -50,9 +52,9 @@ public class AuthIntegrationTest extends BaseIntegrationTest {
                 AuthResponse.class);
 
         assertThat(loginResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(loginResponse.getBody()).isNotNull();
-        assertThat(loginResponse.getBody().getAccessToken()).isNotBlank();
-        assertThat(loginResponse.getBody().getRefreshToken()).isNotBlank();
+        AuthResponse loginBody = Objects.requireNonNull(loginResponse.getBody());
+        assertThat(loginBody.getAccessToken()).isNotBlank();
+        assertThat(loginBody.getRefreshToken()).isNotBlank();
     }
 
     @Test
