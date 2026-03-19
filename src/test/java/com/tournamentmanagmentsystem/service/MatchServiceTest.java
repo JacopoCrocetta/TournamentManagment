@@ -7,7 +7,7 @@ import com.tournamentmanagmentsystem.domain.enums.MatchStatus;
 import com.tournamentmanagmentsystem.dto.request.MatchResultRequest;
 import com.tournamentmanagmentsystem.dto.response.MatchResponse;
 import com.tournamentmanagmentsystem.repository.MatchRepository;
-import com.tournamentmanagmentsystem.service.bracket.SingleEliminationEngine;
+import com.tournamentmanagmentsystem.service.bracket.BracketService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +18,7 @@ import org.modelmapper.ModelMapper;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -25,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("null")
 @ExtendWith(MockitoExtension.class)
 class MatchServiceTest {
 
@@ -35,7 +37,7 @@ class MatchServiceTest {
     @Mock
     private StandingService standingService;
     @Mock
-    private SingleEliminationEngine singleEliminationEngine;
+    private BracketService bracketService;
     @Mock
     private ModelMapper modelMapper;
 
@@ -56,11 +58,11 @@ class MatchServiceTest {
 
         match = Match.builder()
                 .id(matchId)
-                .event(new Event())
+                .event(Event.builder().id(UUID.randomUUID()).build())
                 .participantA(pA)
                 .participantB(pB)
                 .status(MatchStatus.PENDING)
-                .score(new HashMap<>())
+                .score(Objects.requireNonNull(new HashMap<>()))
                 .build();
 
         request = new MatchResultRequest();
@@ -70,15 +72,15 @@ class MatchServiceTest {
 
     @Test
     void updateResult_Success() {
-        when(matchRepository.findById(matchId)).thenReturn(Optional.of(match));
-        when(matchRepository.save(any(Match.class))).thenReturn(match);
-        when(modelMapper.map(any(), eq(MatchResponse.class))).thenReturn(new MatchResponse());
+        when(matchRepository.findById(Objects.requireNonNull(matchId))).thenReturn(Optional.of(Objects.requireNonNull(match)));
+        when(matchRepository.save(any(Match.class))).thenReturn(Objects.requireNonNull(match));
+        when(modelMapper.map(any(), eq(MatchResponse.class))).thenReturn(Objects.requireNonNull(new MatchResponse()));
 
-        matchService.updateResult(matchId, request);
+        matchService.updateResult(Objects.requireNonNull(matchId), Objects.requireNonNull(request));
 
         assertEquals(MatchStatus.FINISHED, match.getStatus());
         assertEquals(pA.getId(), match.getWinnerId());
         verify(standingService, times(2)).updateStanding(any(), any(), anyInt(), any());
-        verify(singleEliminationEngine, times(1)).advanceWinner(match);
+        verify(bracketService, times(1)).advanceWinner(Objects.requireNonNull(match));
     }
 }

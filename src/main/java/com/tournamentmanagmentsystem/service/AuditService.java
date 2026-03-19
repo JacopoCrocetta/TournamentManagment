@@ -14,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -37,7 +38,7 @@ public class AuditService {
      * @param payload    additional metadata about the action (e.g., changed fields)
      */
     @Async
-    public void log(@NonNull String action, @NonNull String entityType, @NonNull UUID entityId,
+    public void log(@NonNull String action, @NonNull String entityType, @Nullable UUID entityId,
             @NonNull Map<String, Object> payload) {
         UUID userId = getCurrentUserId();
 
@@ -49,7 +50,7 @@ public class AuditService {
                 .payload(payload)
                 .build();
 
-        auditLogRepository.save(auditLog);
+        auditLogRepository.save(Objects.requireNonNull(auditLog));
         log.info("Audit log saved: {} on {} ID: {}. Triggered by user: {}", action, entityType, entityId, userId);
     }
 

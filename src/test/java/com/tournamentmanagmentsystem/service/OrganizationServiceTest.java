@@ -21,6 +21,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -85,10 +86,10 @@ class OrganizationServiceTest {
         when(authentication.getPrincipal()).thenReturn(userDetails);
 
         when(organizationRepository.findBySlug(request.getSlug())).thenReturn(Optional.empty());
-        when(modelMapper.map(request, Organization.class)).thenReturn(organization);
-        when(organizationRepository.save(any(Organization.class))).thenReturn(organization);
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(modelMapper.map(organization, OrganizationResponse.class)).thenReturn(new OrganizationResponse());
+        when(modelMapper.map(any(), eq(Organization.class))).thenReturn(Objects.requireNonNull(organization));
+        when(organizationRepository.save(any(Organization.class))).thenReturn(Objects.requireNonNull(organization));
+        when(userRepository.findById(Objects.requireNonNull(userId))).thenReturn(Optional.of(Objects.requireNonNull(user)));
+        when(modelMapper.map(any(), eq(OrganizationResponse.class))).thenReturn(Objects.requireNonNull(new OrganizationResponse()));
 
         OrganizationResponse response = organizationService.createOrganization(request);
 

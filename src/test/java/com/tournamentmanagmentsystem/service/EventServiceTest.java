@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -23,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("null")
 @ExtendWith(MockitoExtension.class)
 class EventServiceTest {
 
@@ -58,22 +60,22 @@ class EventServiceTest {
 
     @Test
     void createEvent_Success() {
-        when(tournamentRepository.findById(tournamentId)).thenReturn(Optional.of(tournament));
-        when(modelMapper.map(request, Event.class)).thenReturn(event);
-        when(eventRepository.save(any(Event.class))).thenReturn(event);
-        when(modelMapper.map(event, EventResponse.class)).thenReturn(new EventResponse());
+        when(tournamentRepository.findById(Objects.requireNonNull(tournamentId))).thenReturn(Optional.of(Objects.requireNonNull(tournament)));
+        when(modelMapper.map(any(), eq(Event.class))).thenReturn(Objects.requireNonNull(event));
+        when(eventRepository.save(any(Event.class))).thenReturn(Objects.requireNonNull(event));
+        when(modelMapper.map(any(), eq(EventResponse.class))).thenReturn(Objects.requireNonNull(new EventResponse()));
 
         EventResponse response = eventService.createEvent(request);
 
         assertNotNull(response);
-        verify(eventRepository).save(event);
+        verify(eventRepository).save(Objects.requireNonNull(event));
         assertEquals(tournament, event.getTournament());
         assertEquals(EventStatus.DRAFT, event.getStatus());
     }
 
     @Test
     void createEvent_TournamentNotFound_ThrowsException() {
-        when(tournamentRepository.findById(tournamentId)).thenReturn(Optional.empty());
+        when(tournamentRepository.findById(Objects.requireNonNull(tournamentId))).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () -> eventService.createEvent(request));
         verify(eventRepository, never()).save(any());

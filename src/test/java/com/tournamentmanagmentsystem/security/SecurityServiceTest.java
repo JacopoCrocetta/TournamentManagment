@@ -19,6 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -73,11 +74,11 @@ class SecurityServiceTest {
                 .role(Role.ORG_ADMIN)
                 .build();
 
-        when(membershipRepository.findByUserIdAndOrganizationId(userId, orgId))
+        when(membershipRepository.findByUserIdAndOrganizationId(Objects.requireNonNull(userId), Objects.requireNonNull(orgId)))
                 .thenReturn(Optional.of(membership));
 
-        assertTrue(securityService.hasRoleInOrganization(orgId, "TOURNAMENT_ADMIN"));
-        assertFalse(securityService.hasRoleInOrganization(orgId, "SUPER_ADMIN"));
+        assertTrue(securityService.hasRoleInOrganization(Objects.requireNonNull(orgId), "TOURNAMENT_ADMIN"));
+        assertFalse(securityService.hasRoleInOrganization(Objects.requireNonNull(orgId), "SUPER_ADMIN"));
     }
 
     @Test
@@ -87,14 +88,14 @@ class SecurityServiceTest {
                 .organization(Organization.builder().id(orgId).build())
                 .build();
 
-        when(tournamentRepository.findById(tournamentId)).thenReturn(Optional.of(tournament));
+        when(tournamentRepository.findById(Objects.requireNonNull(tournamentId))).thenReturn(Optional.of(Objects.requireNonNull(tournament)));
 
         // Mock nested call
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(userDetails);
-        when(membershipRepository.findByUserIdAndOrganizationId(userId, orgId))
-                .thenReturn(Optional.of(Membership.builder().role(Role.ORG_ADMIN).build()));
+        when(membershipRepository.findByUserIdAndOrganizationId(Objects.requireNonNull(userId), Objects.requireNonNull(orgId)))
+                .thenReturn(Optional.of(Objects.requireNonNull(Membership.builder().role(Role.ORG_ADMIN).build())));
 
-        assertTrue(securityService.hasRoleInTournament(tournamentId, "TOURNAMENT_ADMIN"));
+        assertTrue(securityService.hasRoleInTournament(Objects.requireNonNull(tournamentId), "TOURNAMENT_ADMIN"));
     }
 }

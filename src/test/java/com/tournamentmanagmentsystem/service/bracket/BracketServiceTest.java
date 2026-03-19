@@ -26,6 +26,8 @@ class BracketServiceTest {
     @Mock
     private RoundRobinEngine roundRobinEngine;
     @Mock
+    private DoubleEliminationEngine doubleEliminationEngine;
+    @Mock
     private ParticipantRepository participantRepository;
     @Mock
     private AuditService auditService;
@@ -39,7 +41,7 @@ class BracketServiceTest {
     @BeforeEach
     void setUp() {
         eventId = UUID.randomUUID();
-        participants = List.of(Participant.builder().id(UUID.randomUUID()).build());
+        participants = List.of(Participant.builder().id(UUID.randomUUID()).checkedIn(true).build());
         when(participantRepository.findByTournamentId(eventId)).thenReturn(participants);
     }
 
@@ -71,6 +73,6 @@ class BracketServiceTest {
     @Test
     void generateBracket_UnsupportedFormat_ThrowsException() {
         assertThrows(UnsupportedOperationException.class,
-                () -> bracketService.generateBracket(eventId, FormatType.DOUBLE_ELIMINATION));
+                () -> bracketService.generateBracket(eventId, FormatType.SWISS));
     }
 }

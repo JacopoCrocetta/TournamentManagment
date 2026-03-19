@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -42,7 +43,7 @@ public class EventService {
     @Transactional
     @NonNull
     public EventResponse createEvent(@NonNull EventRequest request) {
-        Tournament tournament = tournamentRepository.findById(request.getTournamentId())
+        Tournament tournament = tournamentRepository.findById(Objects.requireNonNull(request.getTournamentId()))
                 .orElseThrow(() -> new NotFoundException("Tournament not found: " + request.getTournamentId()));
 
         Event event = modelMapper.map(request, Event.class);
@@ -54,7 +55,7 @@ public class EventService {
         event.setStatus(EventStatus.DRAFT); // Standard start status
 
         Event savedEvent = eventRepository.save(event);
-        return modelMapper.map(savedEvent, EventResponse.class);
+        return Objects.requireNonNull(modelMapper.map(savedEvent, EventResponse.class));
     }
 
     /**
@@ -66,9 +67,9 @@ public class EventService {
     @Transactional(readOnly = true)
     @NonNull
     public List<EventResponse> getEventsByTournament(@NonNull UUID tournamentId) {
-        return eventRepository.findByTournamentId(tournamentId).stream()
+        return Objects.requireNonNull(eventRepository.findByTournamentId(Objects.requireNonNull(tournamentId)).stream()
                 .map(event -> modelMapper.map(event, EventResponse.class))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
 
     /**
@@ -81,8 +82,8 @@ public class EventService {
     @Transactional(readOnly = true)
     @NonNull
     public EventResponse getEvent(@NonNull UUID id) {
-        Event event = eventRepository.findById(id)
+        Event event = eventRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new NotFoundException("Event not found: " + id));
-        return modelMapper.map(event, EventResponse.class);
+        return Objects.requireNonNull(modelMapper.map(event, EventResponse.class));
     }
 }

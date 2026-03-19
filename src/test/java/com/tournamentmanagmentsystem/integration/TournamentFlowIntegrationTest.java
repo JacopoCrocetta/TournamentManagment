@@ -2,7 +2,6 @@ package com.tournamentmanagmentsystem.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tournamentmanagmentsystem.domain.enums.FormatType;
-import com.tournamentmanagmentsystem.domain.enums.ParticipantType;
 import com.tournamentmanagmentsystem.domain.enums.SeedingPolicy;
 import com.tournamentmanagmentsystem.domain.enums.TournamentStatus;
 import com.tournamentmanagmentsystem.domain.enums.TournamentVisibility;
@@ -18,6 +17,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -44,9 +44,10 @@ class TournamentFlowIntegrationTest extends BaseIntegrationTest {
                 .displayName("Flow Admin")
                 .build();
 
+        String jsonReq = objectMapper.writeValueAsString(registerReq);
         MvcResult regResult = mockMvc.perform(post("/api/v1/auth/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(registerReq)))
+                .contentType(Objects.requireNonNull(MediaType.APPLICATION_JSON))
+                .content(Objects.requireNonNull(jsonReq)))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -63,10 +64,11 @@ class TournamentFlowIntegrationTest extends BaseIntegrationTest {
                 .description("Desc")
                 .build();
                 
+        String orgJson = objectMapper.writeValueAsString(orgReq);
         MvcResult orgResult = mockMvc.perform(post("/api/v1/organizations")
                 .header("Authorization", adminToken)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(orgReq)))
+                .contentType(Objects.requireNonNull(MediaType.APPLICATION_JSON))
+                .content(Objects.requireNonNull(orgJson)))
                 .andExpect(status().isOk())
                 .andReturn();
         OrganizationResponse orgRes = objectMapper.readValue(orgResult.getResponse().getContentAsString(), OrganizationResponse.class);
@@ -84,10 +86,11 @@ class TournamentFlowIntegrationTest extends BaseIntegrationTest {
                 .startDate(LocalDateTime.now().plusDays(1))
                 .build();
                 
+        String tourJson = objectMapper.writeValueAsString(tourReq);
         MvcResult tourResult = mockMvc.perform(post("/api/v1/tournaments")
                 .header("Authorization", adminToken)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(tourReq)))
+                .contentType(Objects.requireNonNull(MediaType.APPLICATION_JSON))
+                .content(Objects.requireNonNull(tourJson)))
                 .andExpect(status().isOk())
                 .andReturn();
         TournamentResponse tourRes = objectMapper.readValue(tourResult.getResponse().getContentAsString(), TournamentResponse.class);
@@ -101,10 +104,11 @@ class TournamentFlowIntegrationTest extends BaseIntegrationTest {
                     .name("Player " + i)
                     .build();
                     
+            String pJson = objectMapper.writeValueAsString(pReq);
             MvcResult pResult = mockMvc.perform(post("/api/v1/participants/register")
                     .header("Authorization", adminToken)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(pReq)))
+                    .contentType(Objects.requireNonNull(MediaType.APPLICATION_JSON))
+                    .content(Objects.requireNonNull(pJson)))
                     .andExpect(status().isOk())
                     .andReturn();
             ParticipantResponse pRes = objectMapper.readValue(pResult.getResponse().getContentAsString(), ParticipantResponse.class);
@@ -129,10 +133,11 @@ class TournamentFlowIntegrationTest extends BaseIntegrationTest {
                 .seedingPolicy(SeedingPolicy.RANDOM)
                 .build();
                 
+        String eventJson = objectMapper.writeValueAsString(eventReq);
         MvcResult eventResult = mockMvc.perform(post("/api/v1/events")
                 .header("Authorization", adminToken)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(eventReq)))
+                .contentType(Objects.requireNonNull(MediaType.APPLICATION_JSON))
+                .content(Objects.requireNonNull(eventJson)))
                 .andExpect(status().isOk())
                 .andReturn();
         EventResponse eventRes = objectMapper.readValue(eventResult.getResponse().getContentAsString(), EventResponse.class);
@@ -166,10 +171,11 @@ class TournamentFlowIntegrationTest extends BaseIntegrationTest {
                 .forfeit(false)
                 .build();
                 
+        String matchResJson = objectMapper.writeValueAsString(matchResReq);
         mockMvc.perform(patch("/api/v1/matches/" + firstRoundMatchId + "/result")
                 .header("Authorization", adminToken)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(matchResReq)))
+                .contentType(Objects.requireNonNull(MediaType.APPLICATION_JSON))
+                .content(Objects.requireNonNull(matchResJson)))
                 .andExpect(status().isOk());
 
         // 9. Fetch Standings

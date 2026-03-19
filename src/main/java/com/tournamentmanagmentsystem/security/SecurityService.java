@@ -12,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @Service("securityService")
@@ -39,20 +40,20 @@ public class SecurityService {
 
     public boolean hasRoleInTournament(@NonNull UUID tournamentId, @NonNull String roleName) {
         return tournamentRepository.findById(tournamentId)
-                .map(t -> hasRoleInOrganization(t.getOrganization().getId(), roleName))
+                .map(t -> hasRoleInOrganization(Objects.requireNonNull(t.getOrganization().getId()), roleName))
                 .orElse(false);
     }
 
     public boolean isTournamentAdminOfEvent(@NonNull UUID eventId) {
         return eventRepository.findById(eventId)
-                .map(e -> hasRoleInTournament(e.getTournament().getId(), "TOURNAMENT_ADMIN"))
+                .map(e -> hasRoleInTournament(Objects.requireNonNull(e.getTournament().getId()), "TOURNAMENT_ADMIN"))
                 .orElse(false);
     }
 
     public boolean isRefereeOfMatch(@NonNull UUID matchId) {
         return matchRepository.findById(matchId)
-                .map(m -> hasRoleInTournament(m.getEvent().getTournament().getId(), "REFEREE")
-                        || hasRoleInTournament(m.getEvent().getTournament().getId(), "TOURNAMENT_ADMIN"))
+                .map(m -> hasRoleInTournament(Objects.requireNonNull(m.getEvent().getTournament().getId()), "REFEREE")
+                        || hasRoleInTournament(Objects.requireNonNull(m.getEvent().getTournament().getId()), "TOURNAMENT_ADMIN"))
                 .orElse(false);
     }
 

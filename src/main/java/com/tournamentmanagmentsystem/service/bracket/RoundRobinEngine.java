@@ -1,6 +1,6 @@
 package com.tournamentmanagmentsystem.service.bracket;
 
-import org.springframework.lang.NonNull;
+
 import org.springframework.lang.Nullable;
 
 import com.tournamentmanagmentsystem.domain.entity.Event;
@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import com.tournamentmanagmentsystem.exception.NotFoundException;
@@ -39,15 +40,17 @@ public class RoundRobinEngine implements BracketEngine {
      * @return all scheduled league matches
      */
     @Override
-    @NonNull
-    public List<Match> generateInitialMatches(@NonNull UUID eventId, @NonNull List<Participant> participants) {
-        Event event = eventRepository.findById(eventId)
+    public List<Match> generateInitialMatches(UUID eventId, List<Participant> participants) {
+        Event event = eventRepository.findById(Objects.requireNonNull(eventId))
                 .orElseThrow(() -> new NotFoundException("Event not found: " + eventId));
 
         List<Participant> sorted = prepareSeeds(participants, event.getSeedingPolicy());
         List<Match> leagueMatches = generateAllPermutations(event, sorted);
 
-        return matchRepository.saveAll(leagueMatches);
+        Iterable<Match> savedMatches = matchRepository.saveAll(Objects.requireNonNull(leagueMatches));
+        List<Match> result = new ArrayList<>();
+        savedMatches.forEach(result::add);
+        return result;
     }
 
     /**
@@ -55,7 +58,7 @@ public class RoundRobinEngine implements BracketEngine {
      */
     @Override
     @Nullable
-    public Match advanceWinner(@NonNull Match finishedMatch) {
+    public Match advanceWinner(Match finishedMatch) {
         return null;
     }
 

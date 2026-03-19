@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -109,7 +110,7 @@ public class TournamentService {
     @Transactional
     @NonNull
     public TournamentResponse updateStatus(@NonNull UUID id, @NonNull TournamentStatus newStatus) {
-        Tournament tournament = tournamentRepository.findById(id)
+        Tournament tournament = tournamentRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new NotFoundException("Tournament not found: " + id));
 
         validateStatusTransition(tournament.getStatus(), newStatus);
@@ -120,9 +121,9 @@ public class TournamentService {
         log.info("Tournament {} status updated to {}", savedTournament.getId(), newStatus);
 
         if (savedTournament.getId() != null) {
-            auditService.log("UPDATE_STATUS", "TOURNAMENT", savedTournament.getId(), Map.of("newStatus", newStatus));
+            auditService.log("UPDATE_STATUS", "TOURNAMENT", Objects.requireNonNull(savedTournament.getId()), Objects.requireNonNull(Map.of("newStatus", newStatus)));
         }
-        return modelMapper.map(savedTournament, TournamentResponse.class);
+        return Objects.requireNonNull(modelMapper.map(savedTournament, TournamentResponse.class));
     }
 
     /**

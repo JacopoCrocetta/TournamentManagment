@@ -1,6 +1,6 @@
 package com.tournamentmanagmentsystem.service.bracket;
 
-import org.springframework.lang.NonNull;
+
 import org.springframework.lang.Nullable;
 
 import com.tournamentmanagmentsystem.domain.entity.Event;
@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import com.tournamentmanagmentsystem.exception.NotFoundException;
@@ -40,13 +41,12 @@ public class SingleEliminationEngine implements BracketEngine {
      * @return persisted list of ALL matches in the bracket
      */
     @Override
-    @NonNull
-    public List<Match> generateInitialMatches(@NonNull UUID eventId, @NonNull List<Participant> participants) {
+    public List<Match> generateInitialMatches(UUID eventId, List<Participant> participants) {
         if (participants.isEmpty()) {
             return Collections.emptyList();
         }
         
-        Event event = eventRepository.findById(eventId)
+        Event event = eventRepository.findById(Objects.requireNonNull(eventId))
                 .orElseThrow(() -> new NotFoundException("Event not found: " + eventId));
 
         List<Participant> sortedParticipants = prepareSeeds(participants, event.getSeedingPolicy());
@@ -106,7 +106,7 @@ public class SingleEliminationEngine implements BracketEngine {
      */
     @Override
     @Nullable
-    public Match advanceWinner(@NonNull Match finishedMatch) {
+    public Match advanceWinner(Match finishedMatch) {
         if (finishedMatch.getWinnerId() == null) {
             return null;
         }

@@ -1,7 +1,6 @@
 package com.tournamentmanagmentsystem.exception;
 
 import org.springframework.http.*;
-import org.springframework.lang.NonNull;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -10,6 +9,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import java.net.URI;
 import lombok.extern.slf4j.Slf4j;
+import java.util.Objects;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,14 +17,12 @@ import java.util.Map;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
-
         @Override
-        @NonNull
         protected ResponseEntity<Object> handleMethodArgumentNotValid(
-                        @NonNull MethodArgumentNotValidException ex,
-                        @NonNull HttpHeaders headers,
-                        @NonNull HttpStatusCode status,
-                        @NonNull WebRequest request) {
+                        @org.springframework.lang.NonNull MethodArgumentNotValidException ex,
+                        @org.springframework.lang.NonNull HttpHeaders headers,
+                        @org.springframework.lang.NonNull HttpStatusCode status,
+                        @org.springframework.lang.NonNull WebRequest request) {
                 Map<String, String> errors = new HashMap<>();
                 ex.getBindingResult().getFieldErrors()
                                 .forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
@@ -33,7 +31,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                 HttpStatus.BAD_REQUEST,
                                 "Validation failed for one or more fields.");
                 problemDetail.setTitle("Constraint Violation");
-                problemDetail.setType(URI.create("https://api.tournamentmanagement.com/errors/validation-failed"));
+                problemDetail.setType(Objects.requireNonNull(URI.create("https://api.tournamentmanagement.com/errors/validation-failed")));
                 problemDetail.setProperty("errors", errors);
 
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problemDetail);

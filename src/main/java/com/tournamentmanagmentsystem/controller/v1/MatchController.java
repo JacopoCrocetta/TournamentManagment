@@ -18,6 +18,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -73,6 +74,6 @@ public class MatchController {
     public ResponseEntity<MatchResponse> updateResult(
             @PathVariable UUID matchId,
             @Parameter(description = "Score and winner ID") @RequestBody MatchResultRequest request) {
-        return ResponseEntity.ok(matchService.updateResult(matchId, request));
+        return ResponseEntity.ok(matchService.updateResult(Objects.requireNonNull(matchId), Objects.requireNonNull(request)));
     }
 }

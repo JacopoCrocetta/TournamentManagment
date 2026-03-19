@@ -17,6 +17,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.Objects;
 
 import com.tournamentmanagmentsystem.exception.ConflictException;
 
@@ -57,9 +58,9 @@ public class AuthService {
                                 .status(UserStatus.ACTIVE)
                                 .build();
 
-                User savedUser = userRepository.save(user);
+                User savedUser = userRepository.save(Objects.requireNonNull(user));
                 log.info("New user registered successfully: {}", savedUser.getEmail());
-                return createAuthResponse(savedUser);
+                return Objects.requireNonNull(createAuthResponse(Objects.requireNonNull(savedUser)));
         }
 
         /**
@@ -80,7 +81,7 @@ public class AuthService {
                                                 "User not found after successful authentication"));
 
                 log.info("User {} logged in successfully", user.getEmail());
-                return createAuthResponse(user);
+                return Objects.requireNonNull(createAuthResponse(Objects.requireNonNull(user)));
         }
 
         /**
@@ -89,7 +90,7 @@ public class AuthService {
          * @param user the user entity
          * @return AuthResponse with JWT tokens
          */
-        private AuthResponse createAuthResponse(@org.springframework.lang.NonNull User user) {
+        private AuthResponse createAuthResponse(User user) {
                 UserDetailsImpl userDetails = UserDetailsImpl.build(user);
                 String accessToken = jwtService.generateToken(userDetails);
                 String refreshToken = jwtService.generateRefreshToken(userDetails);

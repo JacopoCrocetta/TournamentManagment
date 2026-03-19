@@ -15,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -43,7 +44,7 @@ public class OrganizationController {
             @ApiResponse(responseCode = "400", description = "Slug already exists or validation failed", content = @Content)
     })
     public ResponseEntity<OrganizationResponse> create(@Valid @RequestBody OrganizationRequest request) {
-        return ResponseEntity.ok(organizationService.createOrganization(request));
+        return ResponseEntity.ok(organizationService.createOrganization(Objects.requireNonNull(request)));
     }
 
     /**
@@ -72,7 +73,7 @@ public class OrganizationController {
     })
     @PreAuthorize("@securityService.hasRoleInOrganization(#id, 'VIEWER')")
     public ResponseEntity<OrganizationResponse> getById(@PathVariable UUID id) {
-        return ResponseEntity.ok(organizationService.getOrganization(id));
+        return ResponseEntity.ok(organizationService.getOrganization(Objects.requireNonNull(id)));
     }
 
     /**
@@ -90,6 +91,6 @@ public class OrganizationController {
     @PreAuthorize("@securityService.hasRoleInOrganization(#id, 'ORG_ADMIN')")
     public ResponseEntity<OrganizationResponse> update(@PathVariable UUID id,
             @Valid @RequestBody OrganizationRequest request) {
-        return ResponseEntity.ok(organizationService.updateOrganization(id, request));
+        return ResponseEntity.ok(organizationService.updateOrganization(Objects.requireNonNull(id), Objects.requireNonNull(request)));
     }
 }

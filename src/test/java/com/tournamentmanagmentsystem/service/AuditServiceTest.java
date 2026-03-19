@@ -16,11 +16,13 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("null")
 @ExtendWith(MockitoExtension.class)
 class AuditServiceTest {
 
@@ -54,7 +56,7 @@ class AuditServiceTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(userDetails);
 
-        auditService.log("CREATE", "TOURNAMENT", UUID.randomUUID(), Map.of("name", "Test"));
+        auditService.log("CREATE", "TOURNAMENT", Objects.requireNonNull(UUID.randomUUID()), Objects.requireNonNull(Map.of("name", "Test")));
 
         ArgumentCaptor<AuditLog> captor = ArgumentCaptor.forClass(AuditLog.class);
         verify(auditLogRepository).save(captor.capture());
@@ -66,7 +68,7 @@ class AuditServiceTest {
     void log_SystemAction_Success() {
         when(securityContext.getAuthentication()).thenReturn(null);
 
-        auditService.log("SYSTEM_EVENT", "SYSTEM", null, Map.of());
+        auditService.log("SYSTEM_EVENT", "SYSTEM", null, Objects.requireNonNull(Map.of()));
 
         ArgumentCaptor<AuditLog> captor = ArgumentCaptor.forClass(AuditLog.class);
         verify(auditLogRepository).save(captor.capture());

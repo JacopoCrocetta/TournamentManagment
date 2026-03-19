@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -63,11 +64,11 @@ class ParticipantServiceTest {
     @Test
     void register_Confirmed_Success() {
         tournament.setStatus(TournamentStatus.REGISTRATION_OPEN);
-        when(tournamentRepository.findById(tournamentId)).thenReturn(Optional.of(tournament));
-        when(participantRepository.countByTournamentId(tournamentId)).thenReturn(1L);
-        when(participantRepository.save(any(Participant.class))).thenAnswer(i -> i.getArguments()[0]);
+        when(tournamentRepository.findById(Objects.requireNonNull(tournamentId))).thenReturn(Optional.of(Objects.requireNonNull(tournament)));
+        when(participantRepository.countByTournamentId(Objects.requireNonNull(tournamentId))).thenReturn(1L);
+        when(participantRepository.save(any(Participant.class))).thenAnswer(i -> Objects.requireNonNull(i.getArguments()[0]));
         when(modelMapper.map(any(Participant.class), eq(ParticipantResponse.class)))
-                .thenReturn(new ParticipantResponse());
+                .thenReturn(Objects.requireNonNull(new ParticipantResponse()));
 
         participantService.register(request);
 
@@ -79,11 +80,11 @@ class ParticipantServiceTest {
     @Test
     void register_Waitlist_Success() {
         tournament.setStatus(TournamentStatus.REGISTRATION_OPEN);
-        when(tournamentRepository.findById(tournamentId)).thenReturn(Optional.of(tournament));
-        when(participantRepository.countByTournamentId(tournamentId)).thenReturn(2L);
-        when(participantRepository.save(any(Participant.class))).thenAnswer(i -> i.getArguments()[0]);
+        when(tournamentRepository.findById(Objects.requireNonNull(tournamentId))).thenReturn(Optional.of(Objects.requireNonNull(tournament)));
+        when(participantRepository.countByTournamentId(Objects.requireNonNull(tournamentId))).thenReturn(2L);
+        when(participantRepository.save(any(Participant.class))).thenAnswer(i -> Objects.requireNonNull(i.getArguments()[0]));
         when(modelMapper.map(any(Participant.class), eq(ParticipantResponse.class)))
-                .thenReturn(new ParticipantResponse());
+                .thenReturn(Objects.requireNonNull(new ParticipantResponse()));
 
         participantService.register(request);
 

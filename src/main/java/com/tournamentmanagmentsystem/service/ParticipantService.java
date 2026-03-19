@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -47,8 +48,7 @@ public class ParticipantService {
      * @throws BusinessRuleViolationException if registration is closed
      */
     @Transactional
-    @NonNull
-    public ParticipantResponse register(@NonNull ParticipantRequest request) {
+    public ParticipantResponse register(ParticipantRequest request) {
         Tournament tournament = fetchTournament(request.getTournamentId());
         ensureRegistrationIsOpen(tournament);
 
@@ -74,8 +74,7 @@ public class ParticipantService {
      * @return list of participant details
      */
     @Transactional(readOnly = true)
-    @NonNull
-    public List<ParticipantResponse> getParticipants(@NonNull UUID tournamentId) {
+    public List<ParticipantResponse> getParticipants(UUID tournamentId) {
         return participantRepository.findByTournamentId(tournamentId).stream()
                 .map(participant -> modelMapper.map(participant, ParticipantResponse.class))
                 .collect(Collectors.toList());
@@ -90,9 +89,8 @@ public class ParticipantService {
      * @throws BusinessRuleViolationException if already checked in
      */
     @Transactional
-    @NonNull
     public ParticipantResponse checkIn(@NonNull UUID participantId) {
-        Participant participant = participantRepository.findById(participantId)
+        Participant participant = participantRepository.findById(Objects.requireNonNull(participantId))
                 .orElseThrow(() -> new NotFoundException("Participant not found: " + participantId));
         
         if (Boolean.TRUE.equals(participant.getCheckedIn())) {

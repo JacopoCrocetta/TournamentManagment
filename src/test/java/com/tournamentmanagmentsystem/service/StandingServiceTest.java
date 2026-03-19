@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -45,11 +46,11 @@ class StandingServiceTest {
 
     @Test
     void updateStanding_NewStanding_Success() {
-        when(standingRepository.findByEventIdAndParticipantId(eventId, participantId))
+        when(standingRepository.findByEventIdAndParticipantId(Objects.requireNonNull(eventId), Objects.requireNonNull(participantId)))
                 .thenReturn(Optional.empty());
-        when(standingRepository.save(any(Standing.class))).thenAnswer(i -> i.getArguments()[0]);
+        when(standingRepository.save(any(Standing.class))).thenAnswer(i -> Objects.requireNonNull(i.getArguments()[0]));
 
-        standingService.updateStanding(event, participant, 3, Map.of("won", 1));
+        standingService.updateStanding(Objects.requireNonNull(event), Objects.requireNonNull(participant), 3, Objects.requireNonNull(Map.of("won", 1)));
 
         verify(standingRepository).save(any(Standing.class));
     }
@@ -63,13 +64,13 @@ class StandingServiceTest {
                 .tieBreakerData(new HashMap<>(Map.of("won", 1)))
                 .build();
 
-        when(standingRepository.findByEventIdAndParticipantId(eventId, participantId))
+        when(standingRepository.findByEventIdAndParticipantId(Objects.requireNonNull(eventId), Objects.requireNonNull(participantId)))
                 .thenReturn(Optional.of(existing));
 
-        standingService.updateStanding(event, participant, 3, Map.of("won", 2));
+        standingService.updateStanding(Objects.requireNonNull(event), Objects.requireNonNull(participant), 3, Objects.requireNonNull(Map.of("won", 2)));
 
         assertEquals(8, existing.getPoints());
         assertEquals(3, existing.getTieBreakerData().get("won"));
-        verify(standingRepository).save(existing);
+        verify(standingRepository).save(Objects.requireNonNull(existing));
     }
 }

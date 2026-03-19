@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -75,8 +76,8 @@ public class BracketService {
     }
 
     private void logBracketGeneration(UUID eventId, FormatType formatType, int matchCount) {
-        auditService.log("GENERATE_BRACKET", "EVENT", eventId, Map.of(
+        auditService.log("GENERATE_BRACKET", "EVENT", Objects.requireNonNull(eventId), Objects.requireNonNull(Map.of(
                 "format", formatType,
-                "matchCount", matchCount));
+                "matchCount", matchCount)));
     }
 }

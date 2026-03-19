@@ -40,9 +40,8 @@ public class MatchService {
     private final ModelMapper modelMapper;
 
     @Transactional
-    @NonNull
     public MatchResponse updateResult(@NonNull UUID matchId, @NonNull MatchResultRequest request) {
-        Match match = matchRepository.findById(matchId)
+        Match match = matchRepository.findById(Objects.requireNonNull(matchId))
                 .orElseThrow(() -> new NotFoundException("Match not found: " + matchId));
 
         if (match.getStatus() == MatchStatus.DISPUTED) {
@@ -61,10 +60,10 @@ public class MatchService {
 
         log.info("Match result updated: ID={}, winnerID={}", savedMatch.getId(), request.getWinnerId());
 
-        return modelMapper.map(savedMatch, MatchResponse.class);
+        return Objects.requireNonNull(modelMapper.map(savedMatch, MatchResponse.class));
     }
 
-    private void applyResultToMatch(@NonNull Match match, @NonNull MatchResultRequest request) {
+    private void applyResultToMatch(Match match, MatchResultRequest request) {
         match.setScore(request.getScore());
         match.setWinnerId(request.getWinnerId());
         
@@ -107,15 +106,15 @@ public class MatchService {
         }
     }
 
-    private void logResultUpdate(@NonNull Match match, @NonNull MatchResultRequest request) {
+    private void logResultUpdate(Match match, MatchResultRequest request) {
         if (match.getId() != null) {
-            auditService.log("UPDATE_RESULT", "MATCH", match.getId(), Map.of(
+            auditService.log("UPDATE_RESULT", "MATCH", match.getId(), Objects.requireNonNull(Map.of(
                     "winnerId", request.getWinnerId() != null ? request.getWinnerId().toString() : "null",
-                    "score", request.getScore() != null ? request.getScore() : Collections.emptyMap()));
+                    "score", request.getScore() != null ? request.getScore() : Collections.emptyMap())));
         }
     }
 
-    private void processStandingsUpdate(@NonNull Match match) {
+    private void processStandingsUpdate(Match match) {
         if (match.getWinnerId() == null) {
             return;
         }
@@ -136,12 +135,12 @@ public class MatchService {
         int loserScore = extractScore(match, loser.getId());
         int pointsDiff = winnerScore - loserScore;
 
-        standingService.updateStanding(match.getEvent(), winner, 3, Map.of(
+        standingService.updateStanding(Objects.requireNonNull(match.getEvent()), winner, 3, Map.of(
             "wins", 1, 
             "pointsDiff", pointsDiff,
             "lastWin", match.getId() != null ? match.getId().toString() : "null"
         ));
-        standingService.updateStanding(match.getEvent(), loser, 0, Map.of(
+        standingService.updateStanding(Objects.requireNonNull(match.getEvent()), loser, 0, Map.of(
             "losses", 1, 
             "pointsDiff", -pointsDiff,
             "lastLoss", match.getId() != null ? match.getId().toString() : "null"
@@ -161,14 +160,12 @@ public class MatchService {
         return 0;
     }
 
-    private void triggerAdvancementLogic(@NonNull Match match) {
+    private void triggerAdvancementLogic(Match match) {
         bracketService.advanceWinner(match);
     }
 
-    @Transactional
-    @NonNull
-    public MatchResponse openDispute(@NonNull UUID matchId, @NonNull String reason) {
-        Match match = matchRepository.findById(matchId)
+    public MatchResponse openDispute(UUID matchId, String reason) {
+        Match match = matchRepository.findById(Objects.requireNonNull(matchId))
                 .orElseThrow(() -> new NotFoundException("Match not found: " + matchId));
 
         match.setStatus(MatchStatus.DISPUTED);
@@ -177,15 +174,13 @@ public class MatchService {
         match.setScore(currentScore);
         
         Match savedMatch = matchRepository.save(match);
-        auditService.log("MATCH_DISPUTED", "MATCH", matchId, Map.of("reason", reason));
+        auditService.log("MATCH_DISPUTED", "MATCH", Objects.requireNonNull(matchId), Objects.requireNonNull(Map.of("reason", reason)));
         
-        return modelMapper.map(savedMatch, MatchResponse.class);
+        return Objects.requireNonNull(modelMapper.map(savedMatch, MatchResponse.class));
     }
 
-    @Transactional
-    @NonNull
-    public MatchResponse resolveDispute(@NonNull UUID matchId, @NonNull MatchResultRequest request) {
-        Match match = matchRepository.findById(matchId)
+    public MatchResponse resolveDispute(UUID matchId, MatchResultRequest request) {
+        Match match = matchRepository.findById(Objects.requireNonNull(matchId))
                 .orElseThrow(() -> new NotFoundException("Match not found: " + matchId));
 
         if (match.getStatus() != MatchStatus.DISPUTED) {
@@ -201,13 +196,13 @@ public class MatchService {
         }
 
         Match savedMatch = matchRepository.save(match);
-        auditService.log("DISPUTE_RESOLVED", "MATCH", matchId, Map.of(
+        auditService.log("DISPUTE_RESOLVED", "MATCH", Objects.requireNonNull(matchId), Objects.requireNonNull(Map.of(
             "winner", request.getWinnerId() != null ? request.getWinnerId().toString() : "null"
-        ));
+        )));
 
         processStandingsUpdate(savedMatch);
         triggerAdvancementLogic(savedMatch);
 
-        return modelMapper.map(savedMatch, MatchResponse.class);
+        return Objects.requireNonNull(modelMapper.map(savedMatch, MatchResponse.class));
     }
 }
