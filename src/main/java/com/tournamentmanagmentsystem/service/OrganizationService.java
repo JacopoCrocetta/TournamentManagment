@@ -24,6 +24,10 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.tournamentmanagmentsystem.exception.NotFoundException;
+import com.tournamentmanagmentsystem.exception.ConflictException;
+import com.tournamentmanagmentsystem.exception.AccessDeniedBusinessException;
+
 /**
  * Service for managing organizations and their members.
  * Handles the lifecycle of organizations and ensures proper role assignment
@@ -45,7 +49,7 @@ public class OrganizationService {
      *
      * @param request data for the new organization (name, slug, etc.)
      * @return OrganizationResponse containing the created organization's details
-     * @throws RuntimeException if the slug is already taken
+     * @throws ConflictException if the slug is already taken
      */
     @Transactional
     @NonNull
@@ -73,13 +77,13 @@ public class OrganizationService {
      *
      * @param id the UUID of the organization
      * @return OrganizationResponse with details
-     * @throws RuntimeException if organization is not found
+     * @throws NotFoundException if organization is not found
      */
     @Transactional(readOnly = true)
     @NonNull
     public OrganizationResponse getOrganization(@NonNull UUID id) {
         Organization organization = organizationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Organization not found: " + id));
+                .orElseThrow(() -> new NotFoundException("Organization not found: " + id));
         return modelMapper.map(organization, OrganizationResponse.class);
     }
 
@@ -108,7 +112,7 @@ public class OrganizationService {
     @NonNull
     public OrganizationResponse updateOrganization(@NonNull UUID id, @NonNull OrganizationRequest request) {
         Organization organization = organizationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Organization not found: " + id));
+                .orElseThrow(() -> new NotFoundException("Organization not found: " + id));
 
         organization.setName(request.getName());
         organization.setDescription(request.getDescription());
@@ -125,7 +129,7 @@ public class OrganizationService {
 
     private void validateSlugUniqueness(String slug) {
         if (organizationRepository.findBySlug(slug).isPresent()) {
-            throw new RuntimeException("Slug '" + slug + "' is already in use");
+            throw new ConflictException("Slug '" + slug + "' is already in use");
         }
     }
 
@@ -133,7 +137,7 @@ public class OrganizationService {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         return userRepository.findById(userDetails.getId())
-                .orElseThrow(() -> new RuntimeException("Current authenticated user session is invalid"));
+                .orElseThrow(() -> new AccessDeniedBusinessException("Current authenticated user session is invalid"));
     }
 
     private void createMembership(User user, Organization organization, Role role) {

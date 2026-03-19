@@ -7,14 +7,18 @@ import com.tournamentmanagmentsystem.domain.entity.Event;
 import com.tournamentmanagmentsystem.domain.entity.Match;
 import com.tournamentmanagmentsystem.domain.entity.Participant;
 import com.tournamentmanagmentsystem.domain.enums.MatchStatus;
+import com.tournamentmanagmentsystem.domain.enums.SeedingPolicy;
 import com.tournamentmanagmentsystem.repository.EventRepository;
 import com.tournamentmanagmentsystem.repository.MatchRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+
+import com.tournamentmanagmentsystem.exception.NotFoundException;
 
 /**
  * Implementation of a Round Robin (League) tournament structure.
@@ -38,9 +42,10 @@ public class RoundRobinEngine implements BracketEngine {
     @NonNull
     public List<Match> generateInitialMatches(@NonNull UUID eventId, @NonNull List<Participant> participants) {
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new RuntimeException("Event not found: " + eventId));
+                .orElseThrow(() -> new NotFoundException("Event not found: " + eventId));
 
-        List<Match> leagueMatches = generateAllPermutations(event, participants);
+        List<Participant> sorted = prepareSeeds(participants, event.getSeedingPolicy());
+        List<Match> leagueMatches = generateAllPermutations(event, sorted);
 
         return matchRepository.saveAll(leagueMatches);
     }
@@ -64,6 +69,33 @@ public class RoundRobinEngine implements BracketEngine {
             }
         }
         return matches;
+    }
+
+    private List<Participant> prepareSeeds(List<Participant> participants, SeedingPolicy policy) {
+        List<Participant> seeds = new ArrayList<>(participants);
+        if (policy == null) policy = SeedingPolicy.RANDOM;
+
+        switch (policy) {
+            case MANUAL:
+                seeds.sort((p1, p2) -> {
+                    Integer s1 = p1.getSeed() != null ? p1.getSeed() : Integer.MAX_VALUE;
+                    Integer s2 = p2.getSeed() != null ? p2.getSeed() : Integer.MAX_VALUE;
+                    return Integer.compare(s1, s2);
+                });
+                break;
+            case RATING:
+                seeds.sort((p1, p2) -> {
+                    Integer r1 = p1.getRating() != null ? p1.getRating() : Integer.MIN_VALUE;
+                    Integer r2 = p2.getRating() != null ? p2.getRating() : Integer.MIN_VALUE;
+                    return Integer.compare(r2, r1); // Descending highest first
+                });
+                break;
+            case RANDOM:
+            default:
+                Collections.shuffle(seeds);
+                break;
+        }
+        return seeds;
     }
 
     private Match createLeagueMatch(Event event, Participant p1, Participant p2) {

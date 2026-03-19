@@ -1,5 +1,6 @@
 package com.tournamentmanagmentsystem.dto.response;
 
+import com.tournamentmanagmentsystem.domain.enums.EventStatus;
 import com.tournamentmanagmentsystem.domain.enums.FormatType;
 import com.tournamentmanagmentsystem.domain.enums.SeedingPolicy;
 import lombok.AllArgsConstructor;
@@ -21,6 +22,6 @@ public class EventResponse {
     private FormatType formatType;
     private SeedingPolicy seedingPolicy;
     private Integer maxParticipants;
-    private String status;
+    private EventStatus status;
     private Map<String, Object> config;
 }

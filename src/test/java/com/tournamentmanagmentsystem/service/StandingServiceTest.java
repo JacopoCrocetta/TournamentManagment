@@ -69,7 +69,7 @@ class StandingServiceTest {
         standingService.updateStanding(event, participant, 3, Map.of("won", 2));
 
         assertEquals(8, existing.getPoints());
-        assertEquals(2, existing.getTieBreakerData().get("won"));
+        assertEquals(3, existing.getTieBreakerData().get("won"));
         verify(standingRepository).save(existing);
     }
 }

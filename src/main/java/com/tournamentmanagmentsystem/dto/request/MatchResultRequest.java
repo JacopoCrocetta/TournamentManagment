@@ -15,4 +15,7 @@ import java.util.UUID;
 public class MatchResultRequest {
     private Map<String, Object> score;
     private UUID winnerId;
+    
+    @Builder.Default
+    private Boolean forfeit = false;
 }

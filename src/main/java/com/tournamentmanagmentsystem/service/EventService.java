@@ -3,6 +3,7 @@ package com.tournamentmanagmentsystem.service;
 import org.springframework.lang.NonNull;
 
 import com.tournamentmanagmentsystem.domain.entity.Event;
+import com.tournamentmanagmentsystem.domain.enums.EventStatus;
 import com.tournamentmanagmentsystem.domain.entity.Tournament;
 import com.tournamentmanagmentsystem.dto.request.EventRequest;
 import com.tournamentmanagmentsystem.dto.response.EventResponse;
@@ -16,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import com.tournamentmanagmentsystem.exception.NotFoundException;
 
 /**
  * Service for managing tournament events (sub-competitions).
@@ -34,21 +37,21 @@ public class EventService {
      *
      * @param request event configuration (name, format, etc.)
      * @return the created event details
-     * @throws RuntimeException if tournament is not found
+     * @throws NotFoundException if tournament is not found
      */
     @Transactional
     @NonNull
     public EventResponse createEvent(@NonNull EventRequest request) {
         Tournament tournament = tournamentRepository.findById(request.getTournamentId())
-                .orElseThrow(() -> new RuntimeException("Tournament not found: " + request.getTournamentId()));
+                .orElseThrow(() -> new NotFoundException("Tournament not found: " + request.getTournamentId()));
 
         Event event = modelMapper.map(request, Event.class);
         if (event == null) {
-            throw new RuntimeException("Mapping error during event creation");
+            throw new IllegalStateException("Mapping error during event creation");
         }
 
         event.setTournament(tournament);
-        event.setStatus("DRAFT"); // Standard start status
+        event.setStatus(EventStatus.DRAFT); // Standard start status
 
         Event savedEvent = eventRepository.save(event);
         return modelMapper.map(savedEvent, EventResponse.class);
@@ -73,13 +76,13 @@ public class EventService {
      *
      * @param id the event UUID
      * @return event details
-     * @throws RuntimeException if event not found
+     * @throws NotFoundException if event not found
      */
     @Transactional(readOnly = true)
     @NonNull
     public EventResponse getEvent(@NonNull UUID id) {
         Event event = eventRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Event not found: " + id));
+                .orElseThrow(() -> new NotFoundException("Event not found: " + id));
         return modelMapper.map(event, EventResponse.class);
     }
 }

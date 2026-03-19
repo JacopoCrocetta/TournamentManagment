@@ -4,6 +4,8 @@ import com.tournamentmanagmentsystem.domain.entity.Event;
 import com.tournamentmanagmentsystem.domain.entity.Tournament;
 import com.tournamentmanagmentsystem.dto.request.EventRequest;
 import com.tournamentmanagmentsystem.dto.response.EventResponse;
+import com.tournamentmanagmentsystem.domain.enums.EventStatus;
+import com.tournamentmanagmentsystem.exception.NotFoundException;
 import com.tournamentmanagmentsystem.repository.EventRepository;
 import com.tournamentmanagmentsystem.repository.TournamentRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -66,14 +68,14 @@ class EventServiceTest {
         assertNotNull(response);
         verify(eventRepository).save(event);
         assertEquals(tournament, event.getTournament());
-        assertEquals("DRAFT", event.getStatus());
+        assertEquals(EventStatus.DRAFT, event.getStatus());
     }
 
     @Test
     void createEvent_TournamentNotFound_ThrowsException() {
         when(tournamentRepository.findById(tournamentId)).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> eventService.createEvent(request));
+        assertThrows(NotFoundException.class, () -> eventService.createEvent(request));
         verify(eventRepository, never()).save(any());
     }
 }

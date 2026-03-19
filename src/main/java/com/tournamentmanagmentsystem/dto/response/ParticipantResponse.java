@@ -19,5 +19,6 @@ public class ParticipantResponse {
     private String name;
     private ParticipantStatus status;
     private Integer seed;
+    private Boolean checkedIn;
     private Map<String, Object> metadata;
 }

@@ -55,4 +55,16 @@ public class ParticipantController {
     public ResponseEntity<List<ParticipantResponse>> getByTournament(@PathVariable UUID tournamentId) {
         return ResponseEntity.ok(participantService.getParticipants(tournamentId));
     }
+
+    /**
+     * Checks in a participant for the tournament.
+     *
+     * @param participantId participant UUID
+     * @return updated participant details
+     */
+    @PutMapping("/{participantId}/checkin")
+    @Operation(summary = "Check-in a participant", description = "Marks a participant as checked-in for the tournament.")
+    public ResponseEntity<ParticipantResponse> checkIn(@PathVariable UUID participantId) {
+        return ResponseEntity.ok(participantService.checkIn(participantId));
+    }
 }

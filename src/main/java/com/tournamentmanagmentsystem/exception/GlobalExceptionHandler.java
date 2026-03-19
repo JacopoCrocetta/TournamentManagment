@@ -39,12 +39,47 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problemDetail);
         }
 
+        @ExceptionHandler(NotFoundException.class)
+        public ResponseEntity<ProblemDetail> handleNotFoundException(NotFoundException ex) {
+                ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+                problemDetail.setTitle("Resource Not Found");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
+        }
+
+        @ExceptionHandler(BusinessRuleViolationException.class)
+        public ResponseEntity<ProblemDetail> handleBusinessRuleViolationException(BusinessRuleViolationException ex) {
+                ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+                problemDetail.setTitle("Business Rule Violation");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problemDetail);
+        }
+
+        @ExceptionHandler(InvalidStateTransitionException.class)
+        public ResponseEntity<ProblemDetail> handleInvalidStateTransitionException(InvalidStateTransitionException ex) {
+                ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+                problemDetail.setTitle("Invalid State Transition");
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(problemDetail);
+        }
+
+        @ExceptionHandler(ConflictException.class)
+        public ResponseEntity<ProblemDetail> handleConflictException(ConflictException ex) {
+                ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+                problemDetail.setTitle("Conflict");
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(problemDetail);
+        }
+
+        @ExceptionHandler(AccessDeniedBusinessException.class)
+        public ResponseEntity<ProblemDetail> handleAccessDeniedBusinessException(AccessDeniedBusinessException ex) {
+                ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.getMessage());
+                problemDetail.setTitle("Access Denied");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(problemDetail);
+        }
+
         @ExceptionHandler(RuntimeException.class)
         public ResponseEntity<ProblemDetail> handleRuntimeException(RuntimeException ex) {
                 log.error("Unhandled RuntimeException occurred: ", ex);
                 ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
                                 HttpStatus.INTERNAL_SERVER_ERROR,
-                                ex.getMessage());
+                                "An unexpected error occurred.");
                 problemDetail.setTitle("Internal Server Error");
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problemDetail);
         }

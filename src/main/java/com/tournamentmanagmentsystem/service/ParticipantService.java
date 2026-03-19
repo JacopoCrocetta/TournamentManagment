@@ -21,6 +21,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.tournamentmanagmentsystem.exception.NotFoundException;
+import com.tournamentmanagmentsystem.exception.BusinessRuleViolationException;
+
 /**
  * Service for handling participant registrations and player management.
  * Manages confirmed lists and waitlists based on tournament capacity.
@@ -40,7 +43,8 @@ public class ParticipantService {
      *
      * @param request registration details
      * @return ParticipantResponse with status and name
-     * @throws RuntimeException if registration is closed or tournament not found
+     * @throws NotFoundException if tournament not found
+     * @throws BusinessRuleViolationException if registration is closed
      */
     @Transactional
     @NonNull
@@ -77,14 +81,37 @@ public class ParticipantService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Checks in a participant for a tournament.
+     *
+     * @param participantId UUID of the participant
+     * @return updated ParticipantResponse
+     * @throws NotFoundException if the participant is not found
+     * @throws BusinessRuleViolationException if already checked in
+     */
+    @Transactional
+    @NonNull
+    public ParticipantResponse checkIn(@NonNull UUID participantId) {
+        Participant participant = participantRepository.findById(participantId)
+                .orElseThrow(() -> new NotFoundException("Participant not found: " + participantId));
+        
+        if (Boolean.TRUE.equals(participant.getCheckedIn())) {
+            throw new BusinessRuleViolationException("Participant already checked in: " + participantId);
+        }
+        
+        participant.setCheckedIn(true);
+        Participant savedParticipant = participantRepository.save(participant);
+        return modelMapper.map(savedParticipant, ParticipantResponse.class);
+    }
+
     private Tournament fetchTournament(UUID tournamentId) {
         return tournamentRepository.findById(tournamentId)
-                .orElseThrow(() -> new RuntimeException("Tournament not found: " + tournamentId));
+                .orElseThrow(() -> new NotFoundException("Tournament not found: " + tournamentId));
     }
 
     private void ensureRegistrationIsOpen(Tournament tournament) {
         if (tournament.getStatus() != TournamentStatus.REGISTRATION_OPEN) {
-            throw new RuntimeException("Registration is currently " + tournament.getStatus() + " and not open");
+            throw new BusinessRuleViolationException("Registration is currently " + tournament.getStatus() + " and not open");
         }
     }
 
@@ -98,7 +125,7 @@ public class ParticipantService {
     private void associateUserIfExists(Participant participant, UUID userId) {
         if (userId != null) {
             User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new RuntimeException("Target user not found for association: " + userId));
+                    .orElseThrow(() -> new NotFoundException("Target user not found for association: " + userId));
             participant.setUser(user);
         }
     }

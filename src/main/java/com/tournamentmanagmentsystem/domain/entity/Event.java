@@ -1,13 +1,15 @@
 package com.tournamentmanagmentsystem.domain.entity;
 
+import com.tournamentmanagmentsystem.domain.enums.EventStatus;
 import com.tournamentmanagmentsystem.domain.enums.FormatType;
 import com.tournamentmanagmentsystem.domain.enums.SeedingPolicy;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -16,7 +18,8 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "events")
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -49,9 +52,22 @@ public class Event {
 
     private Integer maxParticipants;
 
-    @NotBlank
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private EventStatus status;
 
     @Version
     private Long version;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Event that)) return false;
+        return id != null && id.equals(that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

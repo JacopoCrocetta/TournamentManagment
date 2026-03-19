@@ -40,10 +40,22 @@ public class StandingService {
         Standing standing = standingRepository.findByEventIdAndParticipantId(event.getId(), participant.getId())
                 .orElseGet(() -> createInitialStanding(event, participant));
 
-        standing.setPoints(standing.getPoints() + pointsChange);
+        standing.setPoints((standing.getPoints() != null ? standing.getPoints() : 0) + pointsChange);
 
         if (tieBreakerInfo != null) {
-            standing.getTieBreakerData().putAll(tieBreakerInfo);
+            if (standing.getTieBreakerData() == null) {
+                standing.setTieBreakerData(new HashMap<>());
+            }
+            final Map<String, Object> currentData = standing.getTieBreakerData();
+            tieBreakerInfo.forEach((k, v) -> {
+                if (v instanceof Number numUpdate) {
+                    Object currentVal = currentData.get(k);
+                    int currentInt = currentVal instanceof Number n ? n.intValue() : 0;
+                    currentData.put(k, currentInt + numUpdate.intValue());
+                } else {
+                    currentData.put(k, v);
+                }
+            });
         }
 
         standingRepository.save(standing);
@@ -58,7 +70,33 @@ public class StandingService {
     @Transactional(readOnly = true)
     @NonNull
     public List<Standing> getStandings(@NonNull UUID eventId) {
-        return standingRepository.findByEventIdOrderByPointsDesc(eventId);
+        List<Standing> standings = standingRepository.findByEventIdOrderByPointsDesc(eventId);
+        standings.sort((s1, s2) -> {
+            // 1. Points
+            int p1 = s1.getPoints() != null ? s1.getPoints() : 0;
+            int p2 = s2.getPoints() != null ? s2.getPoints() : 0;
+            int pCmp = Integer.compare(p2, p1);
+            if (pCmp != 0) return pCmp;
+            
+            // 2. Points Differential
+            int diff1 = getTieBreakerInt(s1, "pointsDiff");
+            int diff2 = getTieBreakerInt(s2, "pointsDiff");
+            int diffCmp = Integer.compare(diff2, diff1);
+            if (diffCmp != 0) return diffCmp;
+            
+            // 3. Wins
+            int wins1 = getTieBreakerInt(s1, "wins");
+            int wins2 = getTieBreakerInt(s2, "wins");
+            return Integer.compare(wins2, wins1);
+        });
+        return standings;
+    }
+
+    private int getTieBreakerInt(Standing s, String key) {
+        if (s.getTieBreakerData() == null) return 0;
+        Object val = s.getTieBreakerData().get(key);
+        if (val instanceof Number n) return n.intValue();
+        return 0;
     }
 
     private Standing createInitialStanding(Event event, Participant participant) {

@@ -23,6 +23,7 @@ import java.util.UUID;
 public class BracketService {
 
     private final SingleEliminationEngine singleEliminationEngine;
+    private final DoubleEliminationEngine doubleEliminationEngine;
     private final RoundRobinEngine roundRobinEngine;
     private final ParticipantRepository participantRepository;
     private final AuditService auditService;
@@ -39,7 +40,9 @@ public class BracketService {
      */
     @Transactional
     public List<Match> generateBracket(UUID eventId, FormatType formatType) {
-        List<Participant> participants = participantRepository.findByTournamentId(eventId);
+        List<Participant> participants = participantRepository.findByTournamentId(eventId).stream()
+                .filter(p -> Boolean.TRUE.equals(p.getCheckedIn()))
+                .toList();
 
         List<Match> generatedMatches = dispatchToEngine(eventId, participants, formatType);
 
@@ -51,10 +54,24 @@ public class BracketService {
     private List<Match> dispatchToEngine(UUID eventId, List<Participant> participants, FormatType formatType) {
         return switch (formatType) {
             case SINGLE_ELIMINATION -> singleEliminationEngine.generateInitialMatches(eventId, participants);
+            case DOUBLE_ELIMINATION -> doubleEliminationEngine.generateInitialMatches(eventId, participants);
             case ROUND_ROBIN -> roundRobinEngine.generateInitialMatches(eventId, participants);
             default ->
                 throw new UnsupportedOperationException("Generation logic not yet implemented for: " + formatType);
         };
+    }
+
+    @Transactional
+    public void advanceWinner(Match match) {
+        if (match.getEvent() == null) return;
+        FormatType format = match.getEvent().getFormatType();
+        if (format == FormatType.SINGLE_ELIMINATION) {
+            singleEliminationEngine.advanceWinner(match);
+        } else if (format == FormatType.DOUBLE_ELIMINATION) {
+            doubleEliminationEngine.advanceWinner(match);
+        } else if (format == FormatType.ROUND_ROBIN) {
+            // Round robin has no explicit bracket advancing
+        }
     }
 
     private void logBracketGeneration(UUID eventId, FormatType formatType, int matchCount) {

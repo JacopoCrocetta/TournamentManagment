@@ -20,6 +20,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.tournamentmanagmentsystem.exception.NotFoundException;
+import com.tournamentmanagmentsystem.exception.InvalidStateTransitionException;
+
 /**
  * Service for managing tournament lifecycles.
  * Handles creation, status transitions, and retrieval of tournaments within
@@ -41,17 +44,17 @@ public class TournamentService {
      *
      * @param request data for the new tournament
      * @return TournamentResponse with the created tournament details
-     * @throws RuntimeException if the organization is not found
+     * @throws NotFoundException if the organization is not found
      */
     @Transactional
     @NonNull
     public TournamentResponse createTournament(@NonNull TournamentRequest request) {
         Organization organization = organizationRepository.findById(request.getOrganizationId())
-                .orElseThrow(() -> new RuntimeException("Organization not found: " + request.getOrganizationId()));
+                .orElseThrow(() -> new NotFoundException("Organization not found: " + request.getOrganizationId()));
 
         Tournament tournament = modelMapper.map(request, Tournament.class);
         if (tournament == null) {
-            throw new RuntimeException("Failed to map request to Tournament entity");
+            throw new IllegalStateException("Failed to map request to Tournament entity");
         }
 
         tournament.setOrganization(organization);
@@ -71,13 +74,13 @@ public class TournamentService {
      *
      * @param id tournament UUID
      * @return TournamentResponse
-     * @throws RuntimeException if tournament is not found
+     * @throws NotFoundException if tournament is not found
      */
     @Transactional(readOnly = true)
     @NonNull
     public TournamentResponse getTournament(@NonNull UUID id) {
         Tournament tournament = tournamentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Tournament not found: " + id));
+                .orElseThrow(() -> new NotFoundException("Tournament not found: " + id));
         return modelMapper.map(tournament, TournamentResponse.class);
     }
 
@@ -107,7 +110,7 @@ public class TournamentService {
     @NonNull
     public TournamentResponse updateStatus(@NonNull UUID id, @NonNull TournamentStatus newStatus) {
         Tournament tournament = tournamentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Tournament not found: " + id));
+                .orElseThrow(() -> new NotFoundException("Tournament not found: " + id));
 
         validateStatusTransition(tournament.getStatus(), newStatus);
 
@@ -127,7 +130,7 @@ public class TournamentService {
      * 
      * @param current current tournament status
      * @param next    target tournament status
-     * @throws RuntimeException if transition is invalid
+     * @throws InvalidStateTransitionException if transition is invalid
      */
     private void validateStatusTransition(TournamentStatus current, TournamentStatus next) {
         if (current == next) {
@@ -135,7 +138,7 @@ public class TournamentService {
         }
 
         if (current == TournamentStatus.COMPLETED || current == TournamentStatus.CANCELLED) {
-            throw new RuntimeException("Cannot change status of a finished or cancelled tournament (" + current + ")");
+            throw new InvalidStateTransitionException("Cannot change status of a finished or cancelled tournament (" + current + ")");
         }
 
         // Add more specific rules as needed:

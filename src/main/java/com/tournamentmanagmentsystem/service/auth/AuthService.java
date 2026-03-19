@@ -18,6 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.tournamentmanagmentsystem.exception.ConflictException;
+
 /**
  * Service responsible for user authentication and registration operations.
  * Handles JWT token generation and password encoding.
@@ -38,14 +40,14 @@ public class AuthService {
          * @param request the registration details including email, password, and
          *                display name
          * @return AuthResponse containing access and refresh tokens
-         * @throws RuntimeException if the email already exists
+         * @throws ConflictException if the email already exists
          */
         @Transactional
         @NonNull
         public AuthResponse register(@NonNull RegisterRequest request) {
                 if (userRepository.existsByEmail(request.getEmail())) {
                         log.warn("Registration attempt failed: email {} already exists", request.getEmail());
-                        throw new RuntimeException("Account with this email already exists");
+                        throw new ConflictException("Account with this email already exists");
                 }
 
                 User user = User.builder()
@@ -74,7 +76,7 @@ public class AuthService {
                                                 request.getPassword()));
 
                 User user = userRepository.findByEmail(request.getEmail())
-                                .orElseThrow(() -> new RuntimeException(
+                                .orElseThrow(() -> new IllegalStateException(
                                                 "User not found after successful authentication"));
 
                 log.info("User {} logged in successfully", user.getEmail());
