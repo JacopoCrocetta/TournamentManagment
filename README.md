@@ -36,33 +36,43 @@ This system provides a comprehensive API to handle organizations, multi-format t
 ## 🏁 Getting Started
 
 ### Prerequisites
-- JDK 21
-- Docker (for PostgreSQL and Testcontainers)
-- Maven 3.9+
+- **JDK 21**
+- **Docker** (for PostgreSQL)
+- **Maven 3.9+**
 
-### Installation (Manual)
-1. Clone the repository.
-2. Configure your `application.yml` with your database credentials and JWT secret.
-3. Run migrations and start the app:
-   ```bash
-   mvn spring-boot:run
-   ```
+### ⚡ Quick Start (Docker Compose)
+The easiest way to start the entire stack (App + PostgreSQL) is using Docker Compose:
 
-### 🐳 Docker Deployment (Recommended)
-You can start the entire stack (App + PostgreSQL) with a single command:
 ```bash
 docker-compose up --build
 ```
-This will:
-- Build the optimized multi-stage image.
-- Start a PostgreSQL 16 container with healthchecks.
-- Start the application using the `docker` Spring profile.
 
-Once started, the app will be reachable at `http://localhost:8080`.
+This command builds the optimized multi-stage image and starts a PostgreSQL 16 container. The application will be available at `http://localhost:8080`.
 
-### Documentation
-Once the app is running, access the interactive API docs at:
-`http://localhost:8080/swagger-ui.html`
+### 🛠 Manual Installation & Development
+If you prefer to run the application manually for development:
+
+1. **Start the Database**:
+   Ensure you have a PostgreSQL instance running. You can start a local one with:
+   ```bash
+   docker run --name tournament-db -e POSTGRES_DB=tournament_db -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres:16
+   ```
+
+2. **Configure Environment (Optional)**:
+   The application uses sensible defaults in `application.properties`. You can override them via environment variables:
+   - `DB_URL`: `jdbc:postgresql://localhost:5432/tournament_db`
+   - `DB_USER`: `postgres`
+   - `DB_PASS`: `postgres`
+
+3. **Build and Run**:
+   ```bash
+   mvn clean install
+   mvn spring-boot:run
+   ```
+
+### 📖 API Documentation
+Once the app is running, access the interactive Swagger UI at:
+👉 **`http://localhost:8080/swagger-ui.html`**
 
 ## 🧪 Testing
 The project includes a comprehensive test suite covering business logic and boundary rules.
