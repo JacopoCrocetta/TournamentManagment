@@ -7,6 +7,7 @@
 
     <include file="db/changelog/changeset-001.xml"/>
     <include file="db/changelog/changeset-002.xml"/>
+    <include file="db/changelog/changeset-003.xml"/>
     <!-- Add more change sets as needed -->
 
 </databaseChangeLog>

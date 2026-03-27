@@ -6,37 +6,34 @@ import com.tournamentmanagmentsystem.domain.entity.Participant;
 import com.tournamentmanagmentsystem.domain.enums.MatchStatus;
 import com.tournamentmanagmentsystem.dto.request.MatchResultRequest;
 import com.tournamentmanagmentsystem.repository.MatchRepository;
-import com.tournamentmanagmentsystem.service.bracket.BracketService;
+import com.tournamentmanagmentsystem.mapper.MatchMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import com.tournamentmanagmentsystem.mapper.MatchMapper;
+import org.springframework.lang.NonNull;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-@SuppressWarnings("null")
 @ExtendWith(MockitoExtension.class)
 class MatchServiceTest {
 
     @Mock
     private MatchRepository matchRepository;
     @Mock
+    private com.tournamentmanagmentsystem.repository.ParticipantRepository participantRepository;
+    @Mock
     private AuditService auditService;
     @Mock
     private StandingService standingService;
     @Mock
-    private BracketService bracketService;
+    private com.tournamentmanagmentsystem.controller.ws.NotificationService notificationService;
     @Mock
     private MatchMapper matchMapper;
 
@@ -52,8 +49,8 @@ class MatchServiceTest {
     @BeforeEach
     void setUp() {
         matchId = UUID.randomUUID();
-        pA = Participant.builder().id(UUID.randomUUID()).build();
-        pB = Participant.builder().id(UUID.randomUUID()).build();
+        pA = Participant.builder().id(UUID.randomUUID()).name("Player A").build();
+        pB = Participant.builder().id(UUID.randomUUID()).name("Player B").build();
 
         match = Match.builder()
                 .id(matchId)
@@ -61,25 +58,31 @@ class MatchServiceTest {
                 .participantA(pA)
                 .participantB(pB)
                 .status(MatchStatus.PENDING)
-                .score(Objects.requireNonNull(new HashMap<>()))
+                .score(new HashMap<>())
                 .build();
 
         request = new MatchResultRequest();
         request.setWinnerId(pA.getId());
-        request.setScore(Map.of("A", 2, "B", 1));
+        request.setScore(Map.of(pA.getId().toString(), 2, pB.getId().toString(), 1));
     }
 
     @Test
-    void updateResult_Success() {
-        when(matchRepository.findById(Objects.requireNonNull(matchId))).thenReturn(Optional.of(Objects.requireNonNull(match)));
-        when(matchRepository.save(any(Match.class))).thenReturn(Objects.requireNonNull(match));
+    void updateResult_Success_WithAdvancement() {
+        Match nextMatch = Match.builder().id(UUID.randomUUID()).build();
+        match.setNextMatch(nextMatch);
+        match.setPositionInNextMatch(0);
+
+        when(matchRepository.findById(matchId)).thenReturn(Optional.of(match));
+        when(matchRepository.save(any(Match.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(participantRepository.findById(pA.getId())).thenReturn(Optional.of(pA));
         when(matchMapper.toResponse(any())).thenReturn(new com.tournamentmanagmentsystem.dto.response.MatchResponse());
 
-        matchService.updateResult(Objects.requireNonNull(matchId), Objects.requireNonNull(request));
+        matchService.updateResult(matchId, request);
 
         assertEquals(MatchStatus.FINISHED, match.getStatus());
         assertEquals(pA.getId(), match.getWinnerId());
-        verify(standingService, times(2)).updateStanding(any(), any(), anyInt(), any());
-        verify(bracketService, times(1)).advanceWinner(Objects.requireNonNull(match));
+        assertEquals(pA, nextMatch.getParticipantA());
+        verify(matchRepository).save(nextMatch);
+        verify(notificationService).notifyMatchUpdate(any(), any());
     }
 }

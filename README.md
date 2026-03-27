@@ -24,11 +24,12 @@ This system provides a comprehensive API to handle organizations, multi-format t
 - **Application Logging**: Structured logging with SLF4J and Logback with daily log rotation.
 
 ## 🛠 Tech Stack
-- **Core**: Java 26, Spring Boot 3.4
+- **Core**: Java 21, Spring Boot 3.4
 - **Database**: PostgreSQL (JSONB for dynamic fields)
 - **Migrations**: Liquibase
-- **Mapping**: Manual Domain Mappers (Type-safe)
-- **Security**: Spring Security + JJWT
+- **Mapping**: MapStruct (Automated, type-safe)
+- **Real-time**: Spring WebSocket + STOMP
+- **Security**: Spring Security 6 + JJWT
 - **API Documentation**: Springdoc OpenAPI
 - **Testing**: JUnit 5, Mockito, Testcontainers
 
@@ -78,7 +79,7 @@ This project follows **Clean Code** principles and **SOLID** design patterns.
 - **Controllers**: Thin layers for request/response handling, documented with OpenApi/Swagger annotations.
 - **Services**: Contain business logic and cleanly handle operations via custom domain-specific Exceptions (`BusinessRuleViolationException`, `InvalidStateTransitionException`, etc.).
 - **Domain**: Rich JPA entities with clear lifecycle boundaries and optimized querying logic.
-- **Bracket Engines**: Implemented via Strategy Pattern (`BracketEngine`). Expandable for Custom formats.
+- **Bracket Strategies**: Implemented via Strategy Pattern. Open-closed for custom formats.
 - **Auditing**: Uses `@Slf4j` for technical logs and a custom `AuditService` for domain actions, kept for 30-day retention policies.
 
 ---

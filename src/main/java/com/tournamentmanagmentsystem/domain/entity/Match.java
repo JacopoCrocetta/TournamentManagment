@@ -57,6 +57,12 @@ public class Match {
     @Column(columnDefinition = "jsonb")
     private Map<String, Object> score;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "next_match_id")
+    private Match nextMatch;
+
+    private Integer positionInNextMatch; // 0 for participantA, 1 for participantB
+
     @Column(name = "winner_id")
     private UUID winnerId;
 

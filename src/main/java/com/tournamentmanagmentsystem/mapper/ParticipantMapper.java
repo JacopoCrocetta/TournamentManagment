@@ -2,20 +2,12 @@ package com.tournamentmanagmentsystem.mapper;
 
 import com.tournamentmanagmentsystem.domain.entity.Participant;
 import com.tournamentmanagmentsystem.dto.response.ParticipantResponse;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-@Component
-public class ParticipantMapper {
-    public ParticipantResponse toResponse(Participant participant) {
-        if (participant == null) return null;
-        return ParticipantResponse.builder()
-                .id(participant.getId())
-                .tournamentId(participant.getTournament() != null ? participant.getTournament().getId() : null)
-                .eventId(participant.getEvent() != null ? participant.getEvent().getId() : null)
-                .name(participant.getName())
-                .type(participant.getType())
-                .seed(participant.getSeed())
-                .rating(participant.getRating())
-                .build();
-    }
+@Mapper(componentModel = "spring")
+public interface ParticipantMapper {
+    @Mapping(target = "tournamentId", source = "tournament.id")
+    @Mapping(target = "eventId", source = "event.id")
+    ParticipantResponse toResponse(Participant participant);
 }

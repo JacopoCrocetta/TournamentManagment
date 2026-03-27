@@ -8,7 +8,6 @@ import com.tournamentmanagmentsystem.domain.enums.MatchStatus;
 import com.tournamentmanagmentsystem.dto.request.MatchResultRequest;
 import com.tournamentmanagmentsystem.dto.response.MatchResponse;
 import com.tournamentmanagmentsystem.repository.MatchRepository;
-import com.tournamentmanagmentsystem.service.bracket.BracketService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import com.tournamentmanagmentsystem.mapper.MatchMapper;
@@ -34,9 +33,10 @@ import java.util.HashMap;
 public class MatchService {
 
     private final MatchRepository matchRepository;
+    private final com.tournamentmanagmentsystem.repository.ParticipantRepository participantRepository;
     private final AuditService auditService;
     private final StandingService standingService;
-    private final BracketService bracketService;
+    private final com.tournamentmanagmentsystem.controller.ws.NotificationService notificationService;
     private final MatchMapper matchMapper;
 
     @Transactional
@@ -58,9 +58,12 @@ public class MatchService {
         processStandingsUpdate(savedMatch);
         triggerAdvancementLogic(savedMatch);
 
+        MatchResponse response = matchMapper.toResponse(savedMatch);
+        notificationService.notifyMatchUpdate(savedMatch.getEvent().getId(), response);
+
         log.info("Match result updated: ID={}, winnerID={}", savedMatch.getId(), request.getWinnerId());
 
-        return matchMapper.toResponse(savedMatch);
+        return response;
     }
 
     private void applyResultToMatch(Match match, MatchResultRequest request) {
@@ -161,7 +164,19 @@ public class MatchService {
     }
 
     private void triggerAdvancementLogic(Match match) {
-        bracketService.advanceWinner(match);
+        if (match.getNextMatch() != null && match.getWinnerId() != null) {
+            Match nextMatch = match.getNextMatch();
+            Participant winner = participantRepository.findById(match.getWinnerId())
+                    .orElseThrow(() -> new NotFoundException("Winner not found: " + match.getWinnerId()));
+
+            if (Integer.valueOf(0).equals(match.getPositionInNextMatch())) {
+                nextMatch.setParticipantA(winner);
+            } else {
+                nextMatch.setParticipantB(winner);
+            }
+            matchRepository.save(nextMatch);
+            log.info("Participant '{}' advanced to match {}", winner.getName(), nextMatch.getId());
+        }
     }
 
     public MatchResponse openDispute(UUID matchId, String reason) {

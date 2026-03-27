@@ -18,5 +18,9 @@ public class StandingResponse {
     private UUID participantId;
     private String participantName;
     private Integer points;
+    private Integer played;
+    private Integer wins;
+    private Integer draws;
+    private Integer losses;
     private Map<String, Object> tieBreakerData;
 }

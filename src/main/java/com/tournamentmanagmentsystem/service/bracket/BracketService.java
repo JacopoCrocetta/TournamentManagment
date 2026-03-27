@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import com.tournamentmanagmentsystem.strategy.MatchmakingStrategy;
+import com.tournamentmanagmentsystem.repository.MatchRepository;
 
 /**
  * Orchestrator Service for bracket generation.
@@ -26,11 +28,10 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BracketService {
 
-    private final SingleEliminationEngine singleEliminationEngine;
-    private final DoubleEliminationEngine doubleEliminationEngine;
-    private final RoundRobinEngine roundRobinEngine;
+    private final Map<String, MatchmakingStrategy> matchmakingStrategies;
     private final ParticipantRepository participantRepository;
     private final EventRepository eventRepository;
+    private final MatchRepository matchRepository;
     private final AuditService auditService;
 
     /**
@@ -53,35 +54,23 @@ public class BracketService {
                 .filter(p -> Boolean.TRUE.equals(p.getCheckedIn()))
                 .toList();
 
-        List<Match> generatedMatches = dispatchToEngine(eventId, participants, formatType);
+        List<Match> generatedMatches = dispatchToEngine(event, participants, formatType);
 
         logBracketGeneration(eventId, formatType, generatedMatches.size());
 
         return generatedMatches;
     }
 
-    private List<Match> dispatchToEngine(UUID eventId, List<Participant> participants, FormatType formatType) {
-        return switch (formatType) {
-            case SINGLE_ELIMINATION -> singleEliminationEngine.generateInitialMatches(eventId, participants);
-            case DOUBLE_ELIMINATION -> doubleEliminationEngine.generateInitialMatches(eventId, participants);
-            case ROUND_ROBIN -> roundRobinEngine.generateInitialMatches(eventId, participants);
-            default ->
-                throw new UnsupportedOperationException("Generation logic not yet implemented for: " + formatType);
-        };
+    private List<Match> dispatchToEngine(Event event, List<Participant> participants, FormatType formatType) {
+        MatchmakingStrategy strategy = matchmakingStrategies.get(formatType.name());
+        if (strategy == null) {
+            throw new UnsupportedOperationException("No strategy implemented for: " + formatType);
+        }
+        List<Match> matches = strategy.generateMatches(event, participants);
+        return matchRepository.saveAll(matches);
     }
 
-    @Transactional
-    public void advanceWinner(Match match) {
-        if (match.getEvent() == null) return;
-        FormatType format = match.getEvent().getFormatType();
-        if (format == FormatType.SINGLE_ELIMINATION) {
-            singleEliminationEngine.advanceWinner(match);
-        } else if (format == FormatType.DOUBLE_ELIMINATION) {
-            doubleEliminationEngine.advanceWinner(match);
-        } else if (format == FormatType.ROUND_ROBIN) {
-            // Round robin has no explicit bracket advancing
-        }
-    }
+    // Removed advanceWinner: logic is now handled in MatchService for better encapsulation
 
     private void logBracketGeneration(UUID eventId, FormatType formatType, int matchCount) {
         auditService.log("GENERATE_BRACKET", "EVENT", Objects.requireNonNull(eventId), Objects.requireNonNull(Map.of(

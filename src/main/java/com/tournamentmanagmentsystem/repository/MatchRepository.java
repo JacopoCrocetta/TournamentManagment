@@ -9,5 +9,6 @@ import java.util.UUID;
 
 @Repository
 public interface MatchRepository extends JpaRepository<Match, UUID> {
+    java.util.List<Match> findByEventId(UUID eventId);
     Optional<Match> findByEventIdAndStage(UUID eventId, String stage);
 }
