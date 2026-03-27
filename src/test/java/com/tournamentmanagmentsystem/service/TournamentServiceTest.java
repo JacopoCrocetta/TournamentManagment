@@ -72,7 +72,7 @@ class TournamentServiceTest {
 
         assertNotNull(response);
         verify(tournamentRepository, times(1)).save(any(Tournament.class));
-        verify(auditService, times(1)).log(eq("CREATE"), eq("TOURNAMENT"), any(), any());
+        verify(auditService, times(1)).log(eq("CREATE"), eq("TOURNAMENT"), any(), anyMap());
     }
 
     @Test

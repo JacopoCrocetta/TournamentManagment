@@ -40,6 +40,9 @@ public class TournamentRequest {
     @Min(2)
     private int maxParticipants;
 
+    @NotBlank
+    private String sportType;
+
     @FutureOrPresent
     private LocalDateTime startDate;
 

@@ -74,8 +74,7 @@ public class AuthIntegrationTest extends BaseIntegrationTest {
                 request,
                 AuthResponse.class);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-        // Note: Currently AuthService throws RuntimeException, which defaults to 500.
-        // In a real scenario, this would be 400 with a custom exception.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        // Note: AuthService throws ConflictException (or similar), which maps to 409.
     }
 }

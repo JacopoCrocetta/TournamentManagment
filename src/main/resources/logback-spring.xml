@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-
+    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
     <property name="LOGS" value="./logs" />
 
     <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
             <Pattern>
-                %d{HH:mm:ss.SSS} %highlight(%-5level) %magenta([%thread]) %style([%X{traceId:-NoTrace}]){faint} %cyan(%logger{20}) : %msg%n
+                %d{HH:mm:ss.SSS} %highlight(%-5level) %magenta([%thread]) %clr([%X{traceId:-NoTrace}]){faint} %cyan(%logger{20}) : %msg%n
             </Pattern>
         </layout>
     </appender>
@@ -14,7 +14,7 @@
     <appender name="RollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOGS}/tournament-manager.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <Pattern>%d %p %C{1.} [%t] %m%n</Pattern>
+            <Pattern>%d %p %C{1} [%t] %m%n</Pattern>
         </encoder>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">

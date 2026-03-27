@@ -22,6 +22,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Integration test for Organization lifecycle.
  * Verifies creation and retrieval while handling JWT security context.
  */
+import org.springframework.test.annotation.DirtiesContext;
+
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public class OrganizationIntegrationTest extends BaseIntegrationTest {
 
     @Autowired

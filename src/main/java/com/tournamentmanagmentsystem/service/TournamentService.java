@@ -53,21 +53,33 @@ public class TournamentService {
         Organization organization = organizationRepository.findById(Objects.requireNonNull(request.getOrganizationId()))
                 .orElseThrow(() -> new NotFoundException("Organization not found: " + request.getOrganizationId()));
 
+        log.info("Mapping request to Tournament: {}", request);
         Tournament tournament = modelMapper.map(request, Tournament.class);
         if (tournament == null) {
+            log.error("ModelMapper returned null for Tournament mapping");
             throw new IllegalStateException("Failed to map request to Tournament entity");
         }
+        log.info("Mapped Tournament: name={}, sportType={}", tournament.getName(), tournament.getSportType());
 
         tournament.setOrganization(organization);
         tournament.setStatus(TournamentStatus.DRAFT);
 
-        Tournament savedTournament = tournamentRepository.save(tournament);
-        log.info("Tournament '{}' created in organization {}", savedTournament.getName(), organization.getName());
-        if (savedTournament.getId() != null) {
-            auditService.log("CREATE", "TOURNAMENT", savedTournament.getId(),
-                    Objects.requireNonNull(Map.of("name", savedTournament.getName())));
+        log.info("Saving Tournament to DB...");
+        try {
+            Tournament savedTournament = tournamentRepository.save(tournament);
+            log.info("Tournament saved successfully with ID: {}", savedTournament.getId());
+            return Objects.requireNonNull(modelMapper.map(savedTournament, TournamentResponse.class));
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            log.error("DATA INTEGRITY VIOLATION while saving Tournament: {}", e.getMessage());
+            Throwable cause = e.getRootCause();
+            if (cause != null) {
+                log.error("ROOT CAUSE: {}", cause.getMessage());
+            }
+            throw e;
+        } catch (Exception e) {
+            log.error("FAILED to save Tournament: {}", e.getMessage(), e);
+            throw e;
         }
-        return Objects.requireNonNull(modelMapper.map(savedTournament, TournamentResponse.class));
     }
 
     /**

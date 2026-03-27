@@ -24,7 +24,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.springframework.test.annotation.DirtiesContext;
+
 @AutoConfigureMockMvc
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class TournamentFlowIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
@@ -79,6 +82,7 @@ class TournamentFlowIntegrationTest extends BaseIntegrationTest {
                 .organizationId(orgId)
                 .name("Epic Tournament")
                 .description("desc")
+                .sportType("Tennis")
                 .format(FormatType.SINGLE_ELIMINATION)
                 .visibility(TournamentVisibility.PUBLIC)
                 .seedingPolicy(SeedingPolicy.RANDOM)

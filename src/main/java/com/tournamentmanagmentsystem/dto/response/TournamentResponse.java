@@ -21,6 +21,7 @@ public class TournamentResponse {
     private String name;
     private String description;
     private UUID organizationId;
+    private String sportType;
     private TournamentStatus status;
     private FormatType format;
     private TournamentVisibility visibility;
