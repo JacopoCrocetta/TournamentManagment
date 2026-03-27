@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Implementation of Single Elimination matchmaking.
@@ -26,8 +25,7 @@ public class SingleEliminationStrategy implements MatchmakingStrategy {
 
         int numParticipants = participants.size();
         int rounds = (int) Math.ceil(Math.log(numParticipants) / Math.log(2));
-        int totalMatchesInFirstRound = (int) Math.pow(2, rounds - 1);
-        
+
         List<Match> allMatches = new ArrayList<>();
         List<Match> currentRoundMatches = new ArrayList<>();
         List<Match> nextRoundMatches = new ArrayList<>();
@@ -46,11 +44,11 @@ public class SingleEliminationStrategy implements MatchmakingStrategy {
                 Match m1 = createBaseMatch(event, r, "R" + r + "_" + (matchIndex++));
                 m1.setNextMatch(nextMatch);
                 m1.setPositionInNextMatch(0);
-                
+
                 Match m2 = createBaseMatch(event, r, "R" + r + "_" + (matchIndex++));
                 m2.setNextMatch(nextMatch);
                 m2.setPositionInNextMatch(1);
-                
+
                 currentRoundMatches.add(m1);
                 currentRoundMatches.add(m2);
                 allMatches.add(m1);
@@ -69,12 +67,12 @@ public class SingleEliminationStrategy implements MatchmakingStrategy {
         // For simplicity here, we just pair 1 vs N, 2 vs N-1 etc.
         for (int i = 0; i < firstRoundMatches.size(); i++) {
             Match match = firstRoundMatches.get(i);
-            
+
             // Participant A
             if (i < participants.size()) {
                 match.setParticipantA(participants.get(i));
             }
-            
+
             // Participant B (paired from the end of the list to keep high seeds apart)
             int opponentIndex = participants.size() - 1 - i;
             if (opponentIndex > i && opponentIndex < participants.size()) {

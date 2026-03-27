@@ -8,7 +8,6 @@ import com.tournamentmanagmentsystem.strategy.MatchmakingStrategy;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -31,7 +30,7 @@ public class RoundRobinStrategy implements MatchmakingStrategy {
         int numParticipants = pool.size();
         int numRounds = numParticipants - 1;
         int matchesPerRound = numParticipants / 2;
-        
+
         List<Match> allMatches = new ArrayList<>();
 
         for (int round = 0; round < numRounds; round++) {
