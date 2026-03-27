@@ -11,7 +11,7 @@ import com.tournamentmanagmentsystem.repository.MatchRepository;
 import com.tournamentmanagmentsystem.service.bracket.BracketService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
+import com.tournamentmanagmentsystem.mapper.MatchMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +37,7 @@ public class MatchService {
     private final AuditService auditService;
     private final StandingService standingService;
     private final BracketService bracketService;
+    private final MatchMapper matchMapper;
 
     @Transactional
     public MatchResponse updateResult(@NonNull UUID matchId, @NonNull MatchResultRequest request) {
@@ -59,18 +60,7 @@ public class MatchService {
 
         log.info("Match result updated: ID={}, winnerID={}", savedMatch.getId(), request.getWinnerId());
 
-        return MatchResponse.builder()
-                .id(savedMatch.getId())
-                .eventId(savedMatch.getEvent() != null ? savedMatch.getEvent().getId() : null)
-                .stage(savedMatch.getStage())
-                .roundNumber(savedMatch.getRoundNumber())
-                .participantAName(savedMatch.getParticipantA() != null ? savedMatch.getParticipantA().getName() : null)
-                .participantBName(savedMatch.getParticipantB() != null ? savedMatch.getParticipantB().getName() : null)
-                .status(savedMatch.getStatus())
-                .score(savedMatch.getScore())
-                .winnerId(savedMatch.getWinnerId())
-                .scheduledStart(savedMatch.getScheduledStart())
-                .build();
+        return matchMapper.toResponse(savedMatch);
     }
 
     private void applyResultToMatch(Match match, MatchResultRequest request) {
@@ -186,18 +176,7 @@ public class MatchService {
         Match savedMatch = matchRepository.save(match);
         auditService.log("MATCH_DISPUTED", "MATCH", Objects.requireNonNull(matchId), Objects.requireNonNull(Map.of("reason", reason)));
         
-        return MatchResponse.builder()
-                .id(savedMatch.getId())
-                .eventId(savedMatch.getEvent() != null ? savedMatch.getEvent().getId() : null)
-                .stage(savedMatch.getStage())
-                .roundNumber(savedMatch.getRoundNumber())
-                .participantAName(savedMatch.getParticipantA() != null ? savedMatch.getParticipantA().getName() : null)
-                .participantBName(savedMatch.getParticipantB() != null ? savedMatch.getParticipantB().getName() : null)
-                .status(savedMatch.getStatus())
-                .score(savedMatch.getScore())
-                .winnerId(savedMatch.getWinnerId())
-                .scheduledStart(savedMatch.getScheduledStart())
-                .build();
+        return matchMapper.toResponse(savedMatch);
     }
 
     public MatchResponse resolveDispute(UUID matchId, MatchResultRequest request) {
@@ -224,17 +203,6 @@ public class MatchService {
         processStandingsUpdate(savedMatch);
         triggerAdvancementLogic(savedMatch);
 
-        return MatchResponse.builder()
-                .id(savedMatch.getId())
-                .eventId(savedMatch.getEvent() != null ? savedMatch.getEvent().getId() : null)
-                .stage(savedMatch.getStage())
-                .roundNumber(savedMatch.getRoundNumber())
-                .participantAName(savedMatch.getParticipantA() != null ? savedMatch.getParticipantA().getName() : null)
-                .participantBName(savedMatch.getParticipantB() != null ? savedMatch.getParticipantB().getName() : null)
-                .status(savedMatch.getStatus())
-                .score(savedMatch.getScore())
-                .winnerId(savedMatch.getWinnerId())
-                .scheduledStart(savedMatch.getScheduledStart())
-                .build();
+        return matchMapper.toResponse(savedMatch);
     }
 }

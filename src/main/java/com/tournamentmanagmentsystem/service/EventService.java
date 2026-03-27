@@ -10,7 +10,7 @@ import com.tournamentmanagmentsystem.dto.response.EventResponse;
 import com.tournamentmanagmentsystem.repository.EventRepository;
 import com.tournamentmanagmentsystem.repository.TournamentRepository;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
+import com.tournamentmanagmentsystem.mapper.EventMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +31,7 @@ public class EventService {
 
     private final EventRepository eventRepository;
     private final TournamentRepository tournamentRepository;
-    private final ModelMapper modelMapper;
+    private final EventMapper eventMapper;
 
     /**
      * Creates a new event linked to an existing tournament.
@@ -55,7 +55,7 @@ public class EventService {
                 .build();
 
         Event savedEvent = eventRepository.save(event);
-        return Objects.requireNonNull(modelMapper.map(savedEvent, EventResponse.class));
+        return eventMapper.toResponse(savedEvent);
     }
 
     /**
@@ -67,9 +67,9 @@ public class EventService {
     @Transactional(readOnly = true)
     @NonNull
     public List<EventResponse> getEventsByTournament(@NonNull UUID tournamentId) {
-        return Objects.requireNonNull(eventRepository.findByTournamentId(Objects.requireNonNull(tournamentId)).stream()
-                .map(event -> modelMapper.map(event, EventResponse.class))
-                .collect(Collectors.toList()));
+        return eventRepository.findByTournamentId(Objects.requireNonNull(tournamentId)).stream()
+                .map(eventMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -84,6 +84,6 @@ public class EventService {
     public EventResponse getEvent(@NonNull UUID id) {
         Event event = eventRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new NotFoundException("Event not found: " + id));
-        return Objects.requireNonNull(modelMapper.map(event, EventResponse.class));
+        return eventMapper.toResponse(event);
     }
 }

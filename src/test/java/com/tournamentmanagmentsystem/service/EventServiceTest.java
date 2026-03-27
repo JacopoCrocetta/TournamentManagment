@@ -14,7 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.modelmapper.ModelMapper;
+import com.tournamentmanagmentsystem.mapper.EventMapper;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -33,7 +33,7 @@ class EventServiceTest {
     @Mock
     private TournamentRepository tournamentRepository;
     @Mock
-    private ModelMapper modelMapper;
+    private EventMapper eventMapper;
 
     @InjectMocks
     private EventService eventService;
@@ -63,7 +63,7 @@ class EventServiceTest {
         when(tournamentRepository.findById(Objects.requireNonNull(tournamentId))).thenReturn(Optional.of(Objects.requireNonNull(tournament)));
         // ModelMapper stub for Event.class is no longer needed as we map manually
         when(eventRepository.save(any(Event.class))).thenReturn(Objects.requireNonNull(event));
-        when(modelMapper.map(any(), eq(EventResponse.class))).thenReturn(Objects.requireNonNull(new EventResponse()));
+        when(eventMapper.toResponse(any())).thenReturn(Objects.requireNonNull(new EventResponse()));
 
         EventResponse response = eventService.createEvent(request);
 

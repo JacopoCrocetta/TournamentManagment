@@ -11,7 +11,7 @@ import com.tournamentmanagmentsystem.repository.OrganizationRepository;
 import com.tournamentmanagmentsystem.repository.TournamentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
+import com.tournamentmanagmentsystem.mapper.TournamentMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +37,7 @@ public class TournamentService {
     private final TournamentRepository tournamentRepository;
     private final OrganizationRepository organizationRepository;
     private final AuditService auditService;
-    private final ModelMapper modelMapper;
+    private final TournamentMapper tournamentMapper;
 
     /**
      * Creates a new tournament in a specific organization.
@@ -77,7 +77,7 @@ public class TournamentService {
                     Map.of("name", savedTournament.getName()));
         }
 
-        return Objects.requireNonNull(modelMapper.map(savedTournament, TournamentResponse.class));
+        return tournamentMapper.toResponse(savedTournament);
     }
 
     /**
@@ -92,7 +92,7 @@ public class TournamentService {
     public TournamentResponse getTournament(@NonNull UUID id) {
         Tournament tournament = tournamentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Tournament not found: " + id));
-        return Objects.requireNonNull(modelMapper.map(tournament, TournamentResponse.class));
+        return tournamentMapper.toResponse(tournament);
     }
 
     /**
@@ -104,9 +104,9 @@ public class TournamentService {
     @Transactional(readOnly = true)
     @NonNull
     public List<TournamentResponse> getTournamentsByOrganization(@NonNull UUID organizationId) {
-        return Objects.requireNonNull(tournamentRepository.findByOrganizationId(organizationId).stream()
-                .map(tournament -> Objects.requireNonNull(modelMapper.map(tournament, TournamentResponse.class)))
-                .collect(Collectors.toList()));
+        return tournamentRepository.findByOrganizationId(organizationId).stream()
+                .map(tournamentMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -133,7 +133,7 @@ public class TournamentService {
         if (savedTournament.getId() != null) {
             auditService.log("UPDATE_STATUS", "TOURNAMENT", Objects.requireNonNull(savedTournament.getId()), Objects.requireNonNull(Map.of("newStatus", newStatus)));
         }
-        return Objects.requireNonNull(modelMapper.map(savedTournament, TournamentResponse.class));
+        return tournamentMapper.toResponse(savedTournament);
     }
 
     /**

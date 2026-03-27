@@ -13,7 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.modelmapper.ModelMapper;
+import com.tournamentmanagmentsystem.mapper.MatchMapper;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,7 +38,7 @@ class MatchServiceTest {
     @Mock
     private BracketService bracketService;
     @Mock
-    private ModelMapper modelMapper;
+    private MatchMapper matchMapper;
 
     @InjectMocks
     private MatchService matchService;
@@ -73,6 +73,7 @@ class MatchServiceTest {
     void updateResult_Success() {
         when(matchRepository.findById(Objects.requireNonNull(matchId))).thenReturn(Optional.of(Objects.requireNonNull(match)));
         when(matchRepository.save(any(Match.class))).thenReturn(Objects.requireNonNull(match));
+        when(matchMapper.toResponse(any())).thenReturn(new com.tournamentmanagmentsystem.dto.response.MatchResponse());
 
         matchService.updateResult(Objects.requireNonNull(matchId), Objects.requireNonNull(request));
 

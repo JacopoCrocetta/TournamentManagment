@@ -13,7 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.modelmapper.ModelMapper;
+import com.tournamentmanagmentsystem.mapper.TournamentMapper;
 
 import java.util.List;
 import java.util.Objects;
@@ -34,7 +34,7 @@ class TournamentServiceTest {
     @Mock
     private AuditService auditService;
     @Mock
-    private ModelMapper modelMapper;
+    private TournamentMapper tournamentMapper;
 
     @InjectMocks
     private TournamentService tournamentService;
@@ -67,7 +67,7 @@ class TournamentServiceTest {
     void createTournament_Success() {
         when(organizationRepository.findById(Objects.requireNonNull(orgId))).thenReturn(Optional.of(organization));
         when(tournamentRepository.save(any(Tournament.class))).thenReturn(Objects.requireNonNull(tournament));
-        when(modelMapper.map(tournament, TournamentResponse.class)).thenReturn(new TournamentResponse());
+        when(tournamentMapper.toResponse(tournament)).thenReturn(new TournamentResponse());
 
         TournamentResponse response = tournamentService.createTournament(request);
 
@@ -87,7 +87,7 @@ class TournamentServiceTest {
     @Test
     void getTournamentsByOrganization_Success() {
         when(tournamentRepository.findByOrganizationId(Objects.requireNonNull(orgId))).thenReturn(List.of(tournament));
-        when(modelMapper.map(Objects.requireNonNull(tournament), TournamentResponse.class))
+        when(tournamentMapper.toResponse(Objects.requireNonNull(tournament)))
                 .thenReturn(new TournamentResponse());
 
         List<TournamentResponse> responses = tournamentService

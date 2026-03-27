@@ -14,7 +14,7 @@ import com.tournamentmanagmentsystem.repository.UserRepository;
 import com.tournamentmanagmentsystem.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
+import com.tournamentmanagmentsystem.mapper.OrganizationMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,7 +43,7 @@ public class OrganizationService {
     private final MembershipRepository membershipRepository;
     private final UserRepository userRepository;
     private final AuditService auditService;
-    private final ModelMapper modelMapper;
+    private final OrganizationMapper organizationMapper;
 
     /**
      * Creates a new organization and assigns the current user as the administrator.
@@ -57,7 +57,13 @@ public class OrganizationService {
     public OrganizationResponse createOrganization(@NonNull OrganizationRequest request) {
         validateSlugUniqueness(request.getSlug());
 
-        Organization organization = modelMapper.map(request, Organization.class);
+        Organization organization = Organization.builder()
+                .name(request.getName())
+                .slug(request.getSlug())
+                .description(request.getDescription())
+                .settings(request.getSettings())
+                .build();
+        
         organization = organizationRepository.save(Objects.requireNonNull(organization));
 
         User currentUser = getCurrentUser();
@@ -70,7 +76,7 @@ public class OrganizationService {
             auditService.log("CREATE", "ORGANIZATION", Objects.requireNonNull(organization.getId()), Objects.requireNonNull(Map.of("name", organization.getName())));
         }
 
-        return Objects.requireNonNull(modelMapper.map(organization, OrganizationResponse.class));
+        return organizationMapper.toResponse(organization);
     }
 
     /**
@@ -85,7 +91,7 @@ public class OrganizationService {
     public OrganizationResponse getOrganization(@NonNull UUID id) {
         Organization organization = organizationRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new NotFoundException("Organization not found: " + id));
-        return Objects.requireNonNull(modelMapper.map(organization, OrganizationResponse.class));
+        return organizationMapper.toResponse(organization);
     }
 
     /**
@@ -97,9 +103,9 @@ public class OrganizationService {
     @NonNull
     public List<OrganizationResponse> getAllMyOrganizations() {
         User currentUser = getCurrentUser();
-        return Objects.requireNonNull(membershipRepository.findByUser(Objects.requireNonNull(currentUser)).stream()
-                .map(membership -> modelMapper.map(membership.getOrganization(), OrganizationResponse.class))
-                .collect(Collectors.toList()));
+        return membershipRepository.findByUser(Objects.requireNonNull(currentUser)).stream()
+                .map(membership -> organizationMapper.toResponse(membership.getOrganization()))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -125,7 +131,7 @@ public class OrganizationService {
             auditService.log("UPDATE", "ORGANIZATION", Objects.requireNonNull(organization.getId()), Objects.requireNonNull(Map.of("name", organization.getName())));
         }
 
-        return Objects.requireNonNull(modelMapper.map(organization, OrganizationResponse.class));
+        return organizationMapper.toResponse(organization);
     }
 
     private void validateSlugUniqueness(String slug) {

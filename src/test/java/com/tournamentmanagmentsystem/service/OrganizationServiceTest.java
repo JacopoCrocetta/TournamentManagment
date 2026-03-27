@@ -16,7 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.modelmapper.ModelMapper;
+import com.tournamentmanagmentsystem.mapper.OrganizationMapper;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -41,7 +41,7 @@ class OrganizationServiceTest {
     @Mock
     private AuditService auditService;
     @Mock
-    private ModelMapper modelMapper;
+    private OrganizationMapper organizationMapper;
     @Mock
     private SecurityContext securityContext;
     @Mock
@@ -86,10 +86,9 @@ class OrganizationServiceTest {
         when(authentication.getPrincipal()).thenReturn(userDetails);
 
         when(organizationRepository.findBySlug(request.getSlug())).thenReturn(Optional.empty());
-        when(modelMapper.map(any(), eq(Organization.class))).thenReturn(Objects.requireNonNull(organization));
         when(organizationRepository.save(any(Organization.class))).thenReturn(Objects.requireNonNull(organization));
         when(userRepository.findById(Objects.requireNonNull(userId))).thenReturn(Optional.of(Objects.requireNonNull(user)));
-        when(modelMapper.map(any(), eq(OrganizationResponse.class))).thenReturn(Objects.requireNonNull(new OrganizationResponse()));
+        when(organizationMapper.toResponse(any())).thenReturn(Objects.requireNonNull(new OrganizationResponse()));
 
         OrganizationResponse response = organizationService.createOrganization(request);
 

@@ -14,7 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.modelmapper.ModelMapper;
+import com.tournamentmanagmentsystem.mapper.ParticipantMapper;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -32,7 +32,7 @@ class ParticipantServiceTest {
     @Mock
     private TournamentRepository tournamentRepository;
     @Mock
-    private ModelMapper modelMapper;
+    private ParticipantMapper participantMapper;
 
     @InjectMocks
     private ParticipantService participantService;
@@ -67,7 +67,7 @@ class ParticipantServiceTest {
         when(tournamentRepository.findById(Objects.requireNonNull(tournamentId))).thenReturn(Optional.of(Objects.requireNonNull(tournament)));
         when(participantRepository.countByTournamentId(Objects.requireNonNull(tournamentId))).thenReturn(1L);
         when(participantRepository.save(any(Participant.class))).thenAnswer(i -> Objects.requireNonNull(i.getArguments()[0]));
-        when(modelMapper.map(any(Participant.class), eq(ParticipantResponse.class)))
+        when(participantMapper.toResponse(any(Participant.class)))
                 .thenReturn(Objects.requireNonNull(new ParticipantResponse()));
 
         participantService.register(request);
@@ -83,7 +83,7 @@ class ParticipantServiceTest {
         when(tournamentRepository.findById(Objects.requireNonNull(tournamentId))).thenReturn(Optional.of(Objects.requireNonNull(tournament)));
         when(participantRepository.countByTournamentId(Objects.requireNonNull(tournamentId))).thenReturn(2L);
         when(participantRepository.save(any(Participant.class))).thenAnswer(i -> Objects.requireNonNull(i.getArguments()[0]));
-        when(modelMapper.map(any(Participant.class), eq(ParticipantResponse.class)))
+        when(participantMapper.toResponse(any(Participant.class)))
                 .thenReturn(Objects.requireNonNull(new ParticipantResponse()));
 
         participantService.register(request);

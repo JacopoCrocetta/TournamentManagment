@@ -16,9 +16,12 @@ import java.util.UUID;
 public class ParticipantResponse {
     private UUID id;
     private UUID tournamentId;
+    private UUID eventId;
     private String name;
+    private com.tournamentmanagmentsystem.domain.enums.ParticipantType type;
     private ParticipantStatus status;
     private Integer seed;
+    private Integer rating;
     private Boolean checkedIn;
     private Map<String, Object> metadata;
 }

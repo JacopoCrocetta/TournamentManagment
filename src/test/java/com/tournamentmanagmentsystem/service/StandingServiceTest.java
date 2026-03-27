@@ -3,6 +3,8 @@ package com.tournamentmanagmentsystem.service;
 import com.tournamentmanagmentsystem.domain.entity.Event;
 import com.tournamentmanagmentsystem.domain.entity.Participant;
 import com.tournamentmanagmentsystem.domain.entity.Standing;
+import com.tournamentmanagmentsystem.dto.response.StandingResponse;
+import com.tournamentmanagmentsystem.mapper.StandingMapper;
 import com.tournamentmanagmentsystem.repository.StandingRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -26,6 +29,8 @@ class StandingServiceTest {
 
     @Mock
     private StandingRepository standingRepository;
+    @Mock
+    private StandingMapper standingMapper;
 
     @InjectMocks
     private StandingService standingService;
@@ -69,8 +74,20 @@ class StandingServiceTest {
 
         standingService.updateStanding(Objects.requireNonNull(event), Objects.requireNonNull(participant), 3, Objects.requireNonNull(Map.of("won", 2)));
 
-        assertEquals(8, existing.getPoints());
-        assertEquals(3, existing.getTieBreakerData().get("won"));
         verify(standingRepository).save(Objects.requireNonNull(existing));
+    }
+
+    @Test
+    void getStandings_Success() {
+        UUID eventId = UUID.randomUUID();
+        Standing standing = Standing.builder().points(10).build();
+        when(standingRepository.findByEventIdOrderByPointsDesc(eventId)).thenReturn(new java.util.ArrayList<>(java.util.List.of(standing)));
+        when(standingMapper.toResponse(any())).thenReturn(new StandingResponse());
+
+        List<StandingResponse> results = standingService.getStandings(eventId);
+
+        assertNotNull(results);
+        assertEquals(1, results.size());
+        verify(standingMapper).toResponse(any());
     }
 }

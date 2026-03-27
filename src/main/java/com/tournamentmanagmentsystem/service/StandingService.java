@@ -7,6 +7,7 @@ import com.tournamentmanagmentsystem.domain.entity.Event;
 import com.tournamentmanagmentsystem.domain.entity.Participant;
 import com.tournamentmanagmentsystem.domain.entity.Standing;
 import com.tournamentmanagmentsystem.dto.response.StandingResponse;
+import com.tournamentmanagmentsystem.mapper.StandingMapper;
 import com.tournamentmanagmentsystem.repository.StandingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ import java.util.UUID;
 public class StandingService {
 
     private final StandingRepository standingRepository;
+    private final StandingMapper standingMapper;
 
     /**
      * Updates or creates a standing for a participant in a specific event.
@@ -91,14 +93,7 @@ public class StandingService {
             return Integer.compare(wins2, wins1);
         });
         return standings.stream()
-                .map(s -> StandingResponse.builder()
-                        .id(s.getId())
-                        .eventId(s.getEvent().getId())
-                        .participantId(s.getParticipant().getId())
-                        .participantName(s.getParticipant().getName())
-                        .points(s.getPoints())
-                        .tieBreakerData(s.getTieBreakerData())
-                        .build())
+                .map(standingMapper::toResponse)
                 .toList();
     }
 

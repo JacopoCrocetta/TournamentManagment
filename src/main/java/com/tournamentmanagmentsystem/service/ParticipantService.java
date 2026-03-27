@@ -13,7 +13,7 @@ import com.tournamentmanagmentsystem.repository.ParticipantRepository;
 import com.tournamentmanagmentsystem.repository.TournamentRepository;
 import com.tournamentmanagmentsystem.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
+import com.tournamentmanagmentsystem.mapper.ParticipantMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +36,7 @@ public class ParticipantService {
     private final ParticipantRepository participantRepository;
     private final TournamentRepository tournamentRepository;
     private final UserRepository userRepository;
-    private final ModelMapper modelMapper;
+    private final ParticipantMapper participantMapper;
 
     /**
      * Registers a new participant for a tournament.
@@ -65,7 +65,7 @@ public class ParticipantService {
         associateUserIfExists(participant, request.getUserId());
 
         Participant savedParticipant = participantRepository.save(Objects.requireNonNull(participant));
-        return modelMapper.map(savedParticipant, ParticipantResponse.class);
+        return participantMapper.toResponse(savedParticipant);
     }
 
     /**
@@ -77,7 +77,7 @@ public class ParticipantService {
     @Transactional(readOnly = true)
     public List<ParticipantResponse> getParticipants(@NonNull UUID tournamentId) {
         return participantRepository.findByTournamentId(Objects.requireNonNull(tournamentId)).stream()
-                .map(participant -> modelMapper.map(participant, ParticipantResponse.class))
+                .map(participantMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
@@ -100,7 +100,7 @@ public class ParticipantService {
         
         participant.setCheckedIn(true);
         Participant savedParticipant = participantRepository.save(Objects.requireNonNull(participant));
-        return modelMapper.map(savedParticipant, ParticipantResponse.class);
+        return participantMapper.toResponse(savedParticipant);
     }
 
     private Tournament fetchTournament(@NonNull UUID tournamentId) {

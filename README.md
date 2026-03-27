@@ -1,6 +1,6 @@
 # Tournament Management System
 
-A robust, enterprise-grade backend for managing sports and gaming tournaments. Built with Spring Boot 3.4, Java 26, and PostgreSQL.
+A robust, enterprise-grade backend for managing sports and gaming tournaments. Built with Spring Boot 3.4, Java 21, and PostgreSQL.
 
 ## 🚀 Overview
 
@@ -27,7 +27,7 @@ This system provides a comprehensive API to handle organizations, multi-format t
 - **Core**: Java 26, Spring Boot 3.4
 - **Database**: PostgreSQL (JSONB for dynamic fields)
 - **Migrations**: Liquibase
-- **Mapping**: ModelMapper
+- **Mapping**: Manual Domain Mappers (Type-safe)
 - **Security**: Spring Security + JJWT
 - **API Documentation**: Springdoc OpenAPI
 - **Testing**: JUnit 5, Mockito, Testcontainers
@@ -35,7 +35,7 @@ This system provides a comprehensive API to handle organizations, multi-format t
 ## 🏁 Getting Started
 
 ### Prerequisites
-- JDK 26
+- JDK 21
 - Docker (for PostgreSQL and Testcontainers)
 - Maven 3.9+
 
