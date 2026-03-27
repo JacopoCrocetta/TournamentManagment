@@ -46,13 +46,13 @@ public class EventService {
         Tournament tournament = tournamentRepository.findById(Objects.requireNonNull(request.getTournamentId()))
                 .orElseThrow(() -> new NotFoundException("Tournament not found: " + request.getTournamentId()));
 
-        Event event = modelMapper.map(request, Event.class);
-        if (event == null) {
-            throw new IllegalStateException("Mapping error during event creation");
-        }
-
-        event.setTournament(tournament);
-        event.setStatus(EventStatus.DRAFT); // Standard start status
+        Event event = Event.builder()
+                .name(request.getName())
+                .tournament(tournament)
+                .formatType(request.getFormatType())
+                .seedingPolicy(request.getSeedingPolicy())
+                .status(EventStatus.DRAFT)
+                .build();
 
         Event savedEvent = eventRepository.save(event);
         return Objects.requireNonNull(modelMapper.map(savedEvent, EventResponse.class));

@@ -82,7 +82,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problemDetail);
         }
 
-        @ExceptionHandler(Exception.class)
+        @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
+    public ResponseEntity<ProblemDetail> handleDataIntegrityViolation(org.springframework.dao.DataIntegrityViolationException ex, WebRequest request) {
+        System.err.println("CRITICAL: Data Integrity Violation: " + ex.getMessage());
+        Throwable rootCause = ex.getRootCause();
+        if (rootCause != null) {
+            System.err.println("ROOT CAUSE: " + rootCause.getMessage());
+        }
+        ex.printStackTrace();
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, "Data integrity violation occurred.");
+        problemDetail.setTitle("Data Integrity Violation");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problemDetail);
+    }
+
+    @ExceptionHandler(Exception.class)
         public ResponseEntity<ProblemDetail> handleGeneralException(Exception ex) {
                 log.error("Unexpected Exception occurred: ", ex);
                 ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(

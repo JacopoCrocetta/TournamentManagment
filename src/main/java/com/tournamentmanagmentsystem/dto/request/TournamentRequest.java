@@ -43,6 +43,9 @@ public class TournamentRequest {
     @NotBlank
     private String sportType;
 
+    private String location;
+    private String timezone;
+
     @FutureOrPresent
     private LocalDateTime startDate;
 

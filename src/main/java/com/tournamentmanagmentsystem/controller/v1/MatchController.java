@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -35,7 +34,6 @@ public class MatchController {
 
     private final BracketService bracketService;
     private final MatchService matchService;
-    private final ModelMapper modelMapper;
 
     /**
      * Generates a tournament bracket (initial matches) for an event.
@@ -53,7 +51,18 @@ public class MatchController {
     @PreAuthorize("@securityService.isTournamentAdminOfEvent(#eventId)")
     public ResponseEntity<List<MatchResponse>> generate(@PathVariable UUID eventId, @RequestParam FormatType format) {
         return ResponseEntity.ok(bracketService.generateBracket(eventId, format).stream()
-                .map(match -> modelMapper.map(match, MatchResponse.class))
+                .map(match -> MatchResponse.builder()
+                        .id(match.getId())
+                        .eventId(match.getEvent() != null ? match.getEvent().getId() : null)
+                        .stage(match.getStage())
+                        .roundNumber(match.getRoundNumber())
+                        .participantAName(match.getParticipantA() != null ? match.getParticipantA().getName() : null)
+                        .participantBName(match.getParticipantB() != null ? match.getParticipantB().getName() : null)
+                        .status(match.getStatus())
+                        .score(match.getScore())
+                        .winnerId(match.getWinnerId())
+                        .scheduledStart(match.getScheduledStart())
+                        .build())
                 .collect(Collectors.toList()));
     }
 

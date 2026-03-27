@@ -57,6 +57,7 @@ public class ParticipantService {
         Participant participant = Participant.builder()
                 .tournament(tournament)
                 .name(request.getName())
+                .type(com.tournamentmanagmentsystem.domain.enums.ParticipantType.PLAYER)
                 .status(enrollmentStatus)
                 .metadata(request.getMetadata())
                 .build();

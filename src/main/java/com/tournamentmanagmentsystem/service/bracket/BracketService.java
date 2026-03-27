@@ -1,8 +1,11 @@
 package com.tournamentmanagmentsystem.service.bracket;
 
+import com.tournamentmanagmentsystem.domain.entity.Event;
 import com.tournamentmanagmentsystem.domain.entity.Match;
 import com.tournamentmanagmentsystem.domain.entity.Participant;
 import com.tournamentmanagmentsystem.domain.enums.FormatType;
+import com.tournamentmanagmentsystem.exception.NotFoundException;
+import com.tournamentmanagmentsystem.repository.EventRepository;
 import com.tournamentmanagmentsystem.repository.ParticipantRepository;
 import com.tournamentmanagmentsystem.service.AuditService;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +30,7 @@ public class BracketService {
     private final DoubleEliminationEngine doubleEliminationEngine;
     private final RoundRobinEngine roundRobinEngine;
     private final ParticipantRepository participantRepository;
+    private final EventRepository eventRepository;
     private final AuditService auditService;
 
     /**
@@ -41,7 +45,11 @@ public class BracketService {
      */
     @Transactional
     public List<Match> generateBracket(UUID eventId, FormatType formatType) {
-        List<Participant> participants = participantRepository.findByTournamentId(eventId).stream()
+        Event event = eventRepository.findById(Objects.requireNonNull(eventId))
+                .orElseThrow(() -> new NotFoundException("Event not found: " + eventId));
+        
+        UUID tournamentId = event.getTournament().getId();
+        List<Participant> participants = participantRepository.findByTournamentId(Objects.requireNonNull(tournamentId)).stream()
                 .filter(p -> Boolean.TRUE.equals(p.getCheckedIn()))
                 .toList();
 

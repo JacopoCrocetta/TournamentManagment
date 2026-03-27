@@ -4,7 +4,7 @@ import com.tournamentmanagmentsystem.dto.request.EventRequest;
 import com.tournamentmanagmentsystem.dto.response.EventResponse;
 import com.tournamentmanagmentsystem.service.EventService;
 import com.tournamentmanagmentsystem.service.StandingService;
-import com.tournamentmanagmentsystem.domain.entity.Standing;
+import com.tournamentmanagmentsystem.dto.response.StandingResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -84,7 +84,7 @@ public class EventController {
      */
     @GetMapping("/{id}/standings")
     @Operation(summary = "Get event standings", description = "Returns the live leaderboard for an event, ordered by points. Each entry includes participant info and tie-breaker statistics.")
-    public ResponseEntity<List<Standing>> getStandings(@PathVariable @NonNull UUID id) {
+    public ResponseEntity<List<StandingResponse>> getStandings(@PathVariable @NonNull UUID id) {
         return ResponseEntity.ok(standingService.getStandings(id));
     }
 }

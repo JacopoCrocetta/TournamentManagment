@@ -58,9 +58,18 @@ public class AuthService {
                                 .status(UserStatus.ACTIVE)
                                 .build();
 
-                User savedUser = userRepository.save(Objects.requireNonNull(user));
-                log.info("New user registered successfully: {}", savedUser.getEmail());
-                return Objects.requireNonNull(createAuthResponse(Objects.requireNonNull(savedUser)));
+                try {
+                        User savedUser = userRepository.save(Objects.requireNonNull(user));
+                        log.info("New user registered successfully: {}", savedUser.getEmail());
+                        return Objects.requireNonNull(createAuthResponse(Objects.requireNonNull(savedUser)));
+                } catch (org.springframework.dao.DataIntegrityViolationException e) {
+                        log.error("DATA INTEGRITY VIOLATION during registration for {}: {}", request.getEmail(), e.getMessage());
+                        Throwable cause = e.getRootCause();
+                        if (cause != null) {
+                                log.error("ROOT CAUSE: {}", cause.getMessage());
+                        }
+                        throw e;
+                }
         }
 
         /**

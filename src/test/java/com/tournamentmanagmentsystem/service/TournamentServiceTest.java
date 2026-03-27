@@ -52,11 +52,13 @@ class TournamentServiceTest {
         request = new TournamentRequest();
         request.setName("Test Tournament");
         request.setOrganizationId(orgId);
+        request.setSportType("Tennis");
 
         tournament = Tournament.builder()
                 .id(UUID.randomUUID())
                 .name("Test Tournament")
                 .organization(organization)
+                .sportType("Tennis")
                 .status(TournamentStatus.DRAFT)
                 .build();
     }
@@ -64,7 +66,6 @@ class TournamentServiceTest {
     @Test
     void createTournament_Success() {
         when(organizationRepository.findById(Objects.requireNonNull(orgId))).thenReturn(Optional.of(organization));
-        when(modelMapper.map(request, Tournament.class)).thenReturn(Objects.requireNonNull(tournament));
         when(tournamentRepository.save(any(Tournament.class))).thenReturn(Objects.requireNonNull(tournament));
         when(modelMapper.map(tournament, TournamentResponse.class)).thenReturn(new TournamentResponse());
 

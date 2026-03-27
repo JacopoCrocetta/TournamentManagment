@@ -37,7 +37,6 @@ public class MatchService {
     private final AuditService auditService;
     private final StandingService standingService;
     private final BracketService bracketService;
-    private final ModelMapper modelMapper;
 
     @Transactional
     public MatchResponse updateResult(@NonNull UUID matchId, @NonNull MatchResultRequest request) {
@@ -60,7 +59,18 @@ public class MatchService {
 
         log.info("Match result updated: ID={}, winnerID={}", savedMatch.getId(), request.getWinnerId());
 
-        return Objects.requireNonNull(modelMapper.map(savedMatch, MatchResponse.class));
+        return MatchResponse.builder()
+                .id(savedMatch.getId())
+                .eventId(savedMatch.getEvent() != null ? savedMatch.getEvent().getId() : null)
+                .stage(savedMatch.getStage())
+                .roundNumber(savedMatch.getRoundNumber())
+                .participantAName(savedMatch.getParticipantA() != null ? savedMatch.getParticipantA().getName() : null)
+                .participantBName(savedMatch.getParticipantB() != null ? savedMatch.getParticipantB().getName() : null)
+                .status(savedMatch.getStatus())
+                .score(savedMatch.getScore())
+                .winnerId(savedMatch.getWinnerId())
+                .scheduledStart(savedMatch.getScheduledStart())
+                .build();
     }
 
     private void applyResultToMatch(Match match, MatchResultRequest request) {
@@ -176,7 +186,18 @@ public class MatchService {
         Match savedMatch = matchRepository.save(match);
         auditService.log("MATCH_DISPUTED", "MATCH", Objects.requireNonNull(matchId), Objects.requireNonNull(Map.of("reason", reason)));
         
-        return Objects.requireNonNull(modelMapper.map(savedMatch, MatchResponse.class));
+        return MatchResponse.builder()
+                .id(savedMatch.getId())
+                .eventId(savedMatch.getEvent() != null ? savedMatch.getEvent().getId() : null)
+                .stage(savedMatch.getStage())
+                .roundNumber(savedMatch.getRoundNumber())
+                .participantAName(savedMatch.getParticipantA() != null ? savedMatch.getParticipantA().getName() : null)
+                .participantBName(savedMatch.getParticipantB() != null ? savedMatch.getParticipantB().getName() : null)
+                .status(savedMatch.getStatus())
+                .score(savedMatch.getScore())
+                .winnerId(savedMatch.getWinnerId())
+                .scheduledStart(savedMatch.getScheduledStart())
+                .build();
     }
 
     public MatchResponse resolveDispute(UUID matchId, MatchResultRequest request) {
@@ -203,6 +224,17 @@ public class MatchService {
         processStandingsUpdate(savedMatch);
         triggerAdvancementLogic(savedMatch);
 
-        return Objects.requireNonNull(modelMapper.map(savedMatch, MatchResponse.class));
+        return MatchResponse.builder()
+                .id(savedMatch.getId())
+                .eventId(savedMatch.getEvent() != null ? savedMatch.getEvent().getId() : null)
+                .stage(savedMatch.getStage())
+                .roundNumber(savedMatch.getRoundNumber())
+                .participantAName(savedMatch.getParticipantA() != null ? savedMatch.getParticipantA().getName() : null)
+                .participantBName(savedMatch.getParticipantB() != null ? savedMatch.getParticipantB().getName() : null)
+                .status(savedMatch.getStatus())
+                .score(savedMatch.getScore())
+                .winnerId(savedMatch.getWinnerId())
+                .scheduledStart(savedMatch.getScheduledStart())
+                .build();
     }
 }

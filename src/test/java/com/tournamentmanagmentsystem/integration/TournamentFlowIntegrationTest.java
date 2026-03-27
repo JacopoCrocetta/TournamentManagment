@@ -100,6 +100,11 @@ class TournamentFlowIntegrationTest extends BaseIntegrationTest {
         TournamentResponse tourRes = objectMapper.readValue(tourResult.getResponse().getContentAsString(), TournamentResponse.class);
         UUID tournamentId = tourRes.getId();
 
+        // 2.1 Open Registration
+        mockMvc.perform(patch("/api/v1/tournaments/" + tournamentId + "/status?status=" + TournamentStatus.REGISTRATION_OPEN)
+                .header("Authorization", adminToken))
+                .andExpect(status().isOk());
+
         // 3. Register Participants
         UUID[] pIds = new UUID[4];
         for (int i = 0; i < 4; i++) {

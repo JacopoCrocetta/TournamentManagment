@@ -1,8 +1,11 @@
 package com.tournamentmanagmentsystem.service.bracket;
 
+import com.tournamentmanagmentsystem.domain.entity.Event;
 import com.tournamentmanagmentsystem.domain.entity.Match;
 import com.tournamentmanagmentsystem.domain.entity.Participant;
+import com.tournamentmanagmentsystem.domain.entity.Tournament;
 import com.tournamentmanagmentsystem.domain.enums.FormatType;
+import com.tournamentmanagmentsystem.repository.EventRepository;
 import com.tournamentmanagmentsystem.repository.ParticipantRepository;
 import com.tournamentmanagmentsystem.service.AuditService;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,19 +33,35 @@ class BracketServiceTest {
     @Mock
     private ParticipantRepository participantRepository;
     @Mock
+    private EventRepository eventRepository;
+    @Mock
     private AuditService auditService;
 
     @InjectMocks
     private BracketService bracketService;
 
     private UUID eventId;
+    private UUID tournamentId;
+    private Tournament tournament;
+    private Event event;
     private List<Participant> participants;
 
     @BeforeEach
     void setUp() {
+        tournamentId = UUID.randomUUID();
         eventId = UUID.randomUUID();
+        
+        tournament = new Tournament();
+        tournament.setId(tournamentId);
+        
+        event = new Event();
+        event.setId(eventId);
+        event.setTournament(tournament);
+
         participants = List.of(Participant.builder().id(UUID.randomUUID()).checkedIn(true).build());
-        when(participantRepository.findByTournamentId(eventId)).thenReturn(participants);
+        
+        lenient().when(eventRepository.findById(eventId)).thenReturn(java.util.Optional.of(event));
+        lenient().when(participantRepository.findByTournamentId(tournamentId)).thenReturn(participants);
     }
 
     @Test

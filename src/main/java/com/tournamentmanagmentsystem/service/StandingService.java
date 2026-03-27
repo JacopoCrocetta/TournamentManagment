@@ -6,6 +6,7 @@ import org.springframework.lang.Nullable;
 import com.tournamentmanagmentsystem.domain.entity.Event;
 import com.tournamentmanagmentsystem.domain.entity.Participant;
 import com.tournamentmanagmentsystem.domain.entity.Standing;
+import com.tournamentmanagmentsystem.dto.response.StandingResponse;
 import com.tournamentmanagmentsystem.repository.StandingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -69,7 +70,7 @@ public class StandingService {
      */
     @Transactional(readOnly = true)
     @NonNull
-    public List<Standing> getStandings(@NonNull UUID eventId) {
+    public List<StandingResponse> getStandings(@NonNull UUID eventId) {
         List<Standing> standings = standingRepository.findByEventIdOrderByPointsDesc(eventId);
         standings.sort((s1, s2) -> {
             // 1. Points
@@ -89,7 +90,16 @@ public class StandingService {
             int wins2 = getTieBreakerInt(s2, "wins");
             return Integer.compare(wins2, wins1);
         });
-        return standings;
+        return standings.stream()
+                .map(s -> StandingResponse.builder()
+                        .id(s.getId())
+                        .eventId(s.getEvent().getId())
+                        .participantId(s.getParticipant().getId())
+                        .participantName(s.getParticipant().getName())
+                        .points(s.getPoints())
+                        .tieBreakerData(s.getTieBreakerData())
+                        .build())
+                .toList();
     }
 
     private int getTieBreakerInt(Standing s, String key) {
