@@ -21,6 +21,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("null")
 @ExtendWith(MockitoExtension.class)
 class AuditServiceTest {
 
@@ -54,8 +55,7 @@ class AuditServiceTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(userDetails);
 
-        auditService.log("CREATE", "TOURNAMENT", java.util.Objects.requireNonNull(UUID.randomUUID()),
-                java.util.Objects.requireNonNull(Map.<String, Object>of("name", "Test")));
+        auditService.log("CREATE", "TOURNAMENT", UUID.randomUUID(), Map.of("name", "Test"));
 
         ArgumentCaptor<AuditLog> captor = ArgumentCaptor.forClass(AuditLog.class);
         verify(auditLogRepository).save(captor.capture());
@@ -67,8 +67,7 @@ class AuditServiceTest {
     void log_SystemAction_Success() {
         when(securityContext.getAuthentication()).thenReturn(null);
 
-        auditService.log("SYSTEM_EVENT", "SYSTEM", java.util.Objects.requireNonNull(UUID.randomUUID()),
-                java.util.Objects.requireNonNull(Map.<String, Object>of()));
+        auditService.log("SYSTEM_EVENT", "SYSTEM", UUID.randomUUID(), Map.of());
 
         ArgumentCaptor<AuditLog> captor = ArgumentCaptor.forClass(AuditLog.class);
         verify(auditLogRepository).save(captor.capture());

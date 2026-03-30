@@ -17,13 +17,14 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.Objects;
+
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("null")
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
 
@@ -65,33 +66,33 @@ class AuthServiceTest {
     void register_Success() {
         when(userRepository.existsByEmail(anyString())).thenReturn(false);
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
-        when(userRepository.save(Objects.requireNonNull(any(User.class)))).thenReturn(Objects.requireNonNull(user));
+        when(userRepository.save(any(User.class))).thenReturn(user);
         when(jwtService.generateToken(any())).thenReturn("accessToken");
         when(jwtService.generateRefreshToken(any())).thenReturn("refreshToken");
 
-        AuthResponse response = authService.register(Objects.requireNonNull(registerRequest));
+        AuthResponse response = authService.register(registerRequest);
 
         assertNotNull(response);
         assertEquals("test@example.com", response.getEmail());
         assertEquals("accessToken", response.getAccessToken());
-        verify(userRepository, times(1)).save(Objects.requireNonNull(any(User.class)));
+        verify(userRepository, times(1)).save(any(User.class));
     }
 
     @Test
     void register_AlreadyExists_ThrowsException() {
         when(userRepository.existsByEmail(anyString())).thenReturn(true);
 
-        assertThrows(ConflictException.class, () -> authService.register(Objects.requireNonNull(registerRequest)));
-        verify(userRepository, never()).save(Objects.requireNonNull(any(User.class)));
+        assertThrows(ConflictException.class, () -> authService.register(registerRequest));
+        verify(userRepository, never()).save(any(User.class));
     }
 
     @Test
     void login_Success() {
-        when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(Objects.requireNonNull(user)));
+        when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(user));
         when(jwtService.generateToken(any())).thenReturn("accessToken");
         when(jwtService.generateRefreshToken(any())).thenReturn("refreshToken");
 
-        AuthResponse response = authService.login(Objects.requireNonNull(authRequest));
+        AuthResponse response = authService.login(authRequest);
 
         assertNotNull(response);
         assertEquals("accessToken", response.getAccessToken());

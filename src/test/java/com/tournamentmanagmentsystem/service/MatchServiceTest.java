@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("null")
 @ExtendWith(MockitoExtension.class)
 class MatchServiceTest {
 
@@ -78,7 +79,7 @@ class MatchServiceTest {
 
         assertEquals(MatchStatus.FINISHED, match.getStatus());
         assertEquals(pA.getId(), match.getWinnerId());
-        verify(standingService, times(2)).updateStanding(any(), any(), anyInt(), any());
+        verify(standingService, times(2)).updateStanding(any(Event.class), any(Participant.class), anyInt(), any());
         verify(singleEliminationEngine, times(1)).advanceWinner(match);
     }
 }

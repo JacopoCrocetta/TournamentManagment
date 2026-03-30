@@ -13,7 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
-import java.util.Objects;
+
 import java.util.Optional;
 import java.util.UUID;
 
@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.*;
 
+@SuppressWarnings("null")
 @ExtendWith(MockitoExtension.class)
 class SingleEliminationEngineTest {
 
@@ -51,25 +52,23 @@ class SingleEliminationEngineTest {
 
     @Test
     void generateInitialMatches_Success() {
-        when(eventRepository.findById(Objects.requireNonNull(eventId))).thenReturn(Optional.of(event));
-        when(matchRepository.saveAll(java.util.Objects.requireNonNull(anyList()))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(eventRepository.findById(eventId)).thenReturn(Optional.of(event));
+        when(matchRepository.saveAll(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
 
-        List<Match> results = engine.generateInitialMatches(Objects.requireNonNull(eventId),
-                Objects.requireNonNull(participants));
+        List<Match> results = engine.generateInitialMatches(eventId, participants);
 
         assertNotNull(results);
         assertEquals(2, results.size()); // 4 participants / 2 = 2 matches
-        verify(matchRepository, times(1)).saveAll(java.util.Objects.requireNonNull(anyList()));
+        verify(matchRepository, times(1)).saveAll(anyList());
     }
 
     @Test
     void generateInitialMatches_OddNumber_WithBye() {
         List<Participant> oddParticipants = participants.subList(0, 3); // 3 participants
-        when(eventRepository.findById(Objects.requireNonNull(eventId))).thenReturn(Optional.of(event));
-        when(matchRepository.saveAll(java.util.Objects.requireNonNull(anyList()))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(eventRepository.findById(eventId)).thenReturn(Optional.of(event));
+        when(matchRepository.saveAll(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
 
-        List<Match> results = engine.generateInitialMatches(Objects.requireNonNull(eventId),
-                Objects.requireNonNull(oddParticipants));
+        List<Match> results = engine.generateInitialMatches(eventId, oddParticipants);
 
         assertEquals(2, results.size()); // 1 match + 1 bye match
         long byes = results.stream().filter(m -> m.getParticipantB() == null).count();
