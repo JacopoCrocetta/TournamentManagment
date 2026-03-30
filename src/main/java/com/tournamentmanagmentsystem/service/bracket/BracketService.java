@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -43,9 +44,9 @@ public class BracketService {
     @Transactional
     @NonNull
     public List<Match> generateBracket(@NonNull UUID eventId, @NonNull FormatType formatType) {
-        List<Participant> participants = participantRepository.findByTournamentId(eventId);
+        List<Participant> participants = Objects.requireNonNull(participantRepository.findByTournamentId(eventId));
 
-        List<Match> generatedMatches = dispatchToEngine(eventId, participants, formatType);
+        List<Match> generatedMatches = Objects.requireNonNull(dispatchToEngine(eventId, participants, formatType));
 
         logBracketGeneration(eventId, formatType, generatedMatches.size());
 
@@ -63,8 +64,8 @@ public class BracketService {
     }
 
     private void logBracketGeneration(@NonNull UUID eventId, @NonNull FormatType formatType, int matchCount) {
-        auditService.log("GENERATE_BRACKET", "EVENT", eventId, Map.of(
+        auditService.log("GENERATE_BRACKET", "EVENT", eventId, Objects.requireNonNull(Map.of(
                 "format", formatType,
-                "matchCount", matchCount));
+                "matchCount", matchCount)));
     }
 }

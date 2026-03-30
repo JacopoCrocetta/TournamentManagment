@@ -1,7 +1,6 @@
 package com.tournamentmanagmentsystem.service;
 
 import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
 
 import com.tournamentmanagmentsystem.domain.entity.Match;
 import com.tournamentmanagmentsystem.domain.entity.Participant;
@@ -51,7 +50,8 @@ public class MatchService {
 
         log.info("Match result updated: ID={}, winnerID={}", savedMatch.getId(), request.getWinnerId());
 
-        return Objects.requireNonNull(modelMapper.map(savedMatch, MatchResponse.class), "Mapped response must not be null");
+        return Objects.requireNonNull(modelMapper.map(savedMatch, MatchResponse.class),
+                "Mapped response must not be null");
     }
 
     private void applyResultToMatch(@NonNull Match match, @NonNull MatchResultRequest request) {
@@ -62,9 +62,10 @@ public class MatchService {
 
     private void logResultUpdate(@NonNull Match match, @NonNull MatchResultRequest request) {
         if (match.getId() != null) {
-            auditService.log("UPDATE_RESULT", "MATCH", Objects.requireNonNull(match.getId()), Map.of(
-                    "winnerId", request.getWinnerId() != null ? request.getWinnerId().toString() : "null",
-                    "score", request.getScore() != null ? request.getScore() : Collections.emptyMap()));
+            auditService.log("UPDATE_RESULT", "MATCH", Objects.requireNonNull(match.getId()),
+                    Objects.requireNonNull(Map.of(
+                            "winnerId", request.getWinnerId() != null ? request.getWinnerId().toString() : "null",
+                            "score", request.getScore() != null ? request.getScore() : Collections.emptyMap())));
         }
     }
 
@@ -85,8 +86,10 @@ public class MatchService {
         Participant winner = isAWinner ? participantA : participantB;
         Participant loser = isAWinner ? participantB : participantA;
 
-        standingService.updateStanding(Objects.requireNonNull(match.getEvent()), winner, 3, Map.of("lastWin", Objects.requireNonNull(match.getId())));
-        standingService.updateStanding(Objects.requireNonNull(match.getEvent()), loser, 0, Map.of("lastLoss", Objects.requireNonNull(match.getId())));
+        standingService.updateStanding(Objects.requireNonNull(match.getEvent()), winner, 3,
+                Map.of("lastWin", Objects.requireNonNull(match.getId())));
+        standingService.updateStanding(Objects.requireNonNull(match.getEvent()), loser, 0,
+                Map.of("lastLoss", Objects.requireNonNull(match.getId())));
     }
 
     private void triggerAdvancementLogic(@NonNull Match match) {

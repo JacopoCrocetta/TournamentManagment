@@ -55,8 +55,8 @@ public class OrganizationService {
     public OrganizationResponse createOrganization(@NonNull OrganizationRequest request) {
         validateSlugUniqueness(request.getSlug());
 
-        Organization organization = modelMapper.map(request, Organization.class);
-        organization = organizationRepository.save(organization);
+        Organization organization = Objects.requireNonNull(modelMapper.map(request, Organization.class));
+        organization = Objects.requireNonNull(organizationRepository.save(organization));
 
         User currentUser = getCurrentUser();
         createMembership(currentUser, organization, Role.ORG_ADMIN);
@@ -65,10 +65,10 @@ public class OrganizationService {
                 currentUser.getEmail());
 
         if (organization.getId() != null) {
-            auditService.log("CREATE", "ORGANIZATION", organization.getId(), Map.of("name", organization.getName()));
+            auditService.log("CREATE", "ORGANIZATION", Objects.requireNonNull(organization.getId()), Objects.requireNonNull(Map.of("name", organization.getName())));
         }
 
-        return modelMapper.map(organization, OrganizationResponse.class);
+        return Objects.requireNonNull(modelMapper.map(organization, OrganizationResponse.class));
     }
 
     /**
@@ -83,7 +83,7 @@ public class OrganizationService {
     public OrganizationResponse getOrganization(@NonNull UUID id) {
         Organization organization = organizationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Organization not found: " + id));
-        return modelMapper.map(organization, OrganizationResponse.class);
+        return Objects.requireNonNull(modelMapper.map(organization, OrganizationResponse.class));
     }
 
     /**
@@ -117,13 +117,13 @@ public class OrganizationService {
         organization.setDescription(request.getDescription());
         organization.setSettings(request.getSettings());
 
-        organization = organizationRepository.save(organization);
+        organization = Objects.requireNonNull(organizationRepository.save(organization));
         log.info("Organization updated: ID={}", organization.getId());
         if (organization.getId() != null) {
-            auditService.log("UPDATE", "ORGANIZATION", organization.getId(), Map.of("name", organization.getName()));
+            auditService.log("UPDATE", "ORGANIZATION", Objects.requireNonNull(organization.getId()), Objects.requireNonNull(Map.of("name", organization.getName())));
         }
 
-        return modelMapper.map(organization, OrganizationResponse.class);
+        return Objects.requireNonNull(modelMapper.map(organization, OrganizationResponse.class));
     }
 
     private void validateSlugUniqueness(String slug) {
@@ -135,7 +135,7 @@ public class OrganizationService {
     private User getCurrentUser() {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
-        return userRepository.findById(userDetails.getId())
+        return userRepository.findById(Objects.requireNonNull(userDetails.getId()))
                 .orElseThrow(() -> new BusinessException("Current authenticated user session is invalid"));
     }
 
@@ -145,6 +145,6 @@ public class OrganizationService {
                 .organization(organization)
                 .role(role)
                 .build();
-        membershipRepository.save(membership);
+        membershipRepository.save(Objects.requireNonNull(membership));
     }
 }

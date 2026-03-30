@@ -1,6 +1,8 @@
 package com.tournamentmanagmentsystem.security;
 
 import org.springframework.lang.NonNull;
+import java.util.Objects;
+
 
 import com.tournamentmanagmentsystem.domain.enums.Role;
 import com.tournamentmanagmentsystem.repository.MembershipRepository;
@@ -39,22 +41,25 @@ public class SecurityService {
 
     public boolean hasRoleInTournament(@NonNull UUID tournamentId, @NonNull String roleName) {
         return tournamentRepository.findById(tournamentId)
-                .map(t -> hasRoleInOrganization(t.getOrganization().getId(), roleName))
+                .map(t -> hasRoleInOrganization(Objects.requireNonNull(t.getOrganization().getId()), roleName))
                 .orElse(false);
     }
+
 
     public boolean isTournamentAdminOfEvent(@NonNull UUID eventId) {
         return eventRepository.findById(eventId)
-                .map(e -> hasRoleInTournament(e.getTournament().getId(), "TOURNAMENT_ADMIN"))
+                .map(e -> hasRoleInTournament(Objects.requireNonNull(e.getTournament().getId()), "TOURNAMENT_ADMIN"))
                 .orElse(false);
     }
 
+
     public boolean isRefereeOfMatch(@NonNull UUID matchId) {
         return matchRepository.findById(matchId)
-                .map(m -> hasRoleInTournament(m.getEvent().getTournament().getId(), "REFEREE")
-                        || hasRoleInTournament(m.getEvent().getTournament().getId(), "TOURNAMENT_ADMIN"))
+                .map(m -> hasRoleInTournament(Objects.requireNonNull(m.getEvent().getTournament().getId()), "REFEREE")
+                        || hasRoleInTournament(Objects.requireNonNull(m.getEvent().getTournament().getId()), "TOURNAMENT_ADMIN"))
                 .orElse(false);
     }
+
 
     private boolean isHigherOrEqual(Role userRole, Role requiredRole) {
         if (userRole == Role.SUPER_ADMIN)

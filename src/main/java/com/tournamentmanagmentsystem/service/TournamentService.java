@@ -49,7 +49,7 @@ public class TournamentService {
     @Transactional
     @NonNull
     public TournamentResponse createTournament(@NonNull TournamentRequest request) {
-        Organization organization = organizationRepository.findById(request.getOrganizationId())
+        Organization organization = organizationRepository.findById(Objects.requireNonNull(request.getOrganizationId()))
                 .orElseThrow(
                         () -> new ResourceNotFoundException("Organization not found: " + request.getOrganizationId()));
 
@@ -64,8 +64,8 @@ public class TournamentService {
         Tournament savedTournament = tournamentRepository.save(tournament);
         log.info("Tournament '{}' created in organization {}", savedTournament.getName(), organization.getName());
         if (savedTournament.getId() != null) {
-            auditService.log("CREATE", "TOURNAMENT", savedTournament.getId(),
-                    Map.of("name", savedTournament.getName()));
+            auditService.log("CREATE", "TOURNAMENT", Objects.requireNonNull(savedTournament.getId()),
+                    Objects.requireNonNull(Map.of("name", savedTournament.getName())));
         }
         return Objects.requireNonNull(modelMapper.map(savedTournament, TournamentResponse.class),
                 "Mapped response must not be null");
@@ -96,9 +96,9 @@ public class TournamentService {
     @Transactional(readOnly = true)
     @NonNull
     public List<TournamentResponse> getTournamentsByOrganization(@NonNull UUID organizationId) {
-        return tournamentRepository.findByOrganizationId(organizationId).stream()
+        return Objects.requireNonNull(tournamentRepository.findByOrganizationId(organizationId).stream()
                 .map(tournament -> modelMapper.map(tournament, TournamentResponse.class))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()), "Mapped response list must not be null");
     }
 
     /**
@@ -123,7 +123,8 @@ public class TournamentService {
         log.info("Tournament {} status updated to {}", savedTournament.getId(), newStatus);
 
         if (savedTournament.getId() != null) {
-            auditService.log("UPDATE_STATUS", "TOURNAMENT", savedTournament.getId(), Map.of("newStatus", newStatus));
+            auditService.log("UPDATE_STATUS", "TOURNAMENT", Objects.requireNonNull(savedTournament.getId()),
+                    Objects.requireNonNull(Map.of("newStatus", newStatus)));
         }
         return Objects.requireNonNull(modelMapper.map(savedTournament, TournamentResponse.class),
                 "Mapped response must not be null");

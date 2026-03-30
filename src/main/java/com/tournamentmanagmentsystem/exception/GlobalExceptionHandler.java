@@ -9,6 +9,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.net.URI;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
@@ -33,7 +34,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                                 HttpStatus.BAD_REQUEST,
                                 "Validation failed for one or more fields.");
                 problemDetail.setTitle("Constraint Violation");
-                problemDetail.setType(URI.create("https://api.tournamentmanagement.com/errors/validation-failed"));
+                problemDetail.setType(Objects.requireNonNull(URI.create("https://api.tournamentmanagement.com/errors/validation-failed")));
                 problemDetail.setProperty("errors", errors);
 
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problemDetail);

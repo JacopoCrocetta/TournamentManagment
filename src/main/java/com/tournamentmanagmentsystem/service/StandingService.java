@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -58,7 +59,7 @@ public class StandingService {
     @Transactional(readOnly = true)
     @NonNull
     public List<Standing> getStandings(@NonNull UUID eventId) {
-        return standingRepository.findByEventIdOrderByPointsDesc(eventId);
+        return Objects.requireNonNull(standingRepository.findByEventIdOrderByPointsDesc(eventId));
     }
 
     private Standing createInitialStanding(@NonNull Event event, @NonNull Participant participant) {

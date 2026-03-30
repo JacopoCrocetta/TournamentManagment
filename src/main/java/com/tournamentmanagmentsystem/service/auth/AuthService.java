@@ -52,17 +52,14 @@ public class AuthService {
                         throw new ConflictException("Account with this email already exists");
                 }
 
-                User user = User.builder()
+                User user = Objects.requireNonNull(User.builder()
                                 .displayName(request.getDisplayName())
                                 .email(request.getEmail())
                                 .passwordHash(passwordEncoder.encode(request.getPassword()))
                                 .status(UserStatus.ACTIVE)
-                                .build();
+                                .build(), "User entity must not be null");
 
-                User savedUser = userRepository.save(user);
-                if (savedUser == null) {
-                        throw new ConflictException("Failed to register user");
-                }
+                User savedUser = Objects.requireNonNull(userRepository.save(user), "Saved user must not be null");
                 log.info("New user registered successfully: {}", savedUser.getEmail());
                 return createAuthResponse(savedUser);
         }

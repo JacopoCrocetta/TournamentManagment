@@ -16,6 +16,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -90,5 +92,18 @@ class ParticipantServiceTest {
         org.mockito.ArgumentCaptor<Participant> captor = org.mockito.ArgumentCaptor.forClass(Participant.class);
         verify(participantRepository).save(captor.capture());
         assertEquals(ParticipantStatus.WAITLIST, captor.getValue().getStatus());
+    }
+
+    @Test
+    void getParticipants_Success() {
+        when(participantRepository.findByTournamentId(tournamentId)).thenReturn(List.of(participant));
+        when(modelMapper.map(any(Participant.class), eq(ParticipantResponse.class)))
+                .thenReturn(new ParticipantResponse());
+
+        List<ParticipantResponse> result = participantService.getParticipants(Objects.requireNonNull(tournamentId));
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        verify(participantRepository).findByTournamentId(tournamentId);
     }
 }

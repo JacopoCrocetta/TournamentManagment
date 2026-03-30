@@ -48,29 +48,23 @@ public class ParticipantService {
     @Transactional
     @NonNull
     public ParticipantResponse register(@NonNull ParticipantRequest request) {
-        Tournament tournament = fetchTournament(
-                Objects.requireNonNull(request.getTournamentId(), "Tournament ID must not be null"));
+        Tournament tournament = Objects.requireNonNull(fetchTournament(
+                Objects.requireNonNull(request.getTournamentId(), "Tournament ID must not be null")), "Tournament must not be null");
         ensureRegistrationIsOpen(tournament);
 
         ParticipantStatus enrollmentStatus = determineEnrollmentStatus(tournament);
 
-        Participant participant = Participant.builder()
+        Participant participant = Objects.requireNonNull(Participant.builder()
                 .tournament(tournament)
                 .name(request.getName())
                 .status(enrollmentStatus)
                 .metadata(request.getMetadata())
-                .build();
+                .build(), "Participant must not be null");
 
         associateUserIfExists(participant, request.getUserId());
 
-        Participant savedParticipant = participantRepository.save(participant);
-        if (savedParticipant == null) {
-            throw new BusinessException("Failed to save participant");
-        }
-        ParticipantResponse response = modelMapper.map(savedParticipant, ParticipantResponse.class);
-        if (response == null) {
-            throw new BusinessException("Failed to map participant response");
-        }
+        Participant savedParticipant = Objects.requireNonNull(participantRepository.save(participant), "Saved participant must not be null");
+        ParticipantResponse response = Objects.requireNonNull(modelMapper.map(savedParticipant, ParticipantResponse.class), "Failed to map participant response");
         return response;
     }
 
@@ -83,9 +77,9 @@ public class ParticipantService {
     @Transactional(readOnly = true)
     @NonNull
     public List<ParticipantResponse> getParticipants(@NonNull UUID tournamentId) {
-        return participantRepository.findByTournamentId(tournamentId).stream()
+        return Objects.requireNonNull(participantRepository.findByTournamentId(tournamentId).stream()
                 .map(participant -> modelMapper.map(participant, ParticipantResponse.class))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()), "Participants list must not be null");
     }
 
     private Tournament fetchTournament(@NonNull UUID tournamentId) {
@@ -99,7 +93,7 @@ public class ParticipantService {
         }
     }
 
-    private ParticipantStatus determineEnrollmentStatus(Tournament tournament) {
+    private ParticipantStatus determineEnrollmentStatus(@NonNull Tournament tournament) {
         long currentParticipantCount = participantRepository.countByTournamentId(tournament.getId());
         return (currentParticipantCount < tournament.getMaxParticipants())
                 ? ParticipantStatus.CONFIRMED
