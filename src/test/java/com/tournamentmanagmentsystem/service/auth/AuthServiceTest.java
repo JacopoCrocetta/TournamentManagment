@@ -65,7 +65,7 @@ class AuthServiceTest {
     void register_Success() {
         when(userRepository.existsByEmail(anyString())).thenReturn(false);
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
-        when(userRepository.save(any(User.class))).thenReturn(user);
+        when(userRepository.save(Objects.requireNonNull(any(User.class)))).thenReturn(Objects.requireNonNull(user));
         when(jwtService.generateToken(any())).thenReturn("accessToken");
         when(jwtService.generateRefreshToken(any())).thenReturn("refreshToken");
 
@@ -74,7 +74,7 @@ class AuthServiceTest {
         assertNotNull(response);
         assertEquals("test@example.com", response.getEmail());
         assertEquals("accessToken", response.getAccessToken());
-        verify(userRepository, times(1)).save(any(User.class));
+        verify(userRepository, times(1)).save(Objects.requireNonNull(any(User.class)));
     }
 
     @Test
@@ -82,7 +82,7 @@ class AuthServiceTest {
         when(userRepository.existsByEmail(anyString())).thenReturn(true);
 
         assertThrows(ConflictException.class, () -> authService.register(Objects.requireNonNull(registerRequest)));
-        verify(userRepository, never()).save(any(User.class));
+        verify(userRepository, never()).save(Objects.requireNonNull(any(User.class)));
     }
 
     @Test

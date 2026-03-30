@@ -17,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.Objects;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -45,7 +44,7 @@ public class OrganizationIntegrationTest extends BaseIntegrationTest {
                 "/api/v1/auth/register",
                 registerRequest,
                 AuthResponse.class);
-        
+
         if (!response.getStatusCode().is2xxSuccessful()) {
             throw new RuntimeException("Setup failed to register user: " + response.getStatusCode());
         }

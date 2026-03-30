@@ -44,9 +44,8 @@ public class AuthIntegrationTest extends BaseIntegrationTest {
 
         assertThat(registerResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(registerResponse.getBody()).isNotNull();
-        assertThat(registerResponse.getBody().getEmail()).isEqualTo("it-test@example.com");
-        String token = Objects.requireNonNull(registerResponse.getBody()).getAccessToken();
-        String refreshToken = Objects.requireNonNull(registerResponse.getBody()).getRefreshToken();
+        assertThat(Objects.requireNonNull(registerResponse.getBody()).getEmail())
+                .isEqualTo("it-test@example.com");
 
         // 2. LOGIN
         AuthRequest loginRequest = new AuthRequest("it-test@example.com", "StrongPass123!");
@@ -79,6 +78,7 @@ public class AuthIntegrationTest extends BaseIntegrationTest {
                 AuthResponse.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
-        // Note: AuthService throws ConflictException which maps to 409 via GlobalExceptionHandler.
+        // Note: AuthService throws ConflictException which maps to 409 via
+        // GlobalExceptionHandler.
     }
 }

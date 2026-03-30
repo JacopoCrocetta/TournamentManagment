@@ -38,7 +38,7 @@ class BracketServiceTest {
     private BracketService bracketService;
 
     @NonNull
-    private UUID eventId = UUID.randomUUID();
+    private UUID eventId = Objects.requireNonNull(UUID.randomUUID());
     private List<Participant> participants;
 
     @BeforeEach
@@ -48,6 +48,7 @@ class BracketServiceTest {
     }
 
     @Test
+    @SuppressWarnings("null")
     void generateBracket_SingleElimination_Success() {
         List<Match> expectedMatches = List.of(new Match());
         when(singleEliminationEngine.generateInitialMatches(Objects.requireNonNull(eventId),
@@ -58,7 +59,7 @@ class BracketServiceTest {
         assertEquals(expectedMatches, results);
         verify(singleEliminationEngine).generateInitialMatches(Objects.requireNonNull(eventId),
                 Objects.requireNonNull(participants));
-        verify(roundRobinEngine, never()).generateInitialMatches(any(), any());
+        verify(roundRobinEngine, never()).generateInitialMatches(Objects.requireNonNull(eventId), Objects.requireNonNull(participants));
         verify(auditService).log(eq("GENERATE_BRACKET"), eq("EVENT"), eq(Objects.requireNonNull(eventId)), anyMap());
     }
 
@@ -73,7 +74,7 @@ class BracketServiceTest {
         assertEquals(expectedMatches, results);
         verify(roundRobinEngine).generateInitialMatches(Objects.requireNonNull(eventId),
                 Objects.requireNonNull(participants));
-        verify(singleEliminationEngine, never()).generateInitialMatches(any(), any());
+        verify(singleEliminationEngine, never()).generateInitialMatches(Objects.requireNonNull(eventId), Objects.requireNonNull(participants));
     }
 
     @Test

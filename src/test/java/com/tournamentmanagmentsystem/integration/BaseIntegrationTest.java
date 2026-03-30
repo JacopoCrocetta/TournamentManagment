@@ -21,6 +21,7 @@ import org.springframework.test.annotation.DirtiesContext;
 public abstract class BaseIntegrationTest {
 
     @Container
+    @SuppressWarnings("resource")
     static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine")
             .withDatabaseName("tournament_db_test")
             .withUsername("testuser")

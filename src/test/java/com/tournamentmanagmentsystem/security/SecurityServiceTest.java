@@ -76,8 +76,8 @@ class SecurityServiceTest {
         when(membershipRepository.findByUserIdAndOrganizationId(userId, orgId))
                 .thenReturn(Optional.of(membership));
 
-        assertTrue(securityService.hasRoleInOrganization(orgId, "TOURNAMENT_ADMIN"));
-        assertFalse(securityService.hasRoleInOrganization(orgId, "SUPER_ADMIN"));
+        assertTrue(securityService.hasRoleInOrganization(java.util.Objects.requireNonNull(orgId), "TOURNAMENT_ADMIN"));
+        assertFalse(securityService.hasRoleInOrganization(java.util.Objects.requireNonNull(orgId), "SUPER_ADMIN"));
     }
 
     @Test
@@ -87,7 +87,7 @@ class SecurityServiceTest {
                 .organization(Organization.builder().id(orgId).build())
                 .build();
 
-        when(tournamentRepository.findById(tournamentId)).thenReturn(Optional.of(tournament));
+        when(tournamentRepository.findById(java.util.Objects.requireNonNull(tournamentId))).thenReturn(Optional.of(tournament));
 
         // Mock nested call
         when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -95,6 +95,6 @@ class SecurityServiceTest {
         when(membershipRepository.findByUserIdAndOrganizationId(userId, orgId))
                 .thenReturn(Optional.of(Membership.builder().role(Role.ORG_ADMIN).build()));
 
-        assertTrue(securityService.hasRoleInTournament(tournamentId, "TOURNAMENT_ADMIN"));
+        assertTrue(securityService.hasRoleInTournament(java.util.Objects.requireNonNull(tournamentId), "TOURNAMENT_ADMIN"));
     }
 }

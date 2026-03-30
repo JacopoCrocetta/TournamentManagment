@@ -3,7 +3,6 @@ package com.tournamentmanagmentsystem.service.bracket;
 import com.tournamentmanagmentsystem.domain.entity.Event;
 import com.tournamentmanagmentsystem.domain.entity.Match;
 import com.tournamentmanagmentsystem.domain.entity.Participant;
-import com.tournamentmanagmentsystem.domain.enums.MatchStatus;
 import com.tournamentmanagmentsystem.repository.EventRepository;
 import com.tournamentmanagmentsystem.repository.MatchRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,16 +49,18 @@ class RoundRobinEngineTest {
 
     @Test
     void generateInitialMatches_Success() {
-        when(eventRepository.findById(eventId)).thenReturn(Optional.of(event));
-        when(matchRepository.saveAll(anyList())).thenAnswer(invocation -> invocation.getArgument(0));
+        when(eventRepository.findById(java.util.Objects.requireNonNull(eventId))).thenReturn(Optional.of(event));
+        when(matchRepository.saveAll(java.util.Objects.requireNonNull(anyList())))
+                .thenAnswer(invocation -> invocation.getArgument(0));
 
-        List<Match> results = engine.generateInitialMatches(eventId, participants);
+        List<Match> results = engine.generateInitialMatches(java.util.Objects.requireNonNull(eventId),
+                java.util.Objects.requireNonNull(participants));
 
         assertNotNull(results);
         // For 3 participants, we expect n*(n-1)/2 matches = 3*(2)/2 = 3 matches
         // P1 vs P2, P1 vs P3, P2 vs P3
         assertEquals(3, results.size());
-        verify(matchRepository).saveAll(anyList());
+        verify(matchRepository).saveAll(java.util.Objects.requireNonNull(anyList()));
     }
 
     @Test
