@@ -56,7 +56,8 @@
             </column>
             <column name="timezone" type="varchar(100)"/>
             <column name="locale" type="varchar(10)"/>
-            <column name="default_settings" type="jsonb"/>
+            <column name="description" type="text"/>
+            <column name="settings" type="jsonb"/>
             <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
@@ -106,6 +107,17 @@
             <column name="status" type="varchar(50)">
                 <constraints nullable="false"/>
             </column>
+            <column name="format" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="seeding_policy" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="max_participants" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_date" type="timestamp"/>
+            <column name="end_date" type="timestamp"/>
             <column name="registration_settings" type="jsonb"/>
             <column name="created_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
                 <constraints nullable="false"/>
@@ -145,30 +157,6 @@
             <column name="tournament_id"/>
         </createIndex>
 
-        <!-- Participants -->
-        <createTable tableName="participants">
-            <column name="id" type="uuid">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="event_id" type="uuid">
-                <constraints nullable="false" foreignKeyName="fk_participant_event" references="events(id)"/>
-            </column>
-            <column name="type" type="varchar(50)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="name" type="varchar(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="rating" type="int"/>
-            <column name="metadata" type="jsonb"/>
-            <column name="status" type="varchar(50)">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-        <createIndex tableName="participants" indexName="idx_participant_event">
-            <column name="event_id"/>
-        </createIndex>
-
         <!-- Teams -->
         <createTable tableName="teams">
             <column name="id" type="uuid">
@@ -182,6 +170,40 @@
             </column>
             <column name="captain_id" type="uuid"/>
         </createTable>
+
+        <!-- Participants -->
+        <createTable tableName="participants">
+            <column name="id" type="uuid">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="event_id" type="uuid">
+                <constraints foreignKeyName="fk_participant_event" references="events(id)"/>
+            </column>
+            <column name="tournament_id" type="uuid">
+                <constraints nullable="false" foreignKeyName="fk_participant_tournament" references="tournaments(id)"/>
+            </column>
+            <column name="user_id" type="uuid">
+                <constraints foreignKeyName="fk_participant_user" references="users(id)"/>
+            </column>
+            <column name="team_id" type="uuid">
+                <constraints foreignKeyName="fk_participant_team" references="teams(id)"/>
+            </column>
+            <column name="type" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rating" type="int"/>
+            <column name="seed" type="int"/>
+            <column name="metadata" type="jsonb"/>
+            <column name="status" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createIndex tableName="participants" indexName="idx_participant_event">
+            <column name="event_id"/>
+        </createIndex>
 
         <!-- Venues -->
         <createTable tableName="venues">

@@ -14,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -49,7 +50,7 @@ public class AuditService {
                 .payload(payload)
                 .build();
 
-        auditLogRepository.save(auditLog);
+        auditLogRepository.save(Objects.requireNonNull(auditLog));
         log.info("Audit log saved: {} on {} ID: {}. Triggered by user: {}", action, entityType, entityId, userId);
     }
 

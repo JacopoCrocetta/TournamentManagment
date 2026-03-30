@@ -11,8 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+
+import java.util.Objects;
+
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -41,14 +45,14 @@ public class OrganizationIntegrationTest extends BaseIntegrationTest {
                 "/api/v1/auth/register",
                 registerRequest,
                 AuthResponse.class);
-        token = response.getBody().getAccessToken();
+        token = Objects.requireNonNull(response.getBody()).getAccessToken();
     }
 
     @Test
     @DisplayName("Should create and then retrieve an organization")
     void organizationLifecycle() {
         HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(token);
+        headers.setBearerAuth(Objects.requireNonNull(token));
 
         OrganizationRequest createRequest = OrganizationRequest.builder()
                 .name("Global Esports")
@@ -66,16 +70,16 @@ public class OrganizationIntegrationTest extends BaseIntegrationTest {
 
         assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(createResponse.getBody()).isNotNull();
-        assertThat(createResponse.getBody().getName()).isEqualTo("Global Esports");
+        assertThat(Objects.requireNonNull(createResponse.getBody()).getName()).isEqualTo("Global Esports");
 
         // 2. GET BY ID
         ResponseEntity<OrganizationResponse> getResponse = restTemplate.exchange(
-                "/api/v1/organizations/" + createResponse.getBody().getId(),
-                org.springframework.http.HttpMethod.GET,
+                "/api/v1/organizations/" + Objects.requireNonNull(createResponse.getBody()).getId(),
+                HttpMethod.GET,
                 new HttpEntity<>(headers),
                 OrganizationResponse.class);
 
         assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(getResponse.getBody().getName()).isEqualTo("Global Esports");
+        assertThat(Objects.requireNonNull(getResponse.getBody()).getName()).isEqualTo("Global Esports");
     }
 }

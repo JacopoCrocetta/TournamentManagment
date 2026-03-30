@@ -17,6 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -47,7 +48,7 @@ public class EventController {
     })
     @PreAuthorize("@securityService.hasRoleInTournament(#request.tournamentId, 'TOURNAMENT_ADMIN')")
     public ResponseEntity<EventResponse> create(@Valid @RequestBody EventRequest request) {
-        return ResponseEntity.ok(eventService.createEvent(request));
+        return ResponseEntity.ok(eventService.createEvent(Objects.requireNonNull(request)));
     }
 
     /**
@@ -59,7 +60,7 @@ public class EventController {
     @GetMapping("/tournament/{tournamentId}")
     @Operation(summary = "List events by tournament", description = "Fetches all events configured for the given tournament.")
     public ResponseEntity<List<EventResponse>> getByTournament(@PathVariable UUID tournamentId) {
-        return ResponseEntity.ok(eventService.getEventsByTournament(tournamentId));
+        return ResponseEntity.ok(eventService.getEventsByTournament(Objects.requireNonNull(tournamentId)));
     }
 
     /**
@@ -71,7 +72,7 @@ public class EventController {
     @GetMapping("/{id}")
     @Operation(summary = "Get event by ID", description = "Returns full details including format and status of a specific event.")
     public ResponseEntity<EventResponse> getById(@PathVariable UUID id) {
-        return ResponseEntity.ok(eventService.getEvent(id));
+        return ResponseEntity.ok(eventService.getEvent(Objects.requireNonNull(id)));
     }
 
     /**
@@ -84,6 +85,6 @@ public class EventController {
     @GetMapping("/{id}/standings")
     @Operation(summary = "Get event standings", description = "Returns the live leaderboard for an event, ordered by points. Each entry includes participant info and tie-breaker statistics.")
     public ResponseEntity<List<Standing>> getStandings(@PathVariable UUID id) {
-        return ResponseEntity.ok(standingService.getStandings(id));
+        return ResponseEntity.ok(standingService.getStandings(Objects.requireNonNull(id)));
     }
 }

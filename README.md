@@ -1,6 +1,6 @@
 # Tournament Management System
 
-A robust, enterprise-grade backend for managing sports and gaming tournaments. Built with Spring Boot 3.4, Java 21, and PostgreSQL.
+A robust, enterprise-grade backend for managing sports and gaming tournaments. Built with Spring Boot 3.4, Java 25 (OpenJDK), and PostgreSQL.
 
 ## 🚀 Overview
 
@@ -18,18 +18,18 @@ This system provides a comprehensive API to handle organizations, multi-format t
 - **Application Logging**: Structured logging with SLF4J and Logback, including daily log rotation and colorized console output.
 
 ## 🛠 Tech Stack
-- **Core**: Java 21, Spring Boot 3.4
+- **Core**: Java 25, Spring Boot 3.4
 - **Database**: PostgreSQL (JSONB for dynamic fields)
 - **Migrations**: Liquibase
 - **Mapping**: ModelMapper
 - **Security**: Spring Security + JJWT
 - **API Documentation**: Springdoc OpenAPI
-- **Testing**: JUnit 5, Mockito, Testcontainers
+- **Testing**: JUnit 5, Mockito, Testcontainers (PostgreSQL)
 
 ## 🏁 Getting Started
 
 ### Prerequisites
-- JDK 21
+- JDK 25
 - Docker (for PostgreSQL and Testcontainers)
 - Maven 3.9+
 
@@ -58,14 +58,17 @@ Once the app is running, access the interactive API docs at:
 `http://localhost:8080/swagger-ui.html`
 
 ## 🧪 Testing
-The project includes a comprehensive test suite:
-- **Unit Tests**: Coverage for all service logic and security rules.
-- **Integration Tests**: (In Progress) End-to-end flows using Testcontainers.
+The project includes a comprehensive, stabilized test suite:
+- **Unit Tests**: Full coverage for service logic and security rules.
+- **Integration Tests**: End-to-end flows using Testcontainers (PostgreSQL instance).
 
-Run tests with:
+Run the full suite with:
 ```bash
 mvn clean verify
 ```
+> [!NOTE]
+> The build is optimized for JDK 25. If encountering Byte Buddy or Mockito issues, ensure you are using the latest `pom.xml` settings which include necessary JVM package openings.
+
 
 ## 📖 Developer Guide
 This project follows **Clean Code** principles and **SOLID** design patterns.

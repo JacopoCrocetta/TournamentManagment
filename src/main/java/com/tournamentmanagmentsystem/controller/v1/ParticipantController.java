@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -41,7 +42,7 @@ public class ParticipantController {
             @ApiResponse(responseCode = "400", description = "Registration is closed or tournament is not found", content = @Content)
     })
     public ResponseEntity<ParticipantResponse> register(@Valid @RequestBody ParticipantRequest request) {
-        return ResponseEntity.ok(participantService.register(request));
+        return ResponseEntity.ok(participantService.register(Objects.requireNonNull(request)));
     }
 
     /**
@@ -53,6 +54,6 @@ public class ParticipantController {
     @GetMapping("/tournament/{tournamentId}")
     @Operation(summary = "Get participant list", description = "Returns all registered participants for the specified tournament, including their status (Confirmed/Waitlist).")
     public ResponseEntity<List<ParticipantResponse>> getByTournament(@PathVariable UUID tournamentId) {
-        return ResponseEntity.ok(participantService.getParticipants(tournamentId));
+        return ResponseEntity.ok(participantService.getParticipants(Objects.requireNonNull(tournamentId)));
     }
 }

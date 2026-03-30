@@ -42,8 +42,8 @@ public class MatchService {
         Match match = matchRepository.findById(matchId)
                 .orElseThrow(() -> new ResourceNotFoundException("Match not found: " + matchId));
 
-        applyResultToMatch(match, request);
-        Match savedMatch = matchRepository.save(match);
+        applyResultToMatch(Objects.requireNonNull(match), request);
+        Match savedMatch = Objects.requireNonNull(matchRepository.save(match));
 
         logResultUpdate(savedMatch, request);
         processStandingsUpdate(savedMatch);
@@ -85,8 +85,8 @@ public class MatchService {
         Participant winner = isAWinner ? participantA : participantB;
         Participant loser = isAWinner ? participantB : participantA;
 
-        standingService.updateStanding(match.getEvent(), winner, 3, Map.of("lastWin", match.getId()));
-        standingService.updateStanding(match.getEvent(), loser, 0, Map.of("lastLoss", match.getId()));
+        standingService.updateStanding(Objects.requireNonNull(match.getEvent()), winner, 3, Map.of("lastWin", Objects.requireNonNull(match.getId())));
+        standingService.updateStanding(Objects.requireNonNull(match.getEvent()), loser, 0, Map.of("lastLoss", Objects.requireNonNull(match.getId())));
     }
 
     private void triggerAdvancementLogic(@NonNull Match match) {

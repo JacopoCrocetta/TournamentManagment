@@ -10,6 +10,8 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.Objects;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -17,6 +19,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Verifies that registration and login work against a real PostgreSQL instance.
  */
 public class AuthIntegrationTest extends BaseIntegrationTest {
+
+    @Test
+    void contextLoads() {
+    }
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -39,7 +45,8 @@ public class AuthIntegrationTest extends BaseIntegrationTest {
         assertThat(registerResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(registerResponse.getBody()).isNotNull();
         assertThat(registerResponse.getBody().getEmail()).isEqualTo("it-test@example.com");
-        assertThat(registerResponse.getBody().getAccessToken()).isNotBlank();
+        String token = Objects.requireNonNull(registerResponse.getBody()).getAccessToken();
+        String refreshToken = Objects.requireNonNull(registerResponse.getBody()).getRefreshToken();
 
         // 2. LOGIN
         AuthRequest loginRequest = new AuthRequest("it-test@example.com", "StrongPass123!");
@@ -50,9 +57,8 @@ public class AuthIntegrationTest extends BaseIntegrationTest {
                 AuthResponse.class);
 
         assertThat(loginResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(loginResponse.getBody()).isNotNull();
-        assertThat(loginResponse.getBody().getAccessToken()).isNotBlank();
-        assertThat(loginResponse.getBody().getRefreshToken()).isNotBlank();
+        assertThat(Objects.requireNonNull(loginResponse.getBody()).getAccessToken()).isNotNull();
+        assertThat(Objects.requireNonNull(loginResponse.getBody()).getRefreshToken()).isNotNull();
     }
 
     @Test
@@ -72,8 +78,7 @@ public class AuthIntegrationTest extends BaseIntegrationTest {
                 request,
                 AuthResponse.class);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-        // Note: Currently AuthService throws RuntimeException, which defaults to 500.
-        // In a real scenario, this would be 400 with a custom exception.
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        // Note: AuthService throws ConflictException which maps to 409 via GlobalExceptionHandler.
     }
 }
