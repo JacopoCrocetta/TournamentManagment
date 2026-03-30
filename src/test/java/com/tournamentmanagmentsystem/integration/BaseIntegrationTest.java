@@ -7,6 +7,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.springframework.test.annotation.DirtiesContext;
 
 /**
  * Base class for all integration tests.
@@ -15,16 +16,15 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
+@Testcontainers
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public abstract class BaseIntegrationTest {
-    static final PostgreSQLContainer<?> postgres;
-    
-    static {
-        postgres = new PostgreSQLContainer<>("postgres:16-alpine")
-                .withDatabaseName("tournament_db_test")
-                .withUsername("testuser")
-                .withPassword("testpass");
-        postgres.start();
-    }
+
+    @Container
+    static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine")
+            .withDatabaseName("tournament_db_test")
+            .withUsername("testuser")
+            .withPassword("testpass");
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {

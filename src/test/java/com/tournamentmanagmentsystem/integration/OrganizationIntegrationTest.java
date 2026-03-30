@@ -34,7 +34,7 @@ public class OrganizationIntegrationTest extends BaseIntegrationTest {
     @BeforeEach
     void setup() {
         // Register a user to get a valid token
-        String email = "org-test-" + System.currentTimeMillis() + "@example.com";
+        String email = "org-test-" + java.util.UUID.randomUUID().toString() + "@example.com";
         RegisterRequest registerRequest = RegisterRequest.builder()
                 .email(email)
                 .password("password")
@@ -45,6 +45,10 @@ public class OrganizationIntegrationTest extends BaseIntegrationTest {
                 "/api/v1/auth/register",
                 registerRequest,
                 AuthResponse.class);
+        
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            throw new RuntimeException("Setup failed to register user: " + response.getStatusCode());
+        }
         token = Objects.requireNonNull(response.getBody()).getAccessToken();
     }
 
@@ -56,7 +60,7 @@ public class OrganizationIntegrationTest extends BaseIntegrationTest {
 
         OrganizationRequest createRequest = OrganizationRequest.builder()
                 .name("Global Esports")
-                .slug("global-esports-" + System.currentTimeMillis())
+                .slug("global-esports-" + java.util.UUID.randomUUID().toString().substring(0, 8))
                 .description("Professional org")
                 .build();
 
